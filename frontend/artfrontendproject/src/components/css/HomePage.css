@@ -1,0 +1,52 @@
+.homepage-hero {
+  position: relative;
+  width: 100vw;
+  height: 80vh;
+  background: url('https://images.careerviet.vn/content/images/banner-la-gi-careerviet-3.png') center center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-center {
+  color: #fff;
+  text-align: center;
+  z-index: 2;
+}
+
+.homepage-title {
+  font-size: 2.8rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.homepage-subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 32px;
+  letter-spacing: 1px;
+}
+
+.homepage-btn {
+  background: #fff;
+  color: #222;
+  font-size: 1.1rem;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.homepage-btn:hover {
+  background: #222;
+  color: #fff;
+}
