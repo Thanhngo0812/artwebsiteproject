@@ -9,7 +9,7 @@ import com.ct08team.artbackendproject.mapper.CategoryMapper;
 
 import com.ct08team.artbackendproject.DAO.Catalog.CategoryDAO;
 import com.ct08team.artbackendproject.DTO.CategoryDTO;
-import com.ct08team.artbackendproject.Entity.Category;
+import com.ct08team.artbackendproject.Entity.product.Category;
 
 import jakarta.transaction.Transactional;
 

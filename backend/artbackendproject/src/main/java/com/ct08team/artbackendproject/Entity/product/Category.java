@@ -1,6 +1,8 @@
-package com.ct08team.artbackendproject.Entity;
+package com.ct08team.artbackendproject.Entity.product;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,6 +23,9 @@ public class Category {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> children;
+    
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    private Set<Product> products = new HashSet<>();
 
     public Category() {
         
@@ -67,7 +72,13 @@ public class Category {
         this.children = children;
     }
 
- 
+    public Set<Product> getProducts() {
+        return products;
+    }
+    
+    public void setProducts(Set<Product> products) {
+        this.products = products;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

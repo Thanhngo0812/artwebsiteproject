@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.ct08team.artbackendproject.DTO.CategoryDTO;
-import com.ct08team.artbackendproject.Entity.Category;
+import com.ct08team.artbackendproject.Entity.product.Category;
 
 public class CategoryMapper {
 

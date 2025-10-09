@@ -7,11 +7,12 @@ export default function Header() {
   const [openIndex, setOpenIndex] = useState(null);
 
   useEffect(() => {
-    fetch("/api/v1/categories/parents")
+    fetch("http://localhost:8888/api/v1/categories/parents")
       .then((res) => res.json())
       .then((data) => {
         setCategories(data);
-      });
+      })
+      .catch((error) => console.log(error.message));
   }, []);
 
   const handleCategoryClick = (cat, idx) => {
@@ -21,11 +22,11 @@ export default function Header() {
     }
     setOpenIndex(idx);
     if (cat && cat.id && !children[cat.id]) {
-      fetch(`/api/v1/categories/${cat.id}/children`)
+      fetch(`http://localhost:8888/api/v1/categories/${cat.id}/children`)
         .then((res) => res.json())
         .then((data) => {
           setChildren((prev) => ({ ...prev, [cat.id]: data }));
-        });
+        }).catch((error) => console.log(error));
     }
   };
 

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct08team.artbackendproject.DTO.CategoryDTO;
-import com.ct08team.artbackendproject.Entity.Category;
+import com.ct08team.artbackendproject.Entity.product.Category;
 import com.ct08team.artbackendproject.Service.Catalog.CategoryService;
 
 @RestController

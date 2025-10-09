@@ -3,6 +3,8 @@ import "./css/HomePage.css";
 
 export default function HomePage() {
   return (
+  
+
     <div className="homepage-hero">
       <div className="homepage-overlay">
         <div className="homepage-center">

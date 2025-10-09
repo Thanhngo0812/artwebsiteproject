@@ -1,7 +1,8 @@
 package com.ct08team.artbackendproject.DAO.Catalog;
 
-import com.ct08team.artbackendproject.Entity.Category;
 import org.springframework.stereotype.Repository;
+
+import com.ct08team.artbackendproject.Entity.product.Category;
 
 import java.util.List;
 
