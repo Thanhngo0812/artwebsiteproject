@@ -7,7 +7,7 @@ USE artdbproject;
 
 INSERT INTO categories (name, parent_id) 
 VALUES ('Tranh Trừu Tượng', NULL); 
--- Giả sử ID của "Tranh Trừu Tượng" là 7
+-- Giả sử ID của "Tranh Trừu Tượng" là 1
 
 -- 1. Trừu Tượng Hành động (Action Painting - Jackson Pollock)
 INSERT INTO categories (name, parent_id) 

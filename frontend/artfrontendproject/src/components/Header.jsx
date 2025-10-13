@@ -1,5 +1,6 @@
 import "./css/Header.css";
 import React, { useState, useEffect } from "react";
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   const [categories, setCategories] = useState([]);
@@ -33,34 +34,52 @@ export default function Header() {
   return (
     <header className="header">
       <nav className="nav">
-        <span className="nav-logo" style={{ marginRight: 16 }}>
-          <img
-            src="/logo192.png"
-            alt="Logo"
-            style={{ height: 36, width: "auto" }}
-          />
-        </span>
-        <span className="nav-item shop">Shop</span>
-        {categories.map((cat, idx) => (
-          <div
-            className="nav-item category"
-            key={cat.id}
-            tabIndex={0}
-            onClick={() => handleCategoryClick(cat, idx)}
-            onBlur={() => setOpenIndex(null)}
-          >
-            <span className={openIndex === idx ? "active" : ""}>{cat.name}</span>
-            {openIndex === idx && (
-              <div className="dropdown">
-                {(children[cat.id] || []).map((child) => (
-                  <div className="dropdown-item" key={child.id}>
-                    {child.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+        <div className="nav-left">
+          <span className="nav-logo" style={{ marginRight: 16 }}>
+            <img
+              src="/logo192.png"
+              alt="Logo"
+              style={{ height: 36, width: "auto" }}
+            />
+          </span>
+          <ul className="nav-menu">
+            <li>
+              <a href="/products" className="nav-item shop">Shop</a>
+            </li>
+            {categories.map((cat, idx) => (
+              <li key={cat.id}>
+                <div
+                  className="nav-item category"
+                  tabIndex={0}
+                  onClick={() => handleCategoryClick(cat, idx)}
+                  onBlur={() => setOpenIndex(null)}
+                >
+                  <span className={openIndex === idx ? "active" : ""}>{cat.name}</span>
+                  {openIndex === idx && (
+                    <div className="dropdown">
+                      {(children[cat.id] || []).map((child) => (
+                        <div className="dropdown-item" key={child.id}>
+                          {child.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="nav-right">
+          <button className="icon-button">
+            <img src="/search.png" alt="Search" className="nav-icon" />
+          </button>
+          <Link to="/login" className="icon-button">
+            <img src="/user.png" alt="User" className="nav-icon" />
+          </Link>
+          <button className="icon-button">
+            <img src="/cart.png" alt="Cart" className="nav-icon" />
+          </button>
+        </div>
       </nav>
     </header>
   );
