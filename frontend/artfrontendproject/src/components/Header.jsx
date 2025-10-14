@@ -35,13 +35,13 @@ export default function Header() {
     <header className="header">
       <nav className="nav">
         <div className="nav-left">
-          <span className="nav-logo" style={{ marginRight: 16 }}>
+          <Link to="/" className="nav-logo" style={{ marginRight: 16 }}>
             <img
               src="/logo192.png"
               alt="Logo"
               style={{ height: 36, width: "auto" }}
             />
-          </span>
+          </Link>
           <ul className="nav-menu">
             <li>
               <a href="/products" className="nav-item shop">Shop</a>
@@ -76,9 +76,9 @@ export default function Header() {
           <Link to="/login" className="icon-button">
             <img src="/user.png" alt="User" className="nav-icon" />
           </Link>
-          <button className="icon-button">
+          <Link to="/cart" className="icon-button">
             <img src="/cart.png" alt="Cart" className="nav-icon" />
-          </button>
+          </Link>
         </div>
       </nav>
     </header>
