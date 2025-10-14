@@ -1,0 +1,154 @@
+.cart-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-size: 1.1rem;
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.cart-header h2 {
+  font-size: 2rem;
+  color: #333;
+}
+
+.continue-shopping {
+  color: #666;
+  text-decoration: underline;
+  font-size: 1.1rem;
+}
+
+.cart-labels {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  color: #666;
+  font-size: 1rem;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+}
+
+.item-info {
+  display: flex;
+  gap: 1rem;
+}
+
+.item-info img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.item-details h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.item-details p {
+  margin: 0.25rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.quantity-controls button {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.remove-btn {
+  margin-left: 1rem;
+  border: none !important;
+  color: #999;
+  font-size: 1.2rem;
+}
+
+.item-total {
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+.cart-footer {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.shipping-info {
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.cart-total {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.total-amount {
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
+.checkout-btn {
+  padding: 1rem 3rem;
+  background: #ff6b00;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.checkout-btn:hover {
+  background: #e55d00;
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.cart-empty h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.browse-btn {
+  margin-top: 1rem;
+  padding: 1rem 2.5rem;
+  background: #ff6b00;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.browse-btn:hover {
+  background: #e55d00;
+}
+
+.browse-btn a {
+  color: white;
+  text-decoration: none;
+}

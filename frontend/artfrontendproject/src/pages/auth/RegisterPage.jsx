@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './css/LoginPage.css';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    emailOrUsername: '',
-    password: ''
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,17 +29,27 @@ export default function LoginPage() {
       </Link>
       <div className="auth-box">
         <div className="auth-header">
-          <h2>Login</h2>
-          <p className="welcome-text">Welcome Back!</p>
+          <h2>Register</h2>
+          <p className="welcome-text">Join us today!</p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Username or Email</label>
+            <label>Username</label>
             <input
               type="text"
-              placeholder="Username or Email"
-              value={formData.emailOrUsername}
-              onChange={(e) => setFormData({...formData, emailOrUsername: e.target.value})}
+              placeholder="Username"
+              value={formData.username}
+              onChange={(e) => setFormData({...formData, username: e.target.value})}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
               required
             />
           </div>
@@ -58,13 +71,28 @@ export default function LoginPage() {
               />
             </div>
           </div>
-          <div className="forgot-password">
-            <Link to="/forgot-password">Forgot Password?</Link>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <div className="password-input">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                required
+              />
+              <img
+                src={showConfirmPassword ? "/showpassword.png" : "/hidepassword.png"}
+                alt="toggle password"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
+            </div>
           </div>
-          <button type="submit" className="submit-btn">Login</button>
+          <button type="submit" className="submit-btn">Register</button>
         </form>
         <p className="auth-redirect">
-          Don't have an account? <Link to="/register">Register Now</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>
