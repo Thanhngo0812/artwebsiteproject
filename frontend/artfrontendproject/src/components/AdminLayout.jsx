@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './Header'; 
+ 
 
-const MainLayout = () => {
+const AdminLayout = () => {
   return (
     <>
-      {/* <Header />  */}
+      {/* <Header />  
+      <Sidebar />*/}
       <main>
         <Outlet /> 
       </main>
@@ -15,4 +16,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default AdminLayout;
