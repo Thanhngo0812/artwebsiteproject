@@ -1,17 +1,21 @@
-// src/components/MainLayout.jsx
-
-import React from 'react';
-import { Outlet } from 'react-router-dom';
- 
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Adminheader from "../pages/admin/components/Adminheader";
+import Adminsidebar from "../pages/admin/components/Adminsidebar";
+import "./css/AdminLayout.css";
 
 const AdminLayout = () => {
   return (
     <>
-      {/* <Header />  
-      <Sidebar />*/}
-      <main>
-        <Outlet /> 
-      </main>
+      <div className="admin-container">
+        <Adminsidebar />
+        <div className="header-content-container">
+          <Adminheader />
+          <main className="content-container">
+            <Outlet />
+          </main>
+        </div>
+      </div>
     </>
   );
 };
