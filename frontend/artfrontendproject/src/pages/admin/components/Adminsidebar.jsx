@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../css/Adminsidebar.css";
+import "../css/Adminsidebar.scss";
 import { FaBars, FaChartLine, FaBoxOpen } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
