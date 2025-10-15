@@ -5,33 +5,41 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
-  transition: width 0.3s ease;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  z-index: 20;
+
+  &.close {
+    width: 104px;
+
+    .logo-name {
+      display: none;
+    }
+  }
 }
-.sidebar-container.close {
-  width: 104px;
-}
+
 .sidebar-header {
   display: flex;
   align-items: center;
-  .logo {
+  justify-content: center;
+  padding: 12px 0;
+  border-radius: 10px;
+
+  .icon-chartBar {
+    color: #465fff;
+    font-size: 30px;
+  }
+
+  .logo-name {
+    color: #465fff;
     font-weight: 700;
-    font-size: 25px;
-    color: #2563eb;
-    margin-left: 15px;
-  }
-  .icon-fabars {
-    border: 1px solid #e4e7ec;
-    padding: 5px 10px 0px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-  }
-  .icon-fabars.close {
-    margin: 0 auto;
-  }
-  .icon-fabars:hover {
-    cursor: pointer;
+    font-size: 24px;
+    margin-left: 14px;
+    margin-bottom: 4px;
+    white-space: nowrap;
   }
 }
+
 .sidebar-body {
   margin-top: 50px;
 
@@ -44,20 +52,50 @@
     color: black;
     cursor: pointer;
     border-radius: 10px;
-    transition: 0.1s;
+    transition: background-color 0.2s;
+
+    .icon {
+      font-size: 22px;
+      margin-top: 6px;
+      padding-right: 17px;
+    }
+
+    &:hover {
+      background-color: #f2f4f7;
+    }
+
+    &.active {
+      background-color: #ecf3ff;
+      color: #465fff;
+    }
   }
-  .nav-items .icon {
-    font-size: 25px;
-    margin-top: 6px;
-    padding-right: 17px;
+}
+
+/* Overlay khi sidebar mở trên mobile */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sidebar-container {
+    position: fixed;
+    top: 70px;
+    left: -280px;
+    height: 100vh;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    padding-top: 20px;
   }
-  .nav-items .name {
+
+  .sidebar-container.show-mobile {
+    left: 0;
   }
-  .nav-items:hover {
-    background-color: #f2f4f7;
-  }
-  .nav-items.active {
-    background-color: #ecf3ff;
-    color: #465fff;
+
+  .sidebar-container.close {
+    width: 280px; // luôn full width khi mobile
   }
 }
