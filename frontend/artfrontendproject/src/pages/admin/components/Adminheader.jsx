@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "../css/Adminheader.css";
 import { FaBars, FaTimes } from "react-icons/fa";
 
