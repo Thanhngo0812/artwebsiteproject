@@ -6,6 +6,7 @@ export default function Header() {
   const [categories, setCategories] = useState([]);
   const [children, setChildren] = useState({});
   const [openIndex, setOpenIndex] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:8888/api/v1/categories/parents")
@@ -31,20 +32,31 @@ export default function Header() {
     }
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <header className="header">
       <nav className="nav">
         <div className="nav-left">
-          <Link to="/" className="nav-logo" style={{ marginRight: 16 }}>
+          <Link to="/" className="nav-logo">
             <img
               src="/logo192.png"
               alt="Logo"
               style={{ height: 36, width: "auto" }}
             />
           </Link>
-          <ul className="nav-menu">
+          <button className="hamburger" onClick={toggleMenu}>
+            <span className={isMenuOpen ? "active" : ""}></span>
+            <span className={isMenuOpen ? "active" : ""}></span>
+            <span className={isMenuOpen ? "active" : ""}></span>
+          </button>
+          <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
             <li>
-              <a href="/products" className="nav-item shop">Shop</a>
+              <Link to="/products" className="nav-item shop" onClick={() => setIsMenuOpen(false)}>
+                Shop
+              </Link>
             </li>
             {categories.map((cat, idx) => (
               <li key={cat.id}>
@@ -58,7 +70,7 @@ export default function Header() {
                   {openIndex === idx && (
                     <div className="dropdown">
                       {(children[cat.id] || []).map((child) => (
-                        <div className="dropdown-item" key={child.id}>
+                        <div className="dropdown-item" key={child.id} onClick={() => setIsMenuOpen(false)}>
                           {child.name}
                         </div>
                       ))}
