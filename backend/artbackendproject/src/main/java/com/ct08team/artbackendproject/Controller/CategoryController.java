@@ -1,4 +1,4 @@
-package com.ct08team.artbackendproject.Controller.Catalog;
+package com.ct08team.artbackendproject.Controller;
 
 import java.util.List;
 
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct08team.artbackendproject.DTO.CategoryDTO;
-import com.ct08team.artbackendproject.Entity.product.Category;
 import com.ct08team.artbackendproject.Service.Catalog.CategoryService;
 
 @RestController
@@ -49,7 +48,7 @@ public class CategoryController {
     
  // GET /api/v1/categories/{parentId}/children
     @GetMapping("/{parentId}/children")
-    public ResponseEntity<List<CategoryDTO>> getCategoriesByParent(@PathVariable int parentId) {
+    public ResponseEntity<List<CategoryDTO>> getCategoriesByParent(@PathVariable Long parentId) {
 //        List<CategoryDto> categories = categoryService.findAllCategories();
         // Trả về HTTP 200 OK
 //        return ResponseEntity.ok(categories);

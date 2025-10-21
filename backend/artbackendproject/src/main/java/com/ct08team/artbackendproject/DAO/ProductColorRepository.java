@@ -1,0 +1,13 @@
+package com.ct08team.artbackendproject.DAO;
+import com.ct08team.artbackendproject.Entity.product.*;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ProductColorRepository extends JpaRepository<ProductColor, ProductColorId> {
+    List<ProductColor> findByProduct(Product product);
+    List<ProductColor> findByProductId(Long productId);
+}
