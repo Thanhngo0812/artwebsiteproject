@@ -2,7 +2,7 @@
   position: relative;
   width: 100vw;
   height: 80vh;
-  background: url('https://images.careerviet.vn/content/images/banner-la-gi-careerviet-3.png') center center/cover no-repeat;
+  background: url( '/public/bigbackground.jpg') center center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;

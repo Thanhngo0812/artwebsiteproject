@@ -42,7 +42,7 @@ export default function Header() {
         <div className="nav-left">
           <Link to="/" className="nav-logo">
             <img
-              src="/logo192.png"
+              src="/logo.png"
               alt="Logo"
               style={{ height: 36, width: "auto" }}
             />

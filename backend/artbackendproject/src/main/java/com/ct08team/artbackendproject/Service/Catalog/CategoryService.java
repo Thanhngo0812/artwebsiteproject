@@ -1,13 +1,15 @@
 package com.ct08team.artbackendproject.Service.Catalog;
 
+import com.ct08team.artbackendproject.DTO.CategoryDTO;
 import java.util.List;
 
-import com.ct08team.artbackendproject.DTO.CategoryDTO;
-
 public interface CategoryService {
-	public List<CategoryDTO> getAllCategories();
-	public List<CategoryDTO> getCategoriesParent();
-	public List<CategoryDTO> getAllCategoriesByParent(int parentId);
 
+    List<CategoryDTO> getAllCategories();
+
+    List<CategoryDTO> getCategoriesParent();
+
+    // Thay đổi duy nhất: int -> Long để đồng bộ với kiểu ID của Entity
+    List<CategoryDTO> getAllCategoriesByParent(Long parentId);
 
 }

@@ -20,7 +20,7 @@ export default function RegisterPage() {
   return (
     <div className="auth-container"
     style={{
-        backgroundImage: `url(${process.env.PUBLIC_URL}/background.png)`,
+        backgroundImage: `url(${process.env.PUBLIC_URL}/background.jpg)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}>
