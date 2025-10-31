@@ -113,15 +113,11 @@ export default function Header() {
 
         <div className="nav-center">
           <ul className="nav-menu">
-            {Array(9)
-              .fill(0)
-              .map((_, i) => (
-                <li key={i}>
-                  <a href="/products" className="nav-item shop">
-                    Shop
-                  </a>
-                </li>
-              ))}
+            <li>
+              <a href="/products" className="nav-item shop">
+                Shop
+              </a>
+            </li>
 
             {categories.map((cat, idx) => (
               <li key={cat.id}>
