@@ -1,0 +1,55 @@
+.productUser-container {
+  background-color: #f2f2f2;
+  height: 100vh;
+  .productUser-title {
+    font-weight: 700;
+    font-size: 35px;
+    text-align: center;
+    padding: 50px 0;
+  }
+  .productUser-content {
+    display: flex;
+  }
+  .productUser-filter {
+    width: 250px;
+    min-width: 250px;
+    margin-right: 20px;
+    margin-left: 5rem;
+
+    .productUser-filter-title {
+      margin-bottom: 30px;
+    }
+    .productUser-filter-content {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      .filter-item {
+        .filter-item_name {
+          margin-bottom: 15px;
+          cursor: pointer;
+          & span {
+            font-weight: bold;
+          }
+        }
+        .filter-item_content {
+          display: flex;
+          flex-direction: column;
+          &.close {
+            display: none;
+          }
+          .input-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+          }
+          & label {
+            cursor: pointer;
+          }
+          & span {
+            margin-bottom: 5px;
+          }
+        }
+      }
+    }
+  }
+}
