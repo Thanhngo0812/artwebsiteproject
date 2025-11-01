@@ -3,6 +3,7 @@ import "./css/ProductUser.scss";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
+import { useSearchParams } from "react-router-dom";
 
 export default function ProductUser() {
   const priceContentRef = useRef(null);
@@ -13,8 +14,6 @@ export default function ProductUser() {
     style: true,
   });
 
-  // viết api trả về kết quả như thế này để hiển thị danh sách filter
-  // const [arrayFilters, setArrayFilters] = useState([]);
   const arrayFilter = [
     {
       id: 1,
@@ -81,6 +80,21 @@ export default function ProductUser() {
     });
   };
 
+  const [searchParams] = useSearchParams();
+  const categoryName = searchParams.get("category");
+  const [filterKey, setFilterKey] = useState(0);
+
+  useEffect(() => {
+    setFilters({
+      price: [],
+      style: [],
+    });
+
+    setFilterKey((prevKey) => prevKey + 1);
+
+    // setCurrentPage(0);
+  }, [categoryName]);
+
   useEffect(() => {
     console.log("check filter =>>>>>", filters);
   }, [filters]);
@@ -96,35 +110,32 @@ export default function ProductUser() {
         const params = {
           page: currentPage,
           size: pageSize,
+          categoryName: categoryName || "all",
           ...(filters.price && { price: filters.price }),
           ...(filters.style && { style: filters.style }),
         };
 
-        // const params = {
-        //   page: currentPage,
-        //   size: pageSize,
-        //   ...(filters.price.length > 0 && { price: filters.price.join(",") }),
-        //   ...(filters.style.length > 0 && { style: filters.style.join(",") }),
-        // };
-        
-        // gọi api truyền params vào
+        // ... (gọi api truyền params vào)
         // const response = await axios.get("link lấy sản phẩm", { params });
         // setProducts(response.data.content);
         // setTotalPages(response.data.totalPages);
+        console.log("check params ====>>>> ", params);
       } catch (error) {
         console.error("lỗi khi lọc sản phẩm: ", error);
       }
     };
     fetchProducts();
-  }, [filters, currentPage, pageSize]);
+  }, [filters, currentPage, pageSize, categoryName]);
 
   return (
     <div className="productUser-container">
-      <div className="productUser-title">Tất Cả Sản Phẩm</div>
+      <div className="productUser-title">
+        {categoryName || "Tất Cả Sản Phẩm"}
+      </div>
       <div className="productUser-content">
         <div className="productUser-filter">
           <div className="productUser-filter-title">Filters</div>
-          <div className="productUser-filter-content">
+          <div className="productUser-filter-content" key={filterKey}>
             {arrayFilter &&
               arrayFilter.length > 0 &&
               arrayFilter.map((item) => {
@@ -179,6 +190,9 @@ export default function ProductUser() {
                                     e.target.checked
                                   )
                                 }
+                                checked={filters[item.key].includes(
+                                  itemValue.trim()
+                                )}
                               />{" "}
                               {item.key === "price"
                                 ? formatFilterValue(itemValue.trim())

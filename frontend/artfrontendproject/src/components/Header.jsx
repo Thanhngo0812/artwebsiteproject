@@ -2,35 +2,49 @@ import "./css/Header.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import axios from "axios"; // Đảm bảo bạn đã cài đặt axios
 
 export default function Header() {
   const [categories, setCategories] = useState([]);
-  const [children, setChildren] = useState({});
-  const [openIndex, setOpenIndex] = useState(null);
+  const [childrenMap, setChildrenMap] = useState({});
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeParentId, setActiveParentId] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8888/api/v1/categories/parents")
-      .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch((error) => console.log(error.message));
-  }, []);
+    const fetchCategoriesAndChildren = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:8888/api/v1/categories/parents"
+        );
+        const parentsData = await res.json();
+        setCategories(parentsData);
 
-  const handleCategoryClick = (cat, idx) => {
-    if (openIndex === idx) {
-      setOpenIndex(null);
-      return;
-    }
-    setOpenIndex(idx);
-    if (cat && cat.id && !children[cat.id]) {
-      fetch(`http://localhost:8888/api/v1/categories/${cat.id}/children`)
-        .then((res) => res.json())
-        .then((data) => {
-          setChildren((prev) => ({ ...prev, [cat.id]: data }));
-        })
-        .catch((error) => console.log(error));
-    }
-  };
+        const newChildrenMap = {};
+        const fetchChildrenPromises = parentsData.map(async (parent) => {
+          try {
+            const response = await axios.get(
+              `http://localhost:8888/api/v1/categories/${parent.id}/children`
+            );
+            if (response.data && response.data.length > 0) {
+              newChildrenMap[parent.id] = response.data;
+            }
+          } catch (error) {
+            console.log(
+              `Error fetching children for ${parent.id}:`,
+              error.message
+            );
+          }
+        });
+
+        await Promise.all(fetchChildrenPromises);
+        setChildrenMap(newChildrenMap);
+      } catch (error) {
+        console.log("Error fetching parent categories:", error.message);
+      }
+    };
+
+    fetchCategoriesAndChildren();
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -47,43 +61,67 @@ export default function Header() {
     navigateLogin("/login");
   };
 
+  const navigateShop = useNavigate();
+  const handleToShop = () => {
+    setActiveParentId(null);
+    navigateShop("/products");
+    setMenuOpen(false);
+  };
+
+  const handleCategoryChildOpen = () => {
+    setActiveParentId(null);
+  };
+
+  const navigateCategoryParent = useNavigate();
+  const handleParentClick = (parentId, parentName) => {
+    if (childrenMap[parentId] && childrenMap[parentId].length > 0) {
+      setActiveParentId(activeParentId === parentId ? null : parentId);
+    } else {
+      setActiveParentId(null);
+      navigateCategoryParent(`/products?category=${parentName}`);
+      setMenuOpen(false);
+    }
+  };
+
   return (
     <header className="header">
       <div className={`nav-sidebar ${menuOpen ? "active" : ""}`}>
         <ul className="nav-sidebar-menu">
-          {Array(30)
-            .fill(0)
-            .map((_, i) => (
-              <li key={i}>
-                <a href="/products" className="nav-sidebar-item">
-                  Shop
-                </a>
-              </li>
-            ))}
+          <li onClick={handleToShop}>
+            <div className="nav-sidebar-item shop">Shop</div>
+          </li>
 
-          {categories.map((cat, idx) => (
-            <li key={cat.id}>
-              <div
-                className="nav-sidebar-item-category"
-                tabIndex={0}
-                onClick={() => handleCategoryClick(cat, idx)}
-                onBlur={() => setOpenIndex(null)}
-              >
-                <span className={openIndex === idx ? "active" : ""}>
-                  {cat.name}
-                </span>
-                {openIndex === idx && (
-                  <div className="dropdown">
-                    {(children[cat.id] || []).map((child) => (
-                      <div className="dropdown-item" key={child.id}>
-                        {child.name}
-                      </div>
+          {categories.map((item) => {
+            const hasChildren =
+              childrenMap[item.id] && childrenMap[item.id].length > 0;
+
+            return (
+              <li key={item.id}>
+                <div
+                  className="nav-sidebar-item category"
+                  onClick={() => handleParentClick(item.id, item.name)}
+                >
+                  <span>{item.name}</span> {hasChildren && <span>&#9660;</span>}
+                </div>
+
+                {activeParentId === item.id && hasChildren && (
+                  <ul className="nav-sidebar-children-menu">
+                    {childrenMap[item.id].map((child) => (
+                      <li key={child.id}>
+                        <Link
+                          to={`/products?category=${child.name}`}
+                          className="nav-sidebar-child-item"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          {child.name}
+                        </Link>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 )}
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
 
         <div className="footer-sidebar">
@@ -114,34 +152,46 @@ export default function Header() {
         <div className="nav-center">
           <ul className="nav-menu">
             <li>
-              <a href="/products" className="nav-item shop">
+              <Link
+                to="/products"
+                className="nav-item shop"
+                onClick={handleCategoryChildOpen}
+              >
                 Shop
-              </a>
+              </Link>
             </li>
 
-            {categories.map((cat, idx) => (
-              <li key={cat.id}>
-                <div
-                  className="nav-item category"
-                  tabIndex={0}
-                  onClick={() => handleCategoryClick(cat, idx)}
-                  onBlur={() => setOpenIndex(null)}
-                >
-                  <span className={openIndex === idx ? "active" : ""}>
-                    {cat.name}
-                  </span>
-                  {openIndex === idx && (
-                    <div className="dropdown">
-                      {(children[cat.id] || []).map((child) => (
-                        <div className="dropdown-item" key={child.id}>
-                          {child.name}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
+            {categories.map((item) => {
+              const hasChildren =
+                childrenMap[item.id] && childrenMap[item.id].length > 0;
+
+              return (
+                <li key={item.id}>
+                  <div
+                    className="nav-item category"
+                    onClick={() => handleParentClick(item.id, item.name)}
+                  >
+                    <span>{item.name}</span>{" "}
+                    {hasChildren && <span>&#9660;</span>}
+                    {activeParentId === item.id && hasChildren && (
+                      <ul className="nav-item-children-menu">
+                        {childrenMap[item.id].map((child) => (
+                          <li key={child.id}>
+                            <Link
+                              to={`/products?category=${child.name}`}
+                              className="nav-item-child-item"
+                              onClick={() => setMenuOpen(false)}
+                            >
+                              {child.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
