@@ -7,6 +7,7 @@ import LoginPage from "./pages/auth/LoginPage";
 // trang admin
 import AdminLayout from "./components/AdminLayout";
 import Product from "./pages/admin/Product";
+import ProductUser from "./components/ProductUser";
 import Dashboard from "./pages/admin/Dashboard";
 import RegisterPage from "./pages/auth/RegisterPage";
 
@@ -25,6 +26,7 @@ function App() {
             {/* nên sử dụng index thay cho path="" */}
             <Route index element={<HomePage />} />
             <Route path="cart" element={<Cart />} />
+            <Route path="products" element={<ProductUser />} />
           </Route>
           {/*trang đăng nhập/ đăng kí*/}
           <Route path="/login" element={<LoginPage />} />
