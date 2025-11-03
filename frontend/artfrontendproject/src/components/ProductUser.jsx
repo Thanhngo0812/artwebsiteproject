@@ -89,7 +89,13 @@ export default function ProductUser() {
           foundCategory = parent.children?.find(
             (child) => child.name === categoryNameFromUrl
           );
-          if (foundCategory) break;
+          if (foundCategory) {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete("category");
+
+            setSearchParams(newParams);
+            break;
+          }
         }
       }
 
@@ -112,10 +118,21 @@ export default function ProductUser() {
               topics: [],
             };
           });
+
+          const newParams = new URLSearchParams(searchParams);
+          newParams.delete("category");
+
+          setSearchParams(newParams);
         }
       }
     }
-  }, [categoryNameFromUrl, filters.categories, listFilters.categories]);
+  }, [
+    categoryNameFromUrl,
+    filters.categories,
+    listFilters.categories,
+    searchParams,
+    setSearchParams,
+  ]);
 
   const handleArrayFilterChange = (key, value) => {
     setFilters((prev) => {
