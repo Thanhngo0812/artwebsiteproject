@@ -86,34 +86,34 @@ export default function Product() {
     //call api get dữ liệu cua combobox
   }, []);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const params = {
-          page: currentPage,
-          size: pageSize,
-          ...(filters.id && { id: filters.id }),
-          ...(filters.name && { name: filters.name }),
-          ...(filters.material && { material: filters.material }),
-          ...(filters.type && { type: filters.type }),
-          ...(filters.dimension && { dimension: filters.dimension }),
-          ...(filters.status && { status: filters.status }),
-          ...(filters.minPrice && { minPrice: filters.minPrice }),
-          ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
-          ...(filters.status && { status: filters.status }),
-          // Axios đủ thông minh để chuyển nó thành: ...&colors=val1&colors=val2
-          color: filters.color,
-        };
-        // gọi api truyền params vào
-      } catch (error) {
-        console.error("lỗi khi lọc sản phẩm: ", error);
-      }
-    };
-    fetchProducts();
-  }, [filters, currentPage, pageSize]);
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const params = {
+            page: currentPage,
+            size: pageSize,
+            ...(filters.id && { id: filters.id }),
+            ...(filters.name && { name: filters.name }),
+            ...(filters.material && { material: filters.material }),
+            ...(filters.type && { type: filters.type }),
+            ...(filters.dimension && { dimension: filters.dimension }),
+            ...(filters.status && { status: filters.status }),
+            ...(filters.minPrice && { minPrice: filters.minPrice }),
+            ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
+            ...(filters.status && { status: filters.status }),
+            // Axios đủ thông minh để chuyển nó thành: ...&colors=val1&colors=val2
+            color: filters.color,
+          };
+          // gọi api truyền params vào
+        } catch (error) {
+          console.error("lỗi khi lọc sản phẩm: ", error);
+        }
+      };
+      fetchProducts();
+    }, [filters, currentPage, pageSize]);
 
   return (
     <div className="product-container">
@@ -121,7 +121,7 @@ export default function Product() {
         <div className="filters-title" onClick={handleCloseFilter}>
           FILTERS{" "}
           <span>
-            {openFilter ? (
+            {!openFilter ? (
               <FaChevronDown className="open-close-icon" />
             ) : (
               <FaChevronUp className="open-close-icon" />
@@ -216,7 +216,7 @@ export default function Product() {
             <div className="color-item_title" onClick={handleOpenCloseTable}>
               MÀU SẮC{" "}
               <span>
-                {closeTableColor ? (
+                {!closeTableColor ? (
                   <FaChevronUp className="open-close-icon" />
                 ) : (
                   <FaChevronDown className="open-close-icon" />

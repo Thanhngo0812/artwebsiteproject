@@ -1,6 +1,8 @@
 package com.ct08team.artbackendproject.Entity.product;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +34,10 @@ public class Product {
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductColor> colors = new ArrayList<>();
-    
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ProductTopic> topics = new ArrayList<>();
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "product_categories",
@@ -46,18 +51,29 @@ public class Product {
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImage> images = new ArrayList<>();
-    
+
+    @Column(name = "min_price")
+    private BigDecimal minPrice;
+
+    @Column(name = "sales_count")
+    private Long salesCount;
+
+    @Column(name = "view_count")
+    private Long viewCount;
     public Product() {
     }
     
     public Product(Long id, String productName, Material material, String description, 
-                   String thumbnail, Integer productStatus) {
+                   String thumbnail, Integer productStatus, BigDecimal minPrice, Long salesCount, Long viewCount) {
         this.id = id;
         this.productName = productName;
         this.material = material;
         this.description = description;
         this.thumbnail = thumbnail;
         this.productStatus = productStatus;
+        this.minPrice = minPrice;
+        this.salesCount = salesCount;
+        this.viewCount = viewCount;
     }
     
     // Getters and Setters
@@ -116,6 +132,14 @@ public class Product {
     public void setColors(List<ProductColor> colors) {
         this.colors = colors;
     }
+
+    public List<ProductTopic> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(List<ProductTopic> topics) {
+        this.topics= topics;
+    }
     
     public Set<Category> getCategories() {
         return categories;
@@ -140,7 +164,31 @@ public class Product {
     public void setImages(List<ProductImage> images) {
         this.images = images;
     }
-    
+
+    public BigDecimal getMinPrice() {
+        return minPrice;
+    }
+
+    public void setMinPrice(BigDecimal minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public Long getSalesCount() {
+        return salesCount;
+    }
+
+    public void setSalesCount(Long salesCount) {
+        this.salesCount = salesCount;
+    }
+
+    public Long getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
     // Helper methods
     public void addColor(ProductColor color) {
         colors.add(color);
