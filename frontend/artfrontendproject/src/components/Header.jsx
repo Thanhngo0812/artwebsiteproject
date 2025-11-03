@@ -2,7 +2,7 @@ import "./css/Header.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import axios from "axios"; // Đảm bảo bạn đã cài đặt axios
+import axios from "axios";
 
 export default function Header() {
   const [categories, setCategories] = useState([]);
@@ -64,12 +64,16 @@ export default function Header() {
   const navigateShop = useNavigate();
   const handleToShop = () => {
     setActiveParentId(null);
-    navigateShop("/products");
+    const unique = Date.now(); // hoặc Math.random()
+    navigateShop(`/products?reset=true&_=${unique}`);
     setMenuOpen(false);
   };
 
   const handleCategoryChildOpen = () => {
+    const unique = Date.now();
     setActiveParentId(null);
+    setMenuOpen(false);
+    window.location.href = `/products?reset=true&_=${unique}`;
   };
 
   const navigateCategoryParent = useNavigate();
@@ -153,7 +157,7 @@ export default function Header() {
           <ul className="nav-menu">
             <li>
               <Link
-                to="/products"
+                to="#"
                 className="nav-item shop"
                 onClick={handleCategoryChildOpen}
               >
