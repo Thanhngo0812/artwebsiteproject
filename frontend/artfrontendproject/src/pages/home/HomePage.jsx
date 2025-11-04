@@ -2,6 +2,8 @@ import React from "react";
 import "./css/HomePage.css";
 
 export default function HomePage() {
+  //localStorage.setItem('user', 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoibmdvY29uZ3RoYW5oc2cwODEyIiwiaWF0IjoxNzYxOTg5MzgwLCJleHAiOjE3NjIwMTkzODB9.afj1NTGiTzjppFH9jsVr1iDOy04ZLDe4RBsv9r_j7EI');
+
   return (
   
 
