@@ -1,14 +1,16 @@
 import "./css/Header.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
 export default function Header() {
   const [categories, setCategories] = useState([]);
-  const [children, setChildren] = useState({});
-  const [openIndex, setOpenIndex] = useState(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [childrenMap, setChildrenMap] = useState({});
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeParentId, setActiveParentId] = useState(null);
+  const [activeSidebarParentId, setActiveSidebarParentId] = useState(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchCategoriesAndChildren = async () => {
@@ -50,20 +52,34 @@ export default function Header() {
     const handleResize = () => {
       if (window.innerWidth >= 990) {
         setMenuOpen(false);
+        setActiveSidebarParentId(null);
       }
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setActiveParentId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const navigateLogin = useNavigate();
   const handleNavigateLogin = () => {
     navigateLogin("/login");
+    setMenuOpen(false);
   };
 
   const navigateShop = useNavigate();
   const handleToShop = () => {
     setActiveParentId(null);
+    setActiveSidebarParentId(null);
     navigateShop("/products");
     setMenuOpen(false);
   };
@@ -73,18 +89,34 @@ export default function Header() {
   };
 
   const navigateCategoryParent = useNavigate();
+  
   const handleParentClick = (parentId, parentName) => {
-    if (childrenMap[parentId] && childrenMap[parentId].length > 0) {
+    const hasChildren = childrenMap[parentId] && childrenMap[parentId].length > 0;
+    
+    if (hasChildren) {
       setActiveParentId(activeParentId === parentId ? null : parentId);
     } else {
       setActiveParentId(null);
+      navigateCategoryParent(`/products?category=${parentName}`);
+    }
+  };
+
+  const handleSidebarParentClick = (parentId, parentName) => {
+    const hasChildren = childrenMap[parentId] && childrenMap[parentId].length > 0;
+    
+    if (hasChildren) {
+      setActiveSidebarParentId(activeSidebarParentId === parentId ? null : parentId);
+    } else {
+      setActiveSidebarParentId(null);
       navigateCategoryParent(`/products?category=${parentName}`);
       setMenuOpen(false);
     }
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const handleChildClick = () => {
+    setActiveParentId(null);
+    setActiveSidebarParentId(null);
+    setMenuOpen(false);
   };
 
   return (
@@ -103,19 +135,24 @@ export default function Header() {
               <li key={item.id}>
                 <div
                   className="nav-sidebar-item category"
-                  onClick={() => handleParentClick(item.id, item.name)}
+                  onClick={() => handleSidebarParentClick(item.id, item.name)}
                 >
-                  <span>{item.name}</span> {hasChildren && <span>&#9660;</span>}
+                  <span>{item.name}</span> 
+                  {hasChildren && (
+                    <span className={`arrow ${activeSidebarParentId === item.id ? 'active' : ''}`}>
+                      &#9660;
+                    </span>
+                  )}
                 </div>
 
-                {activeParentId === item.id && hasChildren && (
+                {activeSidebarParentId === item.id && hasChildren && (
                   <ul className="nav-sidebar-children-menu">
                     {childrenMap[item.id].map((child) => (
                       <li key={child.id}>
                         <Link
                           to={`/products?category=${child.name}`}
                           className="nav-sidebar-child-item"
-                          onClick={() => setMenuOpen(false)}
+                          onClick={handleChildClick}
                         >
                           {child.name}
                         </Link>
@@ -133,51 +170,73 @@ export default function Header() {
             <img src="/user.png" alt="User" className="nav-sidebar-icon" />
             <span>Đăng Nhập</span>
           </div>
-          <div> icon: facebook, youtube,...</div>
         </div>
       </div>
 
       <nav className="nav">
-        <div className="nav-left">
-          <Link to="/" className="nav-logo">
-            <img
-              src="/logo.png"
-              alt="Logo"
-              style={{ height: 36, width: "auto" }}
-            />
+        <button
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className="nav-logo">
+          <Link to="/" style={{ display: "flex", alignItems: "center" }} onClick={() => setMenuOpen(false)}>
+            <img src="/logo.png" alt="Logo" />
           </Link>
-          <button className="hamburger" onClick={toggleMenu}>
-            <span className={isMenuOpen ? "active" : ""}></span>
-            <span className={isMenuOpen ? "active" : ""}></span>
-            <span className={isMenuOpen ? "active" : ""}></span>
-          </button>
-          <ul className={`nav-menu ${isMenuOpen ? "active" : ""}`}>
+        </div>
+
+        <div className="nav-center">
+          <ul className="nav-menu" ref={dropdownRef}>
             <li>
-              <Link to="/products" className="nav-item shop" onClick={() => setIsMenuOpen(false)}>
+              <Link
+                to="/products"
+                className="nav-item shop"
+                onClick={handleCategoryChildOpen}
+              >
                 Shop
               </Link>
             </li>
-            {categories.map((cat, idx) => (
-              <li key={cat.id}>
-                <div
-                  className="nav-item category"
-                  tabIndex={0}
-                  onClick={() => handleCategoryClick(cat, idx)}
-                  onBlur={() => setOpenIndex(null)}
-                >
-                  <span className={openIndex === idx ? "active" : ""}>{cat.name}</span>
-                  {openIndex === idx && (
-                    <div className="dropdown">
-                      {(children[cat.id] || []).map((child) => (
-                        <div className="dropdown-item" key={child.id} onClick={() => setIsMenuOpen(false)}>
-                          {child.name}
-                        </div>
+
+            {categories.map((item) => {
+              const hasChildren =
+                childrenMap[item.id] && childrenMap[item.id].length > 0;
+
+              return (
+                <li key={item.id} className="nav-menu-item">
+                  <div
+                    className="nav-item category"
+                    onClick={() => handleParentClick(item.id, item.name)}
+                  >
+                    <span>{item.name}</span>
+                    {hasChildren && (
+                      <span className={`arrow ${activeParentId === item.id ? 'active' : ''}`}>
+                        &#9660;
+                      </span>
+                    )}
+                  </div>
+                  
+                  {activeParentId === item.id && hasChildren && (
+                    <ul className="nav-item-children-menu">
+                      {childrenMap[item.id].map((child) => (
+                        <li key={child.id}>
+                          <Link
+                            to={`/products?category=${child.name}`}
+                            className="nav-item-child-item"
+                            onClick={handleChildClick}
+                          >
+                            {child.name}
+                          </Link>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   )}
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
 

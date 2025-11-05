@@ -1,8 +1,14 @@
+.homepage {
+  min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 .homepage-hero {
   position: relative;
   width: 100vw;
   height: 80vh;
-  background: url( '/public/bigbackground.jpg') center center/cover no-repeat;
+  background: url('/public/bigbackground.jpg') center center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,8 +16,11 @@
 
 .homepage-overlay {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.35);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,7 +55,55 @@
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
+
 .homepage-btn:hover {
   background: #222;
   color: #fff;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #222;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  font-size: 18px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .homepage-hero {
+    height: 60vh;
+  }
+
+  .homepage-title {
+    font-size: 2rem;
+  }
+
+  .homepage-subtitle {
+    font-size: 1rem;
+  }
+
+  .homepage-btn {
+    font-size: 1rem;
+    padding: 12px 24px;
+  }
 }

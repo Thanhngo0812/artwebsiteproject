@@ -1,0 +1,122 @@
+.product-section {
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+
+.product-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #222;
+}
+
+.product-section-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+}
+
+.product-section-view-all {
+  font-size: 16px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-weight: 500;
+}
+
+.product-section-view-all:hover {
+  color: #222;
+}
+
+.product-section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.product-section-grid.scrollable {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 24px;
+  padding-bottom: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.product-section-grid.scrollable::-webkit-scrollbar {
+  height: 8px;
+}
+
+.product-section-grid.scrollable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.product-section-grid.scrollable::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.product-section-grid.scrollable::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.product-section-grid.scrollable .product-card {
+  min-width: 280px;
+  flex-shrink: 0;
+}
+
+.product-section-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.product-section-btn {
+  display: inline-block;
+  padding: 12px 48px;
+  background: #222;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.product-section-btn:hover {
+  background: #444;
+}
+
+@media (max-width: 768px) {
+  .product-section {
+    margin: 40px auto;
+  }
+
+  .product-section-header {
+    margin-bottom: 24px;
+  }
+
+  .product-section-title {
+    font-size: 24px;
+  }
+
+  .product-section-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .product-section-grid.scrollable .product-card {
+    min-width: 200px;
+  }
+
+  .product-section-btn {
+    padding: 10px 32px;
+    font-size: 14px;
+  }
+}
