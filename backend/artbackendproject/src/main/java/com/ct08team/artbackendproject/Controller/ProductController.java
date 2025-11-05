@@ -5,6 +5,7 @@ import com.ct08team.artbackendproject.DTO.ProductListDTO;
 import com.ct08team.artbackendproject.Service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,11 +13,17 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.ct08team.artbackendproject.DAO.ProductVariantRepository;
+import com.ct08team.artbackendproject.DTO.ProductVariantDTO;
+import com.ct08team.artbackendproject.Entity.product.ProductVariant;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -25,6 +32,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductVariantRepository variantRepository;
 
     @PostMapping("/search")
     public ResponseEntity<Page<ProductListDTO>> searchProducts(
@@ -72,5 +82,30 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductListDTO> products = productService.getProductsByIds(ids, pageable);
         return ResponseEntity.ok(products);
+    }
+    @GetMapping("/{productId}/variants")
+    public ResponseEntity<Page<ProductVariantDTO>> getProductVariants(
+            @PathVariable Long productId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size)
+    {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        // ✅ Gọi Repository với Pageable
+        Page<ProductVariant> variantPage = variantRepository.findByProductId(productId, pageable);
+        
+        if (variantPage.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Page<ProductVariantDTO> dtoPage = variantPage.map(v -> 
+            new ProductVariantDTO(
+                v.getDimensions(),
+                v.getPrice().doubleValue(),
+                v.getStockQuantity()
+            )
+        );
+        
+        return ResponseEntity.ok(dtoPage);
     }
 }
