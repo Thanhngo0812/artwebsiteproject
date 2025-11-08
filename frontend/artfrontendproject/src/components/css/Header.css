@@ -224,6 +224,7 @@
   background-color: #f2f2f2;
   box-shadow: 0 5px 20px rgba(120, 120, 120, 0.944);
   border-radius: 4px;
+  z-index: 100;
 }
 
 .nav-item-child-item {
