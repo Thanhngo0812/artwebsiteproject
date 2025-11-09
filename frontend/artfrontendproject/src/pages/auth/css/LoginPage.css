@@ -1,5 +1,26 @@
+@font-face {
+  font-family: 'FZ Poppins';
+  src: url('../../../assets/fonts/FZ\ Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FZ Poppins';
+  src: url('../../../assets/fonts/FZ Poppins-Bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FZ Poppins';
+  src: url('../../../assets/fonts/FZ Poppins-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
 * {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'FZ Poppins', sans-serif;
 }
 
 .auth-container {
@@ -20,11 +41,16 @@
   padding: 0.1rem 1.5rem;
   border-radius: 1rem;
   box-shadow: 0 0.25rem 1.875rem rgba(0, 0, 0, 0.1);
-  border: 1px solid black;
   width: 100%;
   max-width: 22rem;
 }
-
+.auth-header .auth-logo {
+  display: block;       /* Để logo nằm riêng một hàng */
+  margin: 0 auto 15px; 
+  margin-top: 20px; /* Căn giữa ngang và tạo khoảng cách 15px bên dưới */
+  max-width: 180px;     /* Giới hạn chiều rộng (bạn có thể thay đổi số này) */
+  height: auto;         /* Giữ đúng tỷ lệ ảnh */
+}
 .auth-header {
   text-align: center;
   margin-bottom: 0.5rem;
@@ -37,12 +63,12 @@
 }
 
 .welcome-text {
-  color: #666;
-  font-size: 0.875rem;
+  color: black;
+  font-size: 1rem;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .form-group label {
@@ -138,14 +164,22 @@
 
 .back-home-btn {
   position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  z-index: 10;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .home-icon {
-  width: 2rem;
-  height: 2rem;
+  width: 24px;
+    height: 24px;
   cursor: pointer;
   opacity: 0.8;
   transition: opacity 0.2s;
@@ -153,4 +187,16 @@
 
 .home-icon:hover {
   opacity: 1;
+}
+
+#alertE {
+  color: red;
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+#alertPw {
+  color: red;
+  margin-left: 5px;
+  font-size: 12px;
 }

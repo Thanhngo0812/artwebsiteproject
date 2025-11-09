@@ -24,11 +24,28 @@ CREATE TABLE `roles` (
 -- 2. Bảng `users` (Người dùng)
 CREATE TABLE `users` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
+    
+    -- Thông tin xác thực (Bắt buộc khi đăng ký)
     `username` VARCHAR(255) UNIQUE NOT NULL,
     `email` VARCHAR(255) UNIQUE NOT NULL,
     `password` VARCHAR(255) NOT NULL,
+    
+    -- Thông tin hồ sơ (Có thể cập nhật sau)
+    `full_name` VARCHAR(255) NULL,
+    `phone_number` VARCHAR(20) NULL,
+    
+    -- Cột quản lý (Dùng cho Spring Security)
     `enabled` BOOLEAN NOT NULL DEFAULT TRUE,
     `account_non_locked` BOOLEAN NOT NULL DEFAULT TRUE,
+    
+    -- Dấu thời gian
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- OTP
+    `otp` VARCHAR(6) NULL,
+    `otp_requested_time` TIMESTAMP NULL,
+    
     PRIMARY KEY (`id`)
 );
 
@@ -41,6 +58,20 @@ CREATE TABLE `user_roles` (
     FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`)
 );
 
+-- 4. Bảng `addresses` (Địa chỉ)
+-- Lưu trữ thông tin địa chỉ chi tiết
+CREATE TABLE `addresses` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+	`user_id` BIGINT NOT NULL,
+   `address_name` VARCHAR(255) NOT NULL, -- Tên trạm (ví dụ: "Bến Thành")
+    `address` TEXT NOT NULL,                  -- Địa chỉ dạng văn bản
+    `latitude` DECIMAL(10, 8) NOT NULL,       -- Vĩ độ
+    `longitude` DECIMAL(11, 8) NOT NULL,      -- Kinh độ
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+);
 
 -- ============================================
 -- BẢNG SẢN PHẨM VÀ CÁC THUỘC TÍNH LIÊN QUAN

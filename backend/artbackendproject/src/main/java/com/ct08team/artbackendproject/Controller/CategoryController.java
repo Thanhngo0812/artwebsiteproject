@@ -3,6 +3,7 @@ package com.ct08team.artbackendproject.Controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import com.ct08team.artbackendproject.Service.Catalog.CategoryService;
 
 @RestController
 @RequestMapping("/api/v1/categories")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CategoryController {
 	private CategoryService categoryService;
 	

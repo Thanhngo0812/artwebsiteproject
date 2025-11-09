@@ -1,17 +1,21 @@
 // src/components/MainLayout.jsx
 
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
-import Header from "./Header";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Header from './Header'; 
+import Footer from './Footer'; 
+import "./css/MainLayout.css";
 
 const MainLayout = () => {
   return (
-    <>
+    <div className="main-layout">
       <Header />
-      <main>
+      <main className="main-content">
+
         <Outlet />
       </main>
-    </>
+      <Footer />
+    </div>
   );
 };
 
