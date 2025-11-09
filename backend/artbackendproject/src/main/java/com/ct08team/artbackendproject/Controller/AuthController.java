@@ -38,4 +38,21 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Lỗi xác thực OTP: " + e.getMessage());
         }
     }
+
+    // =======================================================
+    // MỚI: Endpoint để gửi lại OTP
+    // =======================================================
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOtp(@RequestBody AuthDtos.ResendOtpRequest resendRequest) {
+        try {
+            // Bạn sẽ cần tạo phương thức 'resendOtp' này trong AuthService
+            authService.resendOtp(resendRequest);
+
+            // Frontend chỉ cần response.ok, nên chúng ta trả về 1 message đơn giản
+            return ResponseEntity.ok("Mã OTP đã được gửi lại thành công.");
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi gửi lại OTP: " + e.getMessage());
+        }
+    }
 }

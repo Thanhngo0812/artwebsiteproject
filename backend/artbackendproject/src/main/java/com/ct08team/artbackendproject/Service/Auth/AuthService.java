@@ -96,6 +96,25 @@ public class AuthService {
         return new AuthDtos.AuthResponse(jwtToken);
     }
 
+    // =======================================================
+    // MỚI: Phương thức để gửi lại OTP
+    // =======================================================
+    public void resendOtp(AuthDtos.ResendOtpRequest resendRequest) {
+        // 1. Tìm User
+        User user = userRepository.findByUsernameOrEmail(resendRequest.username(), resendRequest.username())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + resendRequest.username()));
+
+        // 2. Tạo và Lưu OTP mới
+        String otp = generateOtp();
+        user.setOtp(otp);
+        user.setOtpRequestedTime(Instant.now());
+        userRepository.save(user);
+
+        // 3. Gửi OTP mới qua Email
+        emailService.sendOtpEmail(user.getEmail(), otp);
+
+    }
+
     // Hàm tiện ích tạo OTP 6 số
     private String generateOtp() {
         SecureRandom random = new SecureRandom();

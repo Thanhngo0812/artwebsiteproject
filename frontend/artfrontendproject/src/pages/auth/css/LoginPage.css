@@ -164,14 +164,22 @@
 
 .back-home-btn {
   position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  z-index: 10;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .home-icon {
-  width: 2rem;
-  height: 2rem;
+  width: 24px;
+    height: 24px;
   cursor: pointer;
   opacity: 0.8;
   transition: opacity 0.2s;
