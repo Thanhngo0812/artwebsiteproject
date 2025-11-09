@@ -16,6 +16,8 @@ import ProductUser from "./components/ProductUser";
 import Dashboard from "./pages/admin/Dashboard";
 import RegisterPage from "./pages/auth/RegisterPage";
 
+import ProfilePage from "./pages/profile/ProfilePage";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
@@ -27,8 +29,6 @@ function App() {
     //  <AuthProvider>
     <AuthProvider> 
     <BrowserRouter>
-     
-   
       <div className="App" >
         <Routes>
           {/*trang chưa đăng nhập*/}
@@ -45,6 +45,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin/login" element={<LoginPage />} />
+
+          <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<ProfilePage />} />
+          </Route>
           {/*admin*/}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />

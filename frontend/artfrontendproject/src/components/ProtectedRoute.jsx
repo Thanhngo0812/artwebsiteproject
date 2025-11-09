@@ -1,7 +1,5 @@
 import React from 'react';
 import { Navigate,useNavigate, Outlet } from 'react-router-dom';
-
-
 import AuthService from '../service/authService';
 
 
