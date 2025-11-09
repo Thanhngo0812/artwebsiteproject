@@ -79,13 +79,21 @@ export default function Header() {
   const navigateShop = useNavigate();
   const handleToShop = () => {
     setActiveParentId(null);
+
+    const unique = Date.now(); // hoặc Math.random()
+    navigateShop(`/products?reset=true&_=${unique}`);
     setActiveSidebarParentId(null);
     navigateShop("/products");
     setMenuOpen(false);
+
+    
   };
 
   const handleCategoryChildOpen = () => {
+    const unique = Date.now();
     setActiveParentId(null);
+    setMenuOpen(false);
+    window.location.href = `/products?reset=true&_=${unique}`;
   };
 
   const navigateCategoryParent = useNavigate();
@@ -193,7 +201,7 @@ export default function Header() {
           <ul className="nav-menu" ref={dropdownRef}>
             <li>
               <Link
-                to="/products"
+                to="#"
                 className="nav-item shop"
                 onClick={handleCategoryChildOpen}
               >

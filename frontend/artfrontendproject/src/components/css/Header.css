@@ -54,6 +54,13 @@
   position: relative;
 }
 
+.nav-sidebar-menu li:nth-child(1) {
+  margin-top: 20px;
+}
+
+.nav-sidebar-menu li:last-child {
+  /* margin-bottom: 30px; */
+
 .nav-item {
   cursor: pointer;
   position: relative;
@@ -182,8 +189,16 @@
   flex: 1;
 }
 
+
+.nav-item {
+  cursor: pointer;
+  position: relative;
+  /* padding: 4px 8px; */
+  font-size: 18px;
+
 .nav-sidebar-menu > li {
   padding: 0;
+
 }
 
 .nav-sidebar-item {
@@ -211,6 +226,31 @@
   transform: rotate(180deg);
 }
 
+
+.nav-item-children-menu {
+  position: absolute;
+  list-style: none;
+  margin: 0;
+  padding: 10px 8px;
+  top: 32px;
+  background-color: #f2f2f2;
+  box-shadow: 0 5px 20px rgba(120, 120, 120, 0.944);
+  border-radius: 4px;
+  z-index: 100;
+}
+
+.nav-item-child-item {
+  display: block; /* Giúp mỗi item nằm riêng dòng */
+  text-decoration: none;
+  color: black;
+  padding: 6px 10px;
+  transition: background 0.2s;
+}
+
+.nav-item-child-item:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+
 .nav-sidebar-children-menu {
   list-style: none;
   margin: 0;
@@ -231,6 +271,7 @@
 
 .nav-sidebar-child-item:hover {
   color: rgba(255, 255, 255, 1);
+
 }
 
 .footer-sidebar {
