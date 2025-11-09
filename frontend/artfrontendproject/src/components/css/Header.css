@@ -60,7 +60,7 @@
 
 .nav-sidebar-menu li:last-child {
   /* margin-bottom: 30px; */
-
+}
 .nav-item {
   cursor: pointer;
   position: relative;
@@ -195,10 +195,9 @@
   position: relative;
   /* padding: 4px 8px; */
   font-size: 18px;
-
+}
 .nav-sidebar-menu > li {
   padding: 0;
-
 }
 
 .nav-sidebar-item {
@@ -250,7 +249,7 @@
 .nav-item-child-item:hover {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-
+}
 .nav-sidebar-children-menu {
   list-style: none;
   margin: 0;
