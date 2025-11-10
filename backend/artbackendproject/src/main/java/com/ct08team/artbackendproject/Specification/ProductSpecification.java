@@ -19,12 +19,12 @@ public class ProductSpecification {
             Map<String, Join<?, ?>> joins = new HashMap<>();
 
             // 1. Lọc theo Khoảng giá (minPrice trên bảng product)
-            if (filter.getPrice() != null) {
-                if (filter.getPrice().getMin() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(root.get("minPrice"), filter.getPrice().getMin()));
+            if (filter.getPriceRange() != null) {
+                if (filter.getPriceRange().getMinPrice() != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("minPrice"), filter.getPriceRange().getMinPrice()));
                 }
-                if (filter.getPrice().getMax() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(root.get("minPrice"), filter.getPrice().getMax()));
+                if (filter.getPriceRange().getMaxPrice() != null) {
+                    predicates.add(cb.lessThanOrEqualTo(root.get("minPrice"), filter.getPriceRange().getMaxPrice()));
                 }
             }
 

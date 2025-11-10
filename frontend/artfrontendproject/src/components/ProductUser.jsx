@@ -22,7 +22,7 @@ export default function ProductUser() {
         categories: [],
         materials: [],
         priceRange: {
-          minPrice: 150000,
+          minPrice:0,
           maxPrice: 30000000,
         },
         colors: [],
@@ -48,7 +48,7 @@ export default function ProductUser() {
     categories: [],
     materials: [],
     priceRange: {
-      minPrice: 150000,
+      minPrice: 0,
       maxPrice: 30000000,
     },
     colors: [],
@@ -60,7 +60,38 @@ export default function ProductUser() {
   const handleChangeOptionSort = (value) => {
     setSort(value);
   };
+ 
+  /**
+ * Hàm này nhận một mảng các đối tượng (mỗi đối tượng có key 'id')
+ * và trả về một mảng mới chỉ chứa các giá trị 'id'.
+ *
+ * @param {Array<Object>} inputArray - Mảng các đối tượng đầu vào.
+ * @returns {Array<number>} - Mảng chỉ chứa các ID.
+ */
+  function getIdsFromArray(inputArray) {
+    // Nếu inputArray không phải là mảng (ví dụ: undefined) hoặc rỗng,
+    // hàm map vẫn sẽ trả về mảng rỗng [].
+    if (!Array.isArray(inputArray)) {
+      return [];
+    }
+    return inputArray.map(item => item.id);
+  }
   const [openCategories, setOpenCategories] = useState([]);
+
+  // SỬA LỖI: Dùng useEffect để CẬP NHẬT state
+  // khi 'listFilters.categories' thay đổi
+  useEffect(() => {
+    // Chỉ chạy khi listFilters.categories CÓ dữ liệu
+    if (listFilters.categories && listFilters.categories.length > 0) {
+      const initialIds = getIdsFromArray(listFilters.categories);
+      setOpenCategories(initialIds);
+    } else {
+      // Nếu filter bị xóa, cũng xóa state
+      setOpenCategories([]);
+    }
+    // Bất cứ khi nào listFilters.categories thay đổi,
+    // hãy chạy lại hàm này.
+  }, []);
   const toggleCategory = (categoryId) => {
     setOpenCategories((prevOpenCategories) => {
       // Nếu ID đã có trong mảng (đang mở)
@@ -73,19 +104,19 @@ export default function ProductUser() {
       }
     });
   };
-  const [openMaterial, setOpenMaterial] = useState(true);
+  const [openMaterial, setOpenMaterial] = useState(false);
   const toggleMaterial = () => {
     setOpenMaterial(!openMaterial);
   };
-  const [openPrice, setOpenPrice] = useState(true);
+  const [openPrice, setOpenPrice] = useState(false);
   const togglePrice = () => {
     setOpenPrice(!openPrice);
   };
-  const [openDimension, setOpenDimension] = useState(true);
+  const [openDimension, setOpenDimension] = useState(false);
   const toggleDimension = () => {
     setOpenDimension(!openDimension);
   };
-  const [openTopic, setOpenTopic] = useState(true);
+  const [openTopic, setOpenTopic] = useState(false);
   const toggleTopic = () => {
     setOpenTopic(!openTopic);
   };
@@ -152,7 +183,7 @@ export default function ProductUser() {
               ...prev,
               categories: newCategories,
               materials: [],
-              priceRange: { minPrice: 150000, maxPrice: 30000000 },
+              priceRange: { minPrice: 0, maxPrice: 30000000 },
               colors: [],
               dimensions: [],
               topics: [],
@@ -234,7 +265,7 @@ export default function ProductUser() {
           categories: finalCategories,
           materials: [],
           priceRange: {
-            minPrice: 150000,
+            minPrice: 0,
             maxPrice: 30000000,
           },
           colors: [],
@@ -304,7 +335,7 @@ export default function ProductUser() {
   const minPercent = (filters.priceRange.minPrice / 30000000) * 100;
   const maxPercent = (filters.priceRange.maxPrice / 30000000) * 100;
 
-  const [closeTableColor, setCloseTableColor] = useState(true);
+  const [closeTableColor, setCloseTableColor] = useState(false);
   const handleOpenCloseTable = () => setCloseTableColor(!closeTableColor);
 
   useEffect(() => {
@@ -383,20 +414,33 @@ export default function ProductUser() {
         </div>
         <div className="productUser-filter">
           <div className="productUser-filter-content">
+            <div style={{
+    borderBottom: '1px solid #212121BF'
+  }}>
+            <h4>LOẠI TRANH</h4>
             {listFilters.categories?.length > 0 &&
               listFilters.categories.map((item, index) => {
                 // Kiểm tra xem danh mục hiện tại có đang mở hay không
-                const isCategoryOpen = openCategories.includes(item.id); // <--- KIỂM TRA TRẠNG THÁI
-
+                const childIds = item.children?.map(child => child.id) || [];
+                const selectedChildrenCount = childIds.filter(id => filters.categories.includes(id)).length;
+                const isCategoryOpen = !openCategories.includes(item.id); // <--- KIỂM TRA TRẠNG THÁI
+            
                 return (
-                  <div className="categories-content" key={item.id}>
+                  <div  className="categories-content" key={item.id}>
                     {/* Thêm onClick vào div cha để toggle */}
                     <div
+
                       className="categories-content-name"
                       onClick={() => toggleCategory(item.id)} // <--- THÊM ONCLICK
                     >
                       {/* Thay đổi icon dựa trên trạng thái đóng/mở (Dùng FaChevronUp/Down) */}
-                      {isCategoryOpen ? <FaChevronDown /> : <FaChevronUp />}
+                      <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: isCategoryOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
                       <input
                         type="checkbox"
                         checked={filters.categories.includes(item.id)}
@@ -405,7 +449,10 @@ export default function ProductUser() {
                         }
                         onClick={(e) => e.stopPropagation()} // <--- QUAN TRỌNG: Ngăn chặn click checkbox làm đóng/mở
                       />
-                      <span>{item.name}</span>
+                     <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>
+          {item.name}
+          {selectedChildrenCount > 0 && ` (${selectedChildrenCount})`}
+        </span>
                     </div>
 
                     {/* CHỈ HIỂN THỊ mục con nếu danh mục đang mở (isCategoryOpen là true) */}
@@ -430,12 +477,17 @@ export default function ProductUser() {
                       ))}
                   </div>
                 );
-              })}
+              })}</div>
 
             <div className="materials-content">
               <div className="materials-content-name" onClick={toggleMaterial}>
-                {openMaterial ? <FaChevronUp /> : <FaChevronDown />}
-                <span>Chất Liệu</span>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openMaterial ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>Chất Liệu</span>
               </div>
               {listFilters.materials?.length > 0 &&
                 openMaterial &&
@@ -457,8 +509,14 @@ export default function ProductUser() {
 
             <div className="price-item item">
               <div className="price-item_title" onClick={togglePrice}>
-                {openPrice ? <FaChevronUp /> : <FaChevronDown />}{" "}
-                <span>Giá</span>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openPrice ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>GIÁ</span>
               </div>
               {openPrice && (
                 <div className="price-item_slide">
@@ -471,7 +529,7 @@ export default function ProductUser() {
                     ></div>
                     <input
                       type="range"
-                      min="150000"
+                      min="0"
                       max="30000000"
                       value={filters.priceRange.minPrice}
                       onChange={handleMinChange}
@@ -479,7 +537,7 @@ export default function ProductUser() {
                     />
                     <input
                       type="range"
-                      min="150000"
+                      min="0"
                       max="30000000"
                       value={filters.priceRange.maxPrice}
                       onChange={handleMaxChange}
@@ -494,14 +552,73 @@ export default function ProductUser() {
               )}
             </div>
 
+            <div className="dimensions-content">
+              <div className="dimensions-title" onClick={toggleDimension}>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openDimension ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>KÍCH THƯỚC</span>
+              </div>
+              {listFilters.dimensions?.length > 0 &&
+                openDimension &&
+                listFilters.dimensions.map((item, index) => (
+                  <div className="dimensions-item" key={item}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.dimensions.includes(item)}
+                        onChange={() =>
+                          handleArrayFilterChange("dimensions", item)
+                        }
+                      />
+                      <span>{item}</span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+
+            <div className="topics-content">
+              <div className="topics-title" onClick={toggleTopic}>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openTopic ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>CHỦ ĐỀ</span>
+              </div>
+              {listFilters.topics?.length > 0 &&
+                openTopic &&
+                listFilters.topics.map((item, index) => (
+                  <div className="topics-item" key={item}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.topics.includes(item)}
+                        onChange={() => handleArrayFilterChange("topics", item)}
+                      />
+                      <span>{item}</span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+
+            
             <div className="color-item item">
               <div className="color-item_title" onClick={handleOpenCloseTable}>
-                {closeTableColor ? (
-                  <FaChevronUp className="open-close-icon" />
-                ) : (
-                  <FaChevronDown className="open-close-icon" />
-                )}
-                <span>Màu Sắc</span>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: closeTableColor ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>MÀU SẮC</span>
               </div>
 
               <div
@@ -526,50 +643,6 @@ export default function ProductUser() {
                   ))}
               </div>
             </div>
-
-            <div className="dimensions-content">
-              <div className="dimensions-title" onClick={toggleDimension}>
-                {openDimension ? <FaChevronUp /> : <FaChevronDown />}
-                <span>Kích Thước</span>
-              </div>
-              {listFilters.dimensions?.length > 0 &&
-                openDimension &&
-                listFilters.dimensions.map((item, index) => (
-                  <div className="dimensions-item" key={item}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={filters.dimensions.includes(item)}
-                        onChange={() =>
-                          handleArrayFilterChange("dimensions", item)
-                        }
-                      />
-                      <span>{item}</span>
-                    </label>
-                  </div>
-                ))}
-            </div>
-
-            <div className="topics-content">
-              <div className="topics-title" onClick={toggleTopic}>
-                {openTopic ? <FaChevronUp /> : <FaChevronDown />}
-                <span>Chủ Đề</span>
-              </div>
-              {listFilters.topics?.length > 0 &&
-                openTopic &&
-                listFilters.topics.map((item, index) => (
-                  <div className="topics-item" key={item}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={filters.topics.includes(item)}
-                        onChange={() => handleArrayFilterChange("topics", item)}
-                      />
-                      <span>{item}</span>
-                    </label>
-                  </div>
-                ))}
-            </div>
           </div>
         </div>
       </div>
@@ -591,6 +664,8 @@ export default function ProductUser() {
             </div>
           </div>
           <div className="productUser-filter-content">
+          <div >
+          <h4>LOẠI TRANH</h4>
             {/* {listFilters.categories?.length > 0 &&
               listFilters.categories.map((item, index) => (
                 <div className="categories-content" key={item.id}>
@@ -626,17 +701,27 @@ export default function ProductUser() {
             {listFilters.categories?.length > 0 &&
               listFilters.categories.map((item, index) => {
                 // Kiểm tra xem danh mục hiện tại có đang mở hay không
-                const isCategoryOpen = openCategories.includes(item.id); // <--- KIỂM TRA TRẠNG THÁI
-
+                const childIds = item.children?.map(child => child.id) || [];
+                const selectedChildrenCount = childIds.filter(id => filters.categories.includes(id)).length;
+                const isCategoryOpen = !openCategories.includes(item.id); // <--- KIỂM TRA TRẠNG THÁI
+            
                 return (
-                  <div className="categories-content" key={item.id}>
+                  
+                  <div  className="categories-content" key={item.id}>
+                    
                     {/* Thêm onClick vào div cha để toggle */}
                     <div
                       className="categories-content-name"
                       onClick={() => toggleCategory(item.id)} // <--- THÊM ONCLICK
                     >
                       {/* Thay đổi icon dựa trên trạng thái đóng/mở (Dùng FaChevronUp/Down) */}
-                      {isCategoryOpen ? <FaChevronDown /> : <FaChevronUp />}
+                      <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: isCategoryOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
                       <input
                         type="checkbox"
                         checked={filters.categories.includes(item.id)}
@@ -645,7 +730,10 @@ export default function ProductUser() {
                         }
                         onClick={(e) => e.stopPropagation()} // <--- QUAN TRỌNG: Ngăn chặn click checkbox làm đóng/mở
                       />
-                      <span>{item.name}</span>
+                      <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>
+          {item.name}
+          {selectedChildrenCount > 0 && ` (${selectedChildrenCount})`}
+        </span>
                     </div>
 
                     {/* CHỈ HIỂN THỊ mục con nếu danh mục đang mở (isCategoryOpen là true) */}
@@ -670,12 +758,18 @@ export default function ProductUser() {
                       ))}
                   </div>
                 );
-              })}
+              })}</div>
 
             <div className="materials-content">
               <div className="materials-content-name" onClick={toggleMaterial}>
-                {openMaterial ? <FaChevronUp /> : <FaChevronDown />}
-                <span>Chất Liệu</span>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openMaterial ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>CHẤT LIỆU</span>
               </div>
               {listFilters.materials?.length > 0 &&
                 openMaterial &&
@@ -695,10 +789,16 @@ export default function ProductUser() {
                 ))}
             </div>
 
-            <div className="price-item item">
+            <div className="price-item item" >
               <div className="price-item_title" onClick={togglePrice}>
-                {openPrice ? <FaChevronUp /> : <FaChevronDown />}{" "}
-                <span>Giá</span>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openPrice ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />{" "}
+                <span style={{  fontWeight: 'bold' }}>GIÁ</span>
               </div>
               {openPrice && (
                 <div className="price-item_slide">
@@ -711,7 +811,7 @@ export default function ProductUser() {
                     ></div>
                     <input
                       type="range"
-                      min="150000"
+                      min="0"
                       max="30000000"
                       value={filters.priceRange.minPrice}
                       onChange={handleMinChange}
@@ -719,7 +819,7 @@ export default function ProductUser() {
                     />
                     <input
                       type="range"
-                      min="150000"
+                      min="0"
                       max="30000000"
                       value={filters.priceRange.maxPrice}
                       onChange={handleMaxChange}
@@ -734,14 +834,73 @@ export default function ProductUser() {
               )}
             </div>
 
-            <div className="color-item item">
+       
+            <div className="dimensions-content"  >
+              <div className="dimensions-title" onClick={toggleDimension}>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openDimension ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>KÍCH THƯỚC</span>
+              </div>
+              {listFilters.dimensions?.length > 0 &&
+                openDimension &&
+                listFilters.dimensions.map((item, index) => (
+                  <div className="dimensions-item" key={item}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.dimensions.includes(item)}
+                        onChange={() =>
+                          handleArrayFilterChange("dimensions", item)
+                        }
+                      />
+                      <span>{item}</span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+
+            <div className="topics-content" >
+              <div className="topics-title" onClick={toggleTopic}>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: openTopic ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>CHỦ ĐỀ</span>
+              </div>
+              {listFilters.topics?.length > 0 &&
+                openTopic &&
+                listFilters.topics.map((item, index) => (
+                  <div className="topics-item" key={item}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={filters.topics.includes(item)}
+                        onChange={() => handleArrayFilterChange("topics", item)}
+                      />
+                      <span>{item}</span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+
+            <div className="color-item item" >
               <div className="color-item_title" onClick={handleOpenCloseTable}>
-                {closeTableColor ? (
-                  <FaChevronUp className="open-close-icon" />
-                ) : (
-                  <FaChevronDown className="open-close-icon" />
-                )}
-                <span>Màu Sắc</span>
+              <FaChevronUp // CHỈ DÙNG MỘT ICON (ví dụ: icon trỏ lên)
+                            style={{
+                              transform: closeTableColor ? 'rotate(0deg)' : 'rotate(180deg)',
+                              transition: 'transform 0.3s ease-in-out',
+                              display: 'inline-block' 
+                            }}
+                          />
+                <span style={{ marginLeft: '4px', fontWeight: 'bold' }}>MÀU SẮC</span>
               </div>
 
               <div
@@ -767,49 +926,6 @@ export default function ProductUser() {
               </div>
             </div>
 
-            <div className="dimensions-content">
-              <div className="dimensions-title" onClick={toggleDimension}>
-                {openDimension ? <FaChevronUp /> : <FaChevronDown />}
-                <span>Kích Thước</span>
-              </div>
-              {listFilters.dimensions?.length > 0 &&
-                openDimension &&
-                listFilters.dimensions.map((item, index) => (
-                  <div className="dimensions-item" key={item}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={filters.dimensions.includes(item)}
-                        onChange={() =>
-                          handleArrayFilterChange("dimensions", item)
-                        }
-                      />
-                      <span>{item}</span>
-                    </label>
-                  </div>
-                ))}
-            </div>
-
-            <div className="topics-content">
-              <div className="topics-title" onClick={toggleTopic}>
-                {openTopic ? <FaChevronUp /> : <FaChevronDown />}
-                <span>Chủ Đề</span>
-              </div>
-              {listFilters.topics?.length > 0 &&
-                openTopic &&
-                listFilters.topics.map((item, index) => (
-                  <div className="topics-item" key={item}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={filters.topics.includes(item)}
-                        onChange={() => handleArrayFilterChange("topics", item)}
-                      />
-                      <span>{item}</span>
-                    </label>
-                  </div>
-                ))}
-            </div>
           </div>
         </div>
         <div className="productUser-showProduct">

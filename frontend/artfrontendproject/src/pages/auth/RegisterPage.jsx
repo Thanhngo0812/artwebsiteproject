@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './css/LoginPage.css';
-
+import LoadingSpinner from '../../components/LoadingSpinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toast } from 'react-toastify';
+import { faExclamation,faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: '',
@@ -11,6 +14,11 @@ export default function RegisterPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorPass, setErrorPass] = useState('');
+  const [errorUsername, setErrorUsername] = useState('');
+  const [errorEmail, setErrorEmail] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,12 +37,13 @@ export default function RegisterPage() {
       </Link>
       <div className="auth-box">
         <div className="auth-header">
-          <h2>Register</h2>
-          <p className="welcome-text">Join us today!</p>
+        <img src="/logologin.png" alt="Logo" className="auth-logo" />
+
+          <p className="welcome-text">Chào đón thành viên mới</p>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Username</label>
+            <label>Tên đăng nhập (Tối thiểu 8 kí tự)</label>
             <input
               type="text"
               placeholder="Username"
@@ -54,7 +63,7 @@ export default function RegisterPage() {
             />
           </div>
           <div className="form-group">
-            <label>Password</label>
+            <label>Mật khẩu</label>
             <div className="password-input">
               <input
                 type={showPassword ? "text" : "password"}
@@ -72,7 +81,7 @@ export default function RegisterPage() {
             </div>
           </div>
           <div className="form-group">
-            <label>Confirm Password</label>
+            <label>Xác nhận mật khẩu</label>
             <div className="password-input">
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -89,10 +98,10 @@ export default function RegisterPage() {
               />
             </div>
           </div>
-          <button type="submit" className="submit-btn">Register</button>
+          <button type="submit" className="submit-btn">Đăng kí</button>
         </form>
         <p className="auth-redirect">
-          Already have an account? <Link to="/login">Login</Link>
+          Bạn chưa có tài khoản? <Link to="/login">Đăng nhập</Link>
         </p>
       </div>
     </div>

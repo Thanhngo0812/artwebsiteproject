@@ -28,7 +28,7 @@ public class User {
     private String phoneNumber;
 
     // Cột Spring Security
-    private boolean enabled = true;
+    private boolean enabled = false;
     private boolean accountNonLocked = true;
 
     // --- CÁC CỘT MỚI THÊM CHO 2FA ---

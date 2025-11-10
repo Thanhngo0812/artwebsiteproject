@@ -35,7 +35,7 @@ CREATE TABLE `users` (
     `phone_number` VARCHAR(20) NULL,
     
     -- Cột quản lý (Dùng cho Spring Security)
-    `enabled` BOOLEAN NOT NULL DEFAULT TRUE,
+    `enabled` BOOLEAN NOT NULL DEFAULT FALSE,
     `account_non_locked` BOOLEAN NOT NULL DEFAULT TRUE,
     
     -- Dấu thời gian
@@ -108,7 +108,8 @@ CREATE TABLE `product` (
 ALTER TABLE `product`
 ADD COLUMN `min_price` DECIMAL(10, 2) NULL DEFAULT 0.00,
 ADD COLUMN `sales_count` BIGINT NULL DEFAULT 0,
-ADD COLUMN `view_count` BIGINT NULL DEFAULT 0;
+ADD COLUMN `view_count` BIGINT NULL DEFAULT 0,
+ADD COLUMN `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP;
 
 -- 7. Bảng trung gian `product_categories`
 CREATE TABLE `product_categories` (
@@ -122,23 +123,24 @@ CREATE TABLE `product_categories` (
 
 -- 8. Bảng `product_variants` (Các biến thể của sản phẩm: kích thước, giá)
 CREATE TABLE `product_variants` (
+    `variant_id` BIGINT NOT NULL AUTO_INCREMENT, -- <<< KHÓA CHÍNH MỚI
     `product_id` BIGINT NOT NULL,
     `dimensions` VARCHAR(20) NOT NULL,
     `price` DECIMAL(10, 2) NOT NULL,
     `stock_quantity`  BIGINT NOT NULL DEFAULT 0,
-    `variant_status` INT NOT NULL DEFAULT 1,
-    PRIMARY KEY (`product_id`,`dimensions`),
-    FOREIGN KEY (`product_id`) REFERENCES `product`(`id`)
+    `variant_status` INT NOT NULL DEFAULT 1,    
+    PRIMARY KEY (`variant_id`), -- <<< PK mới
+    FOREIGN KEY (`product_id`) REFERENCES `product`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `uk_product_dimension` (`product_id`, `dimensions`) -- <<< Giữ logic cũ
 );
 
 -- 9. Bảng `product_images` (Các hình ảnh chi tiết của sản phẩm)
 CREATE TABLE `product_images` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
-    `product_id` BIGINT NOT NULL,
+    `variant_id` BIGINT NOT NULL,
     `image_url` VARCHAR(512) NOT NULL,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`product_id`) REFERENCES `product`(`id`)
-);
+FOREIGN KEY (`variant_id`) REFERENCES `product_variants`(`variant_id`) ON DELETE CASCADE);
 -- ============================================
 -- BẢNG CHỦ ĐỀ SẢN PHẨM (LƯU TRỰC TIẾP)
 -- ============================================
@@ -230,8 +232,8 @@ INSERT INTO `material` (materialname) VALUES
 -- ============================================
 
 INSERT INTO `product` (productname, description, thumbnail, material_id, product_status, min_price, sales_count, view_count) VALUES
-('Tranh Hoàng Hôn Trên Biển', 'Mô tả chi tiết về tranh sơn dầu hoàng hôn trên biển.', 'https://placehold.co/400x400/FF8C00/FFFFFF?text=Tranh+01', 1, 1, 0, 150, 2500),
-('Tranh Rối Rắm Hiện Đại', 'Tranh trừu tượng hiện đại trên vải canvas, thể hiện sự phức tạp của đô thị.', 'https://placehold.co/400x400/003366/FFFFFF?text=Tranh+02', 2, 1, 0, 75, 1200),
+('Tranh Hoàng Hôn Trên Biển', 'Mô tả chi tiết về tranh sơn dầu hoàng hôn trên biển.', 'https://placehold.co/400x400/FF8C00/FFFFFF?text=Tranh+01', 1, 1, 100000, 150, 2500),
+('Tranh Rối Rắm Hiện Đại', 'Tranh trừu tượng hiện đại trên vải canvas, thể hiện sự phức tạp của đô thị.', 'https://placehold.co/400x400/003366/FFFFFF?text=Tranh+02', 2, 1, 100000, 75, 1200),
 ('Tranh Làng Quê Mùa Thu', 'Bức tranh sơn mài mô tả cảnh làng quê Việt Nam yên bình vào mùa thu.', 'https://placehold.co/400x400/8B4513/FFFFFF?text=Tranh+03', 3, 1, 0, 220, 3500),
 ('Khung Tranh Gỗ Sồi Cổ Điển', 'Khung tranh làm từ gỗ sồi tự nhiên, chạm khắc tinh xảo.', 'https://placehold.co/400x400/D2B48C/000000?text=Khung+04', 4, 1, 0, 300, 1500),
 ('Tranh Sen Bên Cửa Sổ', 'Tranh sơn dầu tĩnh vật, hoa sen trắng bên cửa sổ.', 'https://placehold.co/400x400/FFFFFF/000000?text=Tranh+05', 1, 1, 0, 180, 2800),
