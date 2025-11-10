@@ -19,7 +19,7 @@ export default function ProductDetail() {
   const [mainImage, setMainImage] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const [displayCategories, setDisplayCategories] = useState([]); // ✅ CHỈ dùng để hiển thị danh mục
+  const [displayCategories, setDisplayCategories] = useState([]);
 
   useEffect(() => {
     fetchProductDetail();
@@ -49,7 +49,6 @@ export default function ProductDetail() {
         setMainImage(data.thumbnail);
       }
 
-      // ✅ Logic xác định categories hiển thị (CHỈ để show trong pd-info-section)
       if (data.categories && data.categories.length > 0) {
         const parents = data.categories.filter(c => c.id >= 1 && c.id <= 5);
         const children = data.categories.filter(c => c.id >= 6);
@@ -106,7 +105,6 @@ export default function ProductDetail() {
       return;
     }
 
-    // ✅ Lấy category đầu tiên trong displayCategories
     const categoryId = displayCategories.length > 0 ? displayCategories[0].id : product.categories[0].id;
     const categoryName = displayCategories.length > 0 ? displayCategories[0].name : product.categories[0].name;
 
@@ -189,7 +187,6 @@ export default function ProductDetail() {
             {selectedVariant ? formatPrice(selectedVariant.price) : formatPrice(product.minPrice)}
           </div>
 
-          {/* ✅ BỎ CATEGORY SELECTOR - CHỈ GIỮ VARIANT/DIMENSION */}
           
           {/* Variant Selection */}
           {product.variants && product.variants.length > 0 && (
@@ -270,7 +267,6 @@ export default function ProductDetail() {
             <div className="pd-info-item">
               <span className="pd-info-label">Danh mục:</span>
               <span className="pd-info-value">
-                {/* ✅ HIỂN THỊ theo logic: 2 cha → cả 2, 1 cha + con → chỉ con */}
                 {displayCategories.length > 0 
                   ? displayCategories.map(c => c.name).join(', ')
                   : (product.categories?.map(c => c.name).join(', ') || '—')}

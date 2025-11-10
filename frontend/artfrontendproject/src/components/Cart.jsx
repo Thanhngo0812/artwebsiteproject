@@ -35,7 +35,6 @@ export default function Cart() {
       
       const variants = data.variants || [];
       
-      // ✅ Đơn giản hóa: Chỉ lưu variants, không cần phân loại category
       setAvailableVariants(prev => ({
         ...prev,
         [productId]: variants
@@ -57,7 +56,6 @@ export default function Cart() {
     const selectedVariant = variants.find(v => v.id === parseInt(newVariantId));
     
     if (selectedVariant) {
-      // ✅ Update với categoryId và categoryName từ cart item hiện tại
       updateSize(
         index,
         cartItems[index].categoryId,
@@ -184,7 +182,6 @@ export default function Cart() {
           
           return (
             <div key={`${item.productId}-${item.categoryId}-${item.dimensions}-${index}`} className="cart-item">
-              {/* ✅ Clickable product info */}
               <div 
                 className="item-info"
                 onClick={() => handleProductClick(item.productId)}
