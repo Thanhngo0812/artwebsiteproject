@@ -72,7 +72,7 @@ export default function ProductDetail() {
         setDisplayCategories(categoriesToDisplay);
       }
 
-      // ✅ Set default variant (chọn variant đầu tiên còn hàng)
+
       if (data.variants && data.variants.length > 0) {
         const firstAvailable = data.variants.find(v => v.stockQuantity > 0) || data.variants[0];
         setSelectedVariant(firstAvailable);
