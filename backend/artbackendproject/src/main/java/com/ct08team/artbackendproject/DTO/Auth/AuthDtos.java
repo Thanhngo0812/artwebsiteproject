@@ -11,6 +11,7 @@ public class AuthDtos {
 
     public record LoginResponse(String message) {}
     public record ResendOtpRequest(String username) {}
+    public record RegisterRequest(String username, String email, String password) {}
 
     // Thêm class này vào bên trong file AuthDtos.java của bạn
 

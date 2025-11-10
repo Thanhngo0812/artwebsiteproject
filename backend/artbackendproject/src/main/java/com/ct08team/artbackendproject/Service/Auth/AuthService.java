@@ -1,7 +1,9 @@
 package com.ct08team.artbackendproject.Service.Auth;
 
+import com.ct08team.artbackendproject.DAO.Auth.RoleRepository;
 import com.ct08team.artbackendproject.DAO.Auth.UserRepository;
 import com.ct08team.artbackendproject.DTO.Auth.AuthDtos;
+import com.ct08team.artbackendproject.Entity.auth.Role;
 import com.ct08team.artbackendproject.Entity.auth.User;
 import com.ct08team.artbackendproject.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +34,8 @@ public class AuthService {
     private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder; // Bạn cần Bean này trong SecurityConfig
-
+    @Autowired
+    private RoleRepository roleRepository;
     private static final long OTP_VALID_DURATION_MINUTES = 5;
 
     // Bước 1: Đăng nhập và Gửi OTP
@@ -84,6 +88,8 @@ public class AuthService {
         // 4. Xác thực thành công -> Xóa OTP
         user.setOtp(null);
         user.setOtpRequestedTime(null);
+        user.setEnabled(true);
+
         userRepository.save(user);
 
         // 5. Tạo và trả về JWT Token
@@ -123,4 +129,50 @@ public class AuthService {
     }
 
     // (Bạn cũng nên thêm hàm đăng ký (register) ở đây)
+    // =======================================================
+    // MỚI: Phương thức để Đăng ký
+    // =======================================================
+    public AuthDtos.LoginResponse registerUser(AuthDtos.RegisterRequest registerRequest) {
+        // 1. Kiểm tra username đã tồn tại
+        if (userRepository.existsByUsername(registerRequest.username())) {
+            throw new RuntimeException("Username đã được sử dụng.");
+        }
+
+        // 2. Kiểm tra email đã tồn tại
+        if (userRepository.existsByEmail(registerRequest.email())) {
+            throw new RuntimeException("Email đã được sử dụng.");
+        }
+
+        // 3. (Tùy chọn) Kiểm tra mật khẩu (ví dụ: độ dài)
+        if (registerRequest.password().length() < 8) {
+            throw new RuntimeException("Mật khẩu phải có ít nhất 8 ký tự.");
+        }
+
+        // 4. Mã hóa mật khẩu
+        String encodedPassword = passwordEncoder.encode(registerRequest.password());
+
+        // 5. Tạo user mới
+        User newUser = new User();
+        newUser.setUsername(registerRequest.username());
+        newUser.setEmail(registerRequest.email());
+        newUser.setPassword(encodedPassword);
+
+        // 6. Gán vai trò (Role) mặc định
+        // Đảm bảo bạn đã có Role "ROLE_USER" trong DB
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy Role 'ROLE_USER' mặc định."));
+        newUser.setRoles(Collections.singleton(userRole)); // Gán 1 role duy nhất
+        String otp = generateOtp();
+        newUser.setOtp(otp);
+        newUser.setOtpRequestedTime(Instant.now());
+        // 7. Lưu user
+        userRepository.save(newUser);
+        // 8. GỬI EMAIL OTP
+        emailService.sendOtpEmail(newUser.getEmail(), otp);
+
+        // 9. Trả về thông báo để frontend điều hướng
+        return new AuthDtos.LoginResponse("Đăng ký thành công. Mã OTP đã được gửi tới email của bạn.");
+        // 8. (Tùy chọn) Bạn có thể gửi email chào mừng ở đây
+        // emailService.sendWelcomeEmail(newUser.getEmail());
+    }
 }

@@ -36,7 +36,7 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Page<ProductListDTO> searchProducts(ProductFilterRequestDTO filter, Pageable pageable) {
-
+        System.out.println(filter.getPriceRange().getMaxPrice().toString());
         // --- BƯỚC MỚI: GỌI FILTERSERVICE ĐỂ MỞ RỘNG IDS ---
         // Lấy danh sách ID gốc từ DTO (ví dụ: [1])
         List<Long> originalCategoryIds = filter.getCategories();

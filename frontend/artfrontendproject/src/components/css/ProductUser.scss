@@ -36,7 +36,7 @@
   }
   .productUser-title {
     font-weight: 700;
-    font-size: 35px;
+    font-size: 25px;
     text-align: center;
     padding: 50px 0;
   }
@@ -44,6 +44,7 @@
     display: flex;
   }
   .productUser-filter {
+    color: #212121BF;
     // min-width: 250px;
     margin-right: 20px;
     margin-left: 3rem;
@@ -94,6 +95,7 @@
         }
       }
       .materials-content {
+        margin-top: 5px;
         margin-bottom: 20px;
         .materials-content-name {
           display: flex;
@@ -180,6 +182,7 @@
       }
       .color-item {
         // width: 100%;
+        // height: 24px;
         margin-bottom: 20px;
 
         .color-item_title {
@@ -410,50 +413,53 @@
   }
 }
 
-@media (max-width: 990px) {
-  .productUser-container {
-    .productUser-showProduct {
-      .main-show-product {
-        .product-item {
-          flex: 0 0 calc((100% / 3) - 10px);
-        }
-      }
-    }
-  }
+.range {
+  -webkit-appearance: none; /* Tắt style mặc định của Chrome/Safari */
+  appearance: none;
+  width: 100%;
+  background: transparent; /* Làm cho track của input trong suốt */
+  pointer-events: none;    /* Input này chỉ dùng để kéo thumb */
+  position: absolute;      /* Đảm bảo nó nằm đè lên track div */
+  left: 0;
 }
 
-@media (max-width: 721px) {
-  .productUser-container {
-    .productUser-content {
-      flex-direction: column;
-      .productUser-filter {
-        margin-left: 20px;
-        .productUser-filter-title {
-          .productUser-filter-title-name {
-            cursor: pointer;
-            .icon-filter-reponsive {
-              display: inline;
-              margin-right: 6px;
-            }
-          }
-        }
-        .productUser-filter-content {
-          display: none;
-        }
-      }
-      .productUser-showProduct {
-        .main-show-product {
-          margin-left: 10px;
-        }
-      }
-    }
-  }
+/* Tắt track mặc định của Firefox */
+.range::-moz-range-track {
+  background: transparent;
+  border-color: transparent;
 }
 
-@media (min-width: 721px) {
-  .productUser-container {
-    .list-filter-reponsive {
-      display: none;
-    }
-  }
+/* 2. Style cho nút tròn (thumb) trên Chrome, Safari, Edge 
+*/
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  
+  /* Các thuộc tính này mô phỏng style trong ảnh của bạn */
+  height: 20px; 
+  width: 20px;
+  border-radius: 50%; /* Làm nó hình tròn */
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  cursor: pointer;
+  pointer-events: auto; /* Cho phép click và kéo thumb */
+  margin-top: -8px; /* Căn chỉnh thumb vào giữa track (thay đổi nếu cần) */
+  
+  /* --- ĐỔI MÀU Ở ĐÂY --- */
+  background-color: #565656; /* <-- MÀU XÁM BẠN MUỐN */
+}
+
+/* 3. Style cho nút tròn (thumb) trên Firefox 
+*/
+.range::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  cursor: pointer;
+  pointer-events: auto;
+
+  /* --- ĐỔI MÀU Ở ĐÂY --- */
+  background-color: #565656; /* <-- MÀU XÁM BẠN MUỐN */
 }

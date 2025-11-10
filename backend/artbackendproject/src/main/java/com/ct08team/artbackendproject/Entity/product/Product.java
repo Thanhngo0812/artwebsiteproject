@@ -1,8 +1,10 @@
 package com.ct08team.artbackendproject.Entity.product;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,9 +50,6 @@ public class Product {
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductVariant> variants = new ArrayList<>();
-    
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ProductImage> images = new ArrayList<>();
 
     @Column(name = "min_price")
     private BigDecimal minPrice;
@@ -62,6 +61,10 @@ public class Product {
     private Long viewCount;
     public Product() {
     }
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
     
     public Product(Long id, String productName, Material material, String description, 
                    String thumbnail, Integer productStatus, BigDecimal minPrice, Long salesCount, Long viewCount) {
@@ -156,14 +159,7 @@ public class Product {
     public void setVariants(List<ProductVariant> variants) {
         this.variants = variants;
     }
-    
-    public List<ProductImage> getImages() {
-        return images;
-    }
-    
-    public void setImages(List<ProductImage> images) {
-        this.images = images;
-    }
+
 
     public BigDecimal getMinPrice() {
         return minPrice;
@@ -189,6 +185,14 @@ public class Product {
         this.viewCount = viewCount;
     }
 
+    // =======================================================
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
     // Helper methods
     public void addColor(ProductColor color) {
         colors.add(color);
@@ -219,16 +223,7 @@ public class Product {
         variants.remove(variant);
         variant.setProduct(null);
     }
-    
-    public void addImage(ProductImage image) {
-        images.add(image);
-        image.setProduct(this);
-    }
-    
-    public void removeImage(ProductImage image) {
-        images.remove(image);
-        image.setProduct(null);
-    }
+
     
     @Override
     public boolean equals(Object o) {
