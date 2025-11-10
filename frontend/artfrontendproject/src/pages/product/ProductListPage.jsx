@@ -10,6 +10,7 @@ const API_BASE = "http://localhost:8888/api/products";
 export default function ProductListPage() {
   const [searchParams] = useSearchParams();
   const sortType = searchParams.get("sort"); // featured, newest, bestseller
+  const searchQuery = searchParams.get("q");
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,13 +20,24 @@ export default function ProductListPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, [sortType, currentPage]);
+  }, [sortType, searchQuery ,currentPage]);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
       let endpoint = "";
       let params = { page: currentPage, size: pageSize };
+
+      if (searchQuery) {
+        const response = await axios.get(`${API_BASE}/search-query`, {
+          params: { q: searchQuery, limit: 50 }
+        });
+        
+        setProducts(response.data);
+        setTotalPages(1);
+        setLoading(false);
+        return;
+      }
 
       switch (sortType) {
         case "featured":
@@ -66,6 +78,11 @@ export default function ProductListPage() {
   };
 
   const getTitleBySortType = () => {
+    
+    if (searchQuery) {
+      return `Kết quả tìm kiếm cho "${searchQuery}"`;
+    }
+    
     switch (sortType) {
       case "featured":
         return "Sản Phẩm Nổi Bật";
@@ -99,6 +116,14 @@ export default function ProductListPage() {
       {/* Title */}
       <h1 className="page-title">{getTitleBySortType()}</h1>
 
+      {searchQuery && (
+        <p className="search-count">
+          {products.length > 0 
+            ? `Tìm thấy ${products.length} sản phẩm` 
+            : 'Không có kết quả nào'}
+        </p>
+      )}
+
       {/* Product Grid */}
       {products.length > 0 ? (
         <>
@@ -130,10 +155,21 @@ export default function ProductListPage() {
         </>
       ) : (
         <div className="no-products">
-          <p>Không tìm thấy sản phẩm nào.</p>
-          <Link to="/products" className="back-btn">
-            ← Quay lại cửa hàng
-          </Link>
+          {searchQuery ? (
+            <>
+              <p>Không tìm thấy sản phẩm nào với từ khóa "<strong>{searchQuery}</strong>"</p>
+              <Link to="/products" className="back-btn">
+                Xem tất cả sản phẩm
+              </Link>
+            </>
+          ) : (
+            <>
+              <p>Không tìm thấy sản phẩm nào.</p>
+              <Link to="/products" className="back-btn">
+                ← Quay lại cửa hàng
+              </Link>
+            </>
+          )}
         </div>
       )}
     </div>

@@ -34,31 +34,38 @@ public class ProductService {
     /**
      * API mới: Lấy chi tiết sản phẩm theo ID
      * Dùng cho trang ProductDetail
-     * 
-     * ✅ FIX: Dùng 3 query riêng biệt + load images thủ công
-     */
+    */
+
+    @Transactional(readOnly = true)
+    public List<ProductListDTO> searchProducts(String keyword, int limit) {
+        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+        
+        List<Product> products = productRepository.searchByKeyword(
+            searchKeyword, 
+            org.springframework.data.domain.PageRequest.of(0, limit)
+        );
+        
+        return products.stream()
+                .map(this::convertToProductListDTO)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public ProductDetailDTO getProductDetail(Long id) {
         try {
-            System.out.println("🔍 [ProductService] Fetching product ID: " + id);
-            
-            // ✅ Query 1: Load Product + Categories + Material
+
             Optional<Product> productOpt = productRepository.findByIdWithDetails(id);
             
             if (!productOpt.isPresent()) {
-                System.out.println("❌ [ProductService] Product not found: " + id);
                 return null;
             }
             
             Product p = productOpt.get();
-            System.out.println("✅ [ProductService] Product loaded: " + p.getProductName());
             
-            // ✅ Query 2: Load Variants (KHÔNG load images ở đây)
             productRepository.findByIdWithVariants(id).ifPresent(productWithVariants -> {
                 p.setVariants(productWithVariants.getVariants());
             });
-            
-            // ✅ Query 3: Load Colors
+
             productRepository.findByIdWithColors(id).ifPresent(productWithColors -> {
                 p.setColors(productWithColors.getColors());
             });
@@ -77,7 +84,6 @@ public class ProductService {
                 p.getCategories().stream()
                     .map(c -> new ProductDetailDTO.CategoryDTO(c.getId(), c.getName()))
                     .collect(Collectors.toList());
-            System.out.println("   - Categories: " + dto.categories.size());
 
             // Variants
             dto.variants = p.getVariants() == null ? List.of() :
@@ -90,14 +96,11 @@ public class ProductService {
                         v.getStockQuantity()
                     ))
                     .collect(Collectors.toList());
-            System.out.println("   - Variants: " + dto.variants.size());
 
-            // ✅ Images: Force load trong transaction (Hibernate sẽ tự fetch)
             List<ProductDetailDTO.ImageDTO> imgs = new ArrayList<>();
             if (p.getVariants() != null) {
                 for (var variant : p.getVariants()) {
-                    // ✅ Hibernate.initialize() sẽ tự động fetch images
-                    var images = variant.getImages(); // Lazy load trong transaction
+                    var images = variant.getImages();
                     if (images != null && !images.isEmpty()) {
                         for (var img : images) {
                             imgs.add(new ProductDetailDTO.ImageDTO(img.getImageUrl()));
@@ -113,18 +116,13 @@ public class ProductService {
             dto.images = imgs;
             System.out.println("   - Images: " + dto.images.size());
 
-            // ✅ Colors
             dto.colors = p.getColors() == null ? List.of() :
                 p.getColors().stream()
                     .map(productColor -> new ProductDetailDTO.ColorDTO(productColor.getHexCode()))
                     .collect(Collectors.toList());
-            System.out.println("   - Colors: " + dto.colors.size());
-            
-            System.out.println("✅ [ProductService] DTO created successfully");
             return dto;
             
         } catch (Exception e) {
-            System.err.println("❌ [ProductService] Error: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Could not fetch product: " + e.getMessage(), e);
         }

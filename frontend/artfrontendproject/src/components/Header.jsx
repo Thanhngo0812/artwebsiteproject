@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import SearchBar from "./SearchBar";
 
 export default function Header() {
   const [categories, setCategories] = useState([]);
@@ -10,6 +11,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeParentId, setActiveParentId] = useState(null);
   const [activeSidebarParentId, setActiveSidebarParentId] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -128,6 +130,8 @@ export default function Header() {
   };
 
   return (
+    <>
+    <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     <header className="header">
       <div className={`nav-sidebar ${menuOpen ? "active" : ""}`}>
         <ul className="nav-sidebar-menu">
@@ -249,7 +253,7 @@ export default function Header() {
         </div>
 
         <div className="nav-right">
-          <button className="icon-button">
+          <button className="icon-button" onClick={() => setSearchOpen(true)}>
             <img src="/search.png" alt="Search" className="nav-icon" />
           </button>
           <Link to="/login" className="icon-button">
@@ -261,5 +265,6 @@ export default function Header() {
         </div>
       </nav>
     </header>
+    </>
   );
 }

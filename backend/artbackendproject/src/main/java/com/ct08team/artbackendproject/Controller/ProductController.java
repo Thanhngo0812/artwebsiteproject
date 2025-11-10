@@ -17,6 +17,7 @@ import com.ct08team.artbackendproject.DTO.ProductVariantDTO;
 import com.ct08team.artbackendproject.Entity.product.ProductVariant;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,6 +30,20 @@ public class ProductController {
 
     @Autowired
     private ProductVariantRepository variantRepository;
+
+
+    @GetMapping("/search-query")
+    public ResponseEntity<List<ProductListDTO>> searchProducts(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        if (q == null || q.trim().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        
+        List<ProductListDTO> results = productService.searchProducts(q.trim(), limit);
+        return ResponseEntity.ok(results);
+    }
 
     @PostMapping("/search")
     public ResponseEntity<Page<ProductListDTO>> searchProducts(
@@ -78,9 +93,6 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * ✅ FIX: Giới hạn size tối đa 20
-     */
     @PostMapping("/by-ids")
     public ResponseEntity<?> getProductsByIds(
             @RequestBody java.util.List<Long> ids,
@@ -150,9 +162,7 @@ public class ProductController {
         }
     }
 
-    /**
-     * ✅ FIX: Giới hạn size tối đa 20
-     */
+
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<?> getProductsByCategory(
             @PathVariable Long categoryId,

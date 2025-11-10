@@ -41,7 +41,7 @@ function App() {
             <Route path="cart" element={<Cart />} />
             <Route path="products" element={<ProductUser />} />
             <Route path="products/:id" element={<ProductDetail />} />
-            <Route path="products/list" element={<ProductListPage />} />
+            <Route path="products/search" element={<ProductListPage />} />
             </Route>
           </Route>
           {/*trang đăng nhập/ đăng kí*/}

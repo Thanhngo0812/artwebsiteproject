@@ -8,6 +8,7 @@ import com.ct08team.artbackendproject.Entity.product.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -43,4 +44,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
            "WHERE p.productStatus = 1 " +
            "ORDER BY p.createdAt DESC")
     Page<Product> findNewestProducts(Pageable pageable);
+
+    @Query("SELECT DISTINCT p FROM Product p " +
+           "LEFT JOIN p.categories c " +
+           "WHERE p.productStatus = 1 " +
+           "AND (LOWER(p.productName) LIKE :keyword " +
+           "OR LOWER(p.description) LIKE :keyword " +
+           "OR LOWER(c.name) LIKE :keyword) " +
+           "ORDER BY p.viewCount DESC, p.salesCount DESC")
+    List<Product> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
