@@ -14,15 +14,12 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const [parentCategories, setParentCategories] = useState([]);
-  const [childCategories, setChildCategories] = useState([]);
-  const [displayCategories, setDisplayCategories] = useState([]); // ✅ THÊM: Categories hiển thị
+  const [displayCategories, setDisplayCategories] = useState([]); // ✅ CHỈ dùng để hiển thị danh mục
 
   useEffect(() => {
     fetchProductDetail();
@@ -52,50 +49,37 @@ export default function ProductDetail() {
         setMainImage(data.thumbnail);
       }
 
-      // ✅ LOGIC MỚI: Phân loại + xác định categories hiển thị
+      // ✅ Logic xác định categories hiển thị (CHỈ để show trong pd-info-section)
       if (data.categories && data.categories.length > 0) {
         const parents = data.categories.filter(c => c.id >= 1 && c.id <= 5);
         const children = data.categories.filter(c => c.id >= 6);
-        
-        setParentCategories(parents);
-        setChildCategories(children);
-
-        console.log('📁 Parent categories:', parents);
-        console.log('📂 Child categories:', children);
 
         let categoriesToDisplay = [];
-        let defaultCategory = null;
 
-        // ✅ QUY TẮC HIỂN THỊ:
         if (parents.length >= 2) {
-          // Trường hợp 1: Có 2 cha → Hiển thị 2 cha
+          // Có 2 cha → Hiển thị cả 2
           categoriesToDisplay = parents;
-          defaultCategory = parents[0].id;
         } else if (parents.length === 1 && children.length > 0) {
-          // Trường hợp 2: 1 cha + con → CHỈ HIỂN THỊ CON
+          // 1 cha + con → CHỈ hiển thị con
           categoriesToDisplay = children;
-          defaultCategory = children[0].id;
         } else if (children.length > 0) {
-          // Trường hợp 3: Chỉ có con → Hiển thị con
+          // Chỉ có con
           categoriesToDisplay = children;
-          defaultCategory = children[0].id;
         } else if (parents.length === 1) {
-          // Trường hợp 4: Chỉ có 1 cha
+          // Chỉ có 1 cha
           categoriesToDisplay = parents;
-          defaultCategory = parents[0].id;
         }
 
         setDisplayCategories(categoriesToDisplay);
-        setSelectedCategory(defaultCategory);
-
-        console.log('✅ Display categories:', categoriesToDisplay);
       }
 
+      // ✅ Set default variant (chọn variant đầu tiên còn hàng)
       if (data.variants && data.variants.length > 0) {
         const firstAvailable = data.variants.find(v => v.stockQuantity > 0) || data.variants[0];
         setSelectedVariant(firstAvailable);
       }
 
+      // Fetch related products
       if (data.categories && data.categories.length > 0) {
         const categoryId = data.categories[0].id;
         const related = await productService.getRelatedByCategory(categoryId, 8);
@@ -111,45 +95,6 @@ export default function ProductDetail() {
     }
   };
 
-  /**
-   * ✅ FIX: getVariantsByCategory - Dựa vào displayCategories
-   */
-  const getVariantsByCategory = (categoryId) => {
-    if (!product || !product.variants) return [];
-
-    // ✅ Nếu có 2 cha
-    if (parentCategories.length >= 2) {
-      const parentIndex = parentCategories.findIndex(c => c.id === categoryId);
-      if (parentIndex === -1) return [];
-      
-      const variantsPerParent = Math.ceil(product.variants.length / parentCategories.length);
-      const startIndex = parentIndex * variantsPerParent;
-      const endIndex = startIndex + variantsPerParent;
-      
-      return product.variants.slice(startIndex, endIndex);
-    }
-    
-    // ✅ Nếu hiển thị con (1 cha + nhiều con)
-    if (displayCategories.length > 0 && displayCategories[0].id >= 6) {
-      const childIndex = displayCategories.findIndex(c => c.id === categoryId);
-      if (childIndex === -1) return product.variants;
-      
-      const variantsPerChild = Math.ceil(product.variants.length / displayCategories.length);
-      const startIndex = childIndex * variantsPerChild;
-      const endIndex = startIndex + variantsPerChild;
-      
-      return product.variants.slice(startIndex, endIndex);
-    }
-    
-    return product.variants;
-  };
-
-  const getCategoryName = () => {
-    if (!product) return '';
-    const cat = product.categories.find(c => c.id === selectedCategory);
-    return cat ? cat.name : '';
-  };
-
   const handleAddToCart = () => {
     if (!selectedVariant || selectedVariant.stockQuantity <= 0) {
       toast.warning('Sản phẩm này hiện đã hết hàng');
@@ -161,9 +106,11 @@ export default function ProductDetail() {
       return;
     }
 
-    const categoryName = getCategoryName();
+    // ✅ Lấy category đầu tiên trong displayCategories
+    const categoryId = displayCategories.length > 0 ? displayCategories[0].id : product.categories[0].id;
+    const categoryName = displayCategories.length > 0 ? displayCategories[0].name : product.categories[0].name;
 
-    addToCart(product, selectedCategory, categoryName, selectedVariant.dimensions, quantity);
+    addToCart(product, categoryId, categoryName, selectedVariant.dimensions, quantity);
     toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
   };
 
@@ -203,7 +150,6 @@ export default function ProductDetail() {
   }
 
   const inStock = selectedVariant && selectedVariant.stockQuantity > 0;
-  const currentCategoryVariants = getVariantsByCategory(selectedCategory);
 
   return (
     <div className="product-detail-page">
@@ -243,62 +189,14 @@ export default function ProductDetail() {
             {selectedVariant ? formatPrice(selectedVariant.price) : formatPrice(product.minPrice)}
           </div>
 
-          {/* ✅ HIỂN THỊ CATEGORY: Buttons hoặc Dropdown */}
-          {displayCategories.length > 1 && (
-            <div className="pd-category-section">
-              <label>Loại tranh:</label>
-              
-              {/* ✅ Nếu có 2 cha → Buttons */}
-              {parentCategories.length >= 2 ? (
-                <div className="pd-category-options">
-                  {displayCategories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      className={`pd-category-btn ${selectedCategory === cat.id ? 'active' : ''}`}
-                      onClick={() => {
-                        setSelectedCategory(cat.id);
-                        const variants = getVariantsByCategory(cat.id);
-                        if (variants.length > 0) {
-                          const firstAvailable = variants.find(v => v.stockQuantity > 0) || variants[0];
-                          setSelectedVariant(firstAvailable);
-                        }
-                      }}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                /* ✅ Nhiều con → Dropdown */
-                <select 
-                  value={selectedCategory}
-                  onChange={(e) => {
-                    const newCatId = parseInt(e.target.value);
-                    setSelectedCategory(newCatId);
-                    const variants = getVariantsByCategory(newCatId);
-                    if (variants.length > 0) {
-                      const firstAvailable = variants.find(v => v.stockQuantity > 0) || variants[0];
-                      setSelectedVariant(firstAvailable);
-                    }
-                  }}
-                  className="pd-category-dropdown"
-                >
-                  {displayCategories.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          )}
-
+          {/* ✅ BỎ CATEGORY SELECTOR - CHỈ GIỮ VARIANT/DIMENSION */}
+          
           {/* Variant Selection */}
-          {currentCategoryVariants.length > 0 && (
+          {product.variants && product.variants.length > 0 && (
             <div className="pd-variant-section">
               <label>Chọn kích thước:</label>
               <div className="pd-variant-options">
-                {currentCategoryVariants.map((variant) => (
+                {product.variants.map((variant) => (
                   <button
                     key={variant.id}
                     className={`pd-variant-btn ${selectedVariant?.id === variant.id ? 'active' : ''} ${variant.stockQuantity <= 0 ? 'out-of-stock' : ''}`}
@@ -367,14 +265,16 @@ export default function ProductDetail() {
             </button>
           </div>
 
+          {/* Product Info */}
           <div className="pd-info-section">
             <div className="pd-info-item">
               <span className="pd-info-label">Danh mục:</span>
-            <span className="pd-info-value">
-              {displayCategories.length > 0 
-                ? displayCategories.map(c => c.name).join(', ')
-                : (product.categories?.map(c => c.name).join(', ') || '—')}
-            </span>
+              <span className="pd-info-value">
+                {/* ✅ HIỂN THỊ theo logic: 2 cha → cả 2, 1 cha + con → chỉ con */}
+                {displayCategories.length > 0 
+                  ? displayCategories.map(c => c.name).join(', ')
+                  : (product.categories?.map(c => c.name).join(', ') || '—')}
+              </span>
             </div>
             
             {product.colors && product.colors.length > 0 && (
