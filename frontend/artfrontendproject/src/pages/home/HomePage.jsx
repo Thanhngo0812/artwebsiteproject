@@ -99,14 +99,14 @@ export default function HomePage() {
       <ProductSection
         title="Sản Phẩm Nổi Bật"
         products={featuredProducts}
-        viewAllLink="/products?sort=featured"
+        viewAllLink="/products/list?sort=featured"
       />
 
       {/* Sản phẩm mới */}
       <ProductSection
         title="Sản Phẩm Mới"
         products={newestProducts}
-        viewAllLink="/products?sort=newest"
+        viewAllLink="/products/list?sort=newest"
       />
 
       {/* Sản phẩm đã xem

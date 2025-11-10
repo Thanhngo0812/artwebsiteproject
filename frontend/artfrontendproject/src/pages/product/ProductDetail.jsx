@@ -1,66 +1,153 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import productService from '../../service/productService';
 import ProductCard from '../../components/ProductCard';
+import { useCart } from '../../hooks/useCart';
 import './css/ProductDetail.css';
-
-const API_BASE = 'http://localhost:8888/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const [parentCategories, setParentCategories] = useState([]);
+  const [childCategories, setChildCategories] = useState([]);
+  const [displayCategories, setDisplayCategories] = useState([]); // ✅ THÊM: Categories hiển thị
 
   useEffect(() => {
     fetchProductDetail();
-    // Scroll to top when product changes
     window.scrollTo(0, 0);
+    saveToViewedProducts(id);
   }, [id]);
+
+  const saveToViewedProducts = (productId) => {
+    try {
+      const viewed = JSON.parse(localStorage.getItem('viewedProducts') || '[]');
+      const newViewed = [Number(productId), ...viewed.filter(v => v !== Number(productId))].slice(0, 20);
+      localStorage.setItem('viewedProducts', JSON.stringify(newViewed));
+    } catch (error) {
+      console.error('Error saving viewed products:', error);
+    }
+  };
 
   const fetchProductDetail = async () => {
     setLoading(true);
     try {
-      // Fetch product detail
-      const response = await fetch(`${API_BASE}/products/${id}`);
-      if (!response.ok) throw new Error('Product not found');
-      
-      const data = await response.json();
+      const data = await productService.getProductById(id);
       setProduct(data);
-      setMainImage(data.thumbnail);
+      
+      if (data.images && data.images.length > 0) {
+        setMainImage(data.images[0].imageUrl);
+      } else {
+        setMainImage(data.thumbnail);
+      }
 
-      // Set default variant (first one with stock)
+      // ✅ LOGIC MỚI: Phân loại + xác định categories hiển thị
+      if (data.categories && data.categories.length > 0) {
+        const parents = data.categories.filter(c => c.id >= 1 && c.id <= 5);
+        const children = data.categories.filter(c => c.id >= 6);
+        
+        setParentCategories(parents);
+        setChildCategories(children);
+
+        console.log('📁 Parent categories:', parents);
+        console.log('📂 Child categories:', children);
+
+        let categoriesToDisplay = [];
+        let defaultCategory = null;
+
+        // ✅ QUY TẮC HIỂN THỊ:
+        if (parents.length >= 2) {
+          // Trường hợp 1: Có 2 cha → Hiển thị 2 cha
+          categoriesToDisplay = parents;
+          defaultCategory = parents[0].id;
+        } else if (parents.length === 1 && children.length > 0) {
+          // Trường hợp 2: 1 cha + con → CHỈ HIỂN THỊ CON
+          categoriesToDisplay = children;
+          defaultCategory = children[0].id;
+        } else if (children.length > 0) {
+          // Trường hợp 3: Chỉ có con → Hiển thị con
+          categoriesToDisplay = children;
+          defaultCategory = children[0].id;
+        } else if (parents.length === 1) {
+          // Trường hợp 4: Chỉ có 1 cha
+          categoriesToDisplay = parents;
+          defaultCategory = parents[0].id;
+        }
+
+        setDisplayCategories(categoriesToDisplay);
+        setSelectedCategory(defaultCategory);
+
+        console.log('✅ Display categories:', categoriesToDisplay);
+      }
+
       if (data.variants && data.variants.length > 0) {
         const firstAvailable = data.variants.find(v => v.stockQuantity > 0) || data.variants[0];
         setSelectedVariant(firstAvailable);
       }
 
-      // Fetch related products (same category, in stock)
       if (data.categories && data.categories.length > 0) {
         const categoryId = data.categories[0].id;
-        const relatedResponse = await fetch(`${API_BASE}/products?categoryId=${categoryId}&size=9`);
-        const relatedData = await relatedResponse.json();
-        
-        // Filter out current product and out of stock
-        const filtered = (relatedData.content || relatedData).filter(p => 
-          p.id !== parseInt(id) && 
-          p.variants?.some(v => v.stockQuantity > 0)
-        ).slice(0, 8);
-        
+        const related = await productService.getRelatedByCategory(categoryId, 8);
+        const filtered = related.filter(p => p.id !== parseInt(id));
         setRelatedProducts(filtered);
       }
 
     } catch (error) {
-      console.error('Error fetching product:', error);
+      console.error('❌ Error:', error);
       toast.error('Không thể tải thông tin sản phẩm');
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * ✅ FIX: getVariantsByCategory - Dựa vào displayCategories
+   */
+  const getVariantsByCategory = (categoryId) => {
+    if (!product || !product.variants) return [];
+
+    // ✅ Nếu có 2 cha
+    if (parentCategories.length >= 2) {
+      const parentIndex = parentCategories.findIndex(c => c.id === categoryId);
+      if (parentIndex === -1) return [];
+      
+      const variantsPerParent = Math.ceil(product.variants.length / parentCategories.length);
+      const startIndex = parentIndex * variantsPerParent;
+      const endIndex = startIndex + variantsPerParent;
+      
+      return product.variants.slice(startIndex, endIndex);
+    }
+    
+    // ✅ Nếu hiển thị con (1 cha + nhiều con)
+    if (displayCategories.length > 0 && displayCategories[0].id >= 6) {
+      const childIndex = displayCategories.findIndex(c => c.id === categoryId);
+      if (childIndex === -1) return product.variants;
+      
+      const variantsPerChild = Math.ceil(product.variants.length / displayCategories.length);
+      const startIndex = childIndex * variantsPerChild;
+      const endIndex = startIndex + variantsPerChild;
+      
+      return product.variants.slice(startIndex, endIndex);
+    }
+    
+    return product.variants;
+  };
+
+  const getCategoryName = () => {
+    if (!product) return '';
+    const cat = product.categories.find(c => c.id === selectedCategory);
+    return cat ? cat.name : '';
   };
 
   const handleAddToCart = () => {
@@ -69,35 +156,25 @@ export default function ProductDetail() {
       return;
     }
 
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const cartItem = {
-      productId: product.id,
-      productName: product.productname,
-      thumbnail: product.thumbnail,
-      variant: selectedVariant.dimensions,
-      price: selectedVariant.price,
-      quantity: quantity,
-      maxStock: selectedVariant.stockQuantity
-    };
-
-    // Check if item already exists in cart
-    const existingIndex = cart.findIndex(
-      item => item.productId === cartItem.productId && item.variant === cartItem.variant
-    );
-
-    if (existingIndex >= 0) {
-      cart[existingIndex].quantity += quantity;
-    } else {
-      cart.push(cartItem);
+    if (!product || !product.id) {
+      toast.error('Lỗi: Không tìm thấy thông tin sản phẩm');
+      return;
     }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
-    toast.success('Đã thêm vào giỏ hàng!');
+    const categoryName = getCategoryName();
+
+    addToCart(product, selectedCategory, categoryName, selectedVariant.dimensions, quantity);
+    toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
   };
 
   const handleBuyNow = () => {
     handleAddToCart();
     navigate('/cart');
+  };
+
+  const handleImageClick = (imageUrl, index) => {
+    setMainImage(imageUrl);
+    setActiveImageIndex(index);
   };
 
   const formatPrice = (price) => {
@@ -108,65 +185,123 @@ export default function ProductDetail() {
   };
 
   if (loading) {
-    return <div className="pd-loading">Đang tải...</div>;
+    return (
+      <div className="pd-loading-container">
+        <div className="pd-loading-spinner"></div>
+        <p>Đang tải sản phẩm...</p>
+      </div>
+    );
   }
 
   if (!product) {
-    return <div className="pd-error">Không tìm thấy sản phẩm</div>;
+    return (
+      <div className="pd-error">
+        <h2>Không tìm thấy sản phẩm</h2>
+        <Link to="/products" className="pd-back-link">← Quay lại danh sách sản phẩm</Link>
+      </div>
+    );
   }
 
   const inStock = selectedVariant && selectedVariant.stockQuantity > 0;
-  const colorsText = product.colors?.map(c => c.hexCode).join(' - ') || '—';
-  const variantsText = product.variants?.map(v => v.dimensions).join(' / ') || '—';
+  const currentCategoryVariants = getVariantsByCategory(selectedCategory);
 
   return (
     <div className="product-detail-page">
-      {/* Top Section: Image + Info */}
+      <div className="pd-breadcrumb">
+        <Link to="/">Trang chủ</Link>
+        <span> / </span>
+        <Link to="/products">Sản phẩm</Link>
+        <span> / </span>
+        <span>{product.productName || product.productname}</span>
+      </div>
+
       <div className="pd-container">
-        {/* Left: Images */}
         <div className="pd-left">
           <div className="pd-main-image">
-            <img src={mainImage} alt={product.productname} />
+            <img src={mainImage} alt={product.productName || product.productname} />
           </div>
           
-          {product.images && product.images.length > 0 && (
+          {product.images && product.images.length > 1 && (
             <div className="pd-thumbnails">
-              <img 
-                src={product.thumbnail} 
-                alt="Main" 
-                className={mainImage === product.thumbnail ? 'active' : ''}
-                onClick={() => setMainImage(product.thumbnail)}
-              />
               {product.images.map((img, idx) => (
                 <img 
                   key={idx}
                   src={img.imageUrl} 
-                  alt={`${product.productname}-${idx}`}
-                  className={mainImage === img.imageUrl ? 'active' : ''}
-                  onClick={() => setMainImage(img.imageUrl)}
+                  alt={`${product.productName}-${idx}`}
+                  className={activeImageIndex === idx ? 'active' : ''}
+                  onClick={() => handleImageClick(img.imageUrl, idx)}
                 />
               ))}
             </div>
           )}
         </div>
 
-        {/* Right: Product Info */}
         <div className="pd-right">
-          <h1 className="pd-title">{product.productname}</h1>
+          <h1 className="pd-title">{product.productName || product.productname}</h1>
           
           <div className="pd-price">
             {selectedVariant ? formatPrice(selectedVariant.price) : formatPrice(product.minPrice)}
           </div>
 
+          {/* ✅ HIỂN THỊ CATEGORY: Buttons hoặc Dropdown */}
+          {displayCategories.length > 1 && (
+            <div className="pd-category-section">
+              <label>Loại tranh:</label>
+              
+              {/* ✅ Nếu có 2 cha → Buttons */}
+              {parentCategories.length >= 2 ? (
+                <div className="pd-category-options">
+                  {displayCategories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      className={`pd-category-btn ${selectedCategory === cat.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedCategory(cat.id);
+                        const variants = getVariantsByCategory(cat.id);
+                        if (variants.length > 0) {
+                          const firstAvailable = variants.find(v => v.stockQuantity > 0) || variants[0];
+                          setSelectedVariant(firstAvailable);
+                        }
+                      }}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                /* ✅ Nhiều con → Dropdown */
+                <select 
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    const newCatId = parseInt(e.target.value);
+                    setSelectedCategory(newCatId);
+                    const variants = getVariantsByCategory(newCatId);
+                    if (variants.length > 0) {
+                      const firstAvailable = variants.find(v => v.stockQuantity > 0) || variants[0];
+                      setSelectedVariant(firstAvailable);
+                    }
+                  }}
+                  className="pd-category-dropdown"
+                >
+                  {displayCategories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
           {/* Variant Selection */}
-          {product.variants && product.variants.length > 0 && (
+          {currentCategoryVariants.length > 0 && (
             <div className="pd-variant-section">
-              <label>Chọn loại:</label>
+              <label>Chọn kích thước:</label>
               <div className="pd-variant-options">
-                {product.variants.map((variant) => (
+                {currentCategoryVariants.map((variant) => (
                   <button
-                    key={variant.dimensions}
-                    className={`pd-variant-btn ${selectedVariant?.dimensions === variant.dimensions ? 'active' : ''} ${variant.stockQuantity <= 0 ? 'out-of-stock' : ''}`}
+                    key={variant.id}
+                    className={`pd-variant-btn ${selectedVariant?.id === variant.id ? 'active' : ''} ${variant.stockQuantity <= 0 ? 'out-of-stock' : ''}`}
                     onClick={() => setSelectedVariant(variant)}
                     disabled={variant.stockQuantity <= 0}
                   >
@@ -192,7 +327,7 @@ export default function ProductDetail() {
               <input 
                 type="number" 
                 value={quantity} 
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) => setQuantity(Math.max(1, Math.min(selectedVariant?.stockQuantity || 1, parseInt(e.target.value) || 1)))}
                 min="1"
                 max={selectedVariant?.stockQuantity || 1}
                 disabled={!inStock}
@@ -213,7 +348,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Actions */}
           <div className="pd-actions">
             <button 
               className={`pd-btn-add ${!inStock ? 'disabled' : ''}`}
@@ -228,46 +363,35 @@ export default function ProductDetail() {
               onClick={handleBuyNow}
               disabled={!inStock}
             >
-              Thanh toán
+              Mua ngay
             </button>
           </div>
 
-          {/* Product Info */}
           <div className="pd-info-section">
             <div className="pd-info-item">
-              <span className="pd-info-label">Tên tác phẩm:</span>
-              <span className="pd-info-value">{product.productname}</span>
+              <span className="pd-info-label">Danh mục:</span>
+            <span className="pd-info-value">
+              {displayCategories.length > 0 
+                ? displayCategories.map(c => c.name).join(', ')
+                : (product.categories?.map(c => c.name).join(', ') || '—')}
+            </span>
             </div>
             
-            <div className="pd-info-item">
-              <span className="pd-info-label">Thể loại:</span>
-              <span className="pd-info-value">
-                {product.categories?.map(c => c.name).join(', ') || '—'}
-              </span>
-            </div>
-            
-            <div className="pd-info-item">
-              <span className="pd-info-label">Màu sắc:</span>
-              <span className="pd-info-value">
-                {product.colors && product.colors.length > 0 ? (
-                  <div className="pd-colors">
-                    {product.colors.map((color, idx) => (
-                      <span 
-                        key={idx}
-                        className="pd-color-box"
-                        style={{ backgroundColor: color.hexCode }}
-                        title={color.hexCode}
-                      />
-                    ))}
-                  </div>
-                ) : '—'}
-              </span>
-            </div>
-            
-            <div className="pd-info-item">
-              <span className="pd-info-label">Loại:</span>
-              <span className="pd-info-value">{variantsText}</span>
-            </div>
+            {product.colors && product.colors.length > 0 && (
+              <div className="pd-info-item">
+                <span className="pd-info-label">Màu sắc:</span>
+                <div className="pd-colors">
+                  {product.colors.map((color, idx) => (
+                    <span 
+                      key={idx}
+                      className="pd-color-box"
+                      style={{ backgroundColor: color.hexCode }}
+                      title={color.hexCode}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="pd-info-item pd-description">
               <span className="pd-info-label">Mô tả:</span>
@@ -277,26 +401,14 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Related Products Section */}
       {relatedProducts.length > 0 && (
         <div className="pd-related-section">
-          <h2 className="pd-related-title">Có thể bạn quan tâm</h2>
+          <h2 className="pd-related-title">Sản phẩm liên quan</h2>
           <div className="pd-related-grid">
             {relatedProducts.map(p => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
-          
-          {relatedProducts.length >= 8 && product.categories?.[0] && (
-            <div className="pd-related-more">
-              <Link 
-                to={`/products?categoryId=${product.categories[0].id}`}
-                className="pd-view-more-btn"
-              >
-                Xem thêm →
-              </Link>
-            </div>
-          )}
         </div>
       )}
     </div>

@@ -13,11 +13,18 @@ export default function ProductCard({ product }) {
   return (
     <Link to={`/products/${product.id}`} className="product-card">
       <div className="product-card-image">
-        <img src={product.thumbnail} alt={product.productname} />
+        <img 
+          src={product.thumbnail} 
+          alt={product.productName || product.productname} 
+        />
       </div>
       <div className="product-card-info">
-        <h3 className="product-card-name">{product.productname}</h3>
-        <p className="product-card-price">{formatPrice(product.minPrice)}</p>
+        <h3 className="product-card-name">
+          {product.productName || product.productname}
+        </h3>
+        <p className="product-card-price">
+          {formatPrice(product.minPrice)}
+        </p>
       </div>
     </Link>
   );

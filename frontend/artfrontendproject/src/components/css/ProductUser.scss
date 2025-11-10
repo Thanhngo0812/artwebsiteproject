@@ -1,6 +1,7 @@
 .productUser-container {
   background-color: #f2f2f2;
   min-height: 100vh;
+  
   .list-filter-reponsive {
     position: fixed;
     background-color: #f2f2f2;
@@ -13,113 +14,139 @@
     padding: 20px;
     transform: translateX(-110%);
     transition: transform 0.35s ease;
+    
     &.active {
       transform: translateX(0);
     }
+    
     .list-filter-reponsive-title {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
+      
       span:nth-child(1) {
         font-size: 20px;
         font-weight: bold;
       }
+      
       .icon-close-filter-reponsive {
         font-size: 25px;
         cursor: pointer;
       }
     }
+    
     .productUser-filter {
       margin: 0;
     }
   }
+  
   .productUser-title {
     font-weight: 700;
     font-size: 25px;
     text-align: center;
     padding: 50px 0;
   }
+  
   .productUser-content {
     display: flex;
   }
+  
   .productUser-filter {
     color: #212121BF;
-    // min-width: 250px;
     margin-right: 20px;
     margin-left: 3rem;
+    
     .productUser-filter-title {
       margin-bottom: 30px;
       display: flex;
       justify-content: space-between;
+      
       .productUser-filter-title-name {
         font-weight: bold;
+        
         .icon-filter-reponsive {
           display: none;
         }
       }
+      
       .clear-all-filters {
         font-style: italic;
         cursor: pointer;
         text-decoration: underline;
         transition: 0.2s;
         color: #56575a;
+        
         &:hover {
           color: black;
         }
       }
     }
+    
     .productUser-filter-content {
       input {
         width: 17px;
         height: 17px;
         cursor: pointer;
       }
+      
       span {
         cursor: pointer;
       }
+      
       .categories-content {
         margin-bottom: 20px;
+        
         .categories-content-name {
           display: flex;
           align-items: center;
           cursor: pointer;
         }
+        
         .categories-content-child {
           margin-top: 5px;
           margin-left: 30px;
+          
           label {
             display: flex;
             align-items: center;
           }
         }
       }
+      
       .materials-content {
         margin-top: 5px;
         margin-bottom: 20px;
+        
         .materials-content-name {
           display: flex;
           align-items: center;
           cursor: pointer;
+          
           span {
             margin-left: 4px;
           }
         }
+        
         .materials-content-child {
           margin-top: 5px;
           margin-left: 30px;
+          
           label {
             display: flex;
             align-items: center;
           }
         }
       }
+      
       .price-item {
         position: relative;
         margin-bottom: 20px;
+        
         .price-item_title {
           cursor: pointer;
         }
+        
         .price-item_slide {
           display: flex;
           flex-direction: column;
@@ -180,9 +207,8 @@
           }
         }
       }
+      
       .color-item {
-        // width: 100%;
-        // height: 24px;
         margin-bottom: 20px;
 
         .color-item_title {
@@ -214,13 +240,14 @@
             width: 30px;
             height: 30px;
             border-radius: 4px;
-            // border: 1px solid #bbb;
             display: flex;
             align-items: center;
             justify-content: center;
+            
             &:hover {
               cursor: pointer;
             }
+            
             .ticked-color {
               &.hide {
                 display: none;
@@ -236,38 +263,48 @@
           }
         }
       }
+      
       .dimensions-content {
         margin-bottom: 20px;
+        
         .dimensions-title {
           display: flex;
           align-items: center;
           cursor: pointer;
+          
           span {
             margin-left: 4px;
           }
         }
+        
         .dimensions-item {
           margin-top: 5px;
           margin-left: 30px;
+          
           label {
             display: flex;
             align-items: center;
           }
         }
       }
+      
       .topics-content {
         margin-bottom: 20px;
+        
         .topics-title {
           display: flex;
           align-items: center;
           cursor: pointer;
+          
           span {
             margin-left: 4px;
           }
         }
+        
         .topics-item {
           margin-top: 5px;
           margin-left: 30px;
+          
           label {
             display: flex;
             align-items: center;
@@ -276,62 +313,120 @@
       }
     }
   }
+  
   .productUser-showProduct {
     flex: 1;
     display: flex;
     flex-direction: column;
+    
     .sort-container {
       margin-bottom: 30px;
       padding-right: 70px;
       display: flex;
       align-items: center;
       justify-content: end;
+      
       span {
         margin-right: 10px;
       }
     }
+    
     .main-show-product {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 20px;
+      padding: 0 20px;
+      
       .product-item {
-        flex: 0 0 calc(25% - 10px);
+        // ✅ FIX: Styles cho Link component
+        flex: 0 0 calc(25% - 20px);
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        &:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
         .product-thumbnail {
+          width: 100%;
+          aspect-ratio: 1;
+          overflow: hidden;
+          background-color: #f5f5f5;
+          
           img {
             width: 100%;
-            // height: 100%;
+            height: 100%;
             object-fit: cover;
+            transition: transform 0.3s ease;
           }
         }
-        .product-name {
-          margin-top: 5px;
+
+        &:hover .product-thumbnail img {
+          transform: scale(1.08);
         }
+        
+        .product-name {
+          margin-top: 12px;
+          padding: 0 16px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+          line-height: 1.4;
+          min-height: 48px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
         .product-price {
-          margin-top: 5px;
+          margin-top: 8px;
+          padding: 0 16px 16px;
+          font-size: 18px;
+          font-weight: bold;
+          color: #D32F2F;
         }
       }
+      
       .product-not-found {
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        min-height: 400px;
+        
         .product-not-found-title {
           font-weight: 700;
           font-size: 40px;
+          color: #666;
+          margin-bottom: 20px;
         }
+        
         .back-to-shop {
           font-style: italic;
           cursor: pointer;
           text-decoration: underline;
           transition: 0.2s;
           color: #56575a;
+          font-size: 18px;
+          
           &:hover {
             color: black;
           }
         }
       }
     }
+    
     .pagination {
       display: flex;
       justify-content: center;
@@ -365,12 +460,25 @@
   }
 }
 
+// Responsive breakpoints
+@media (max-width: 1200px) {
+  .productUser-container {
+    .productUser-showProduct {
+      .main-show-product {
+        .product-item {
+          flex: 0 0 calc(33.333% - 20px);
+        }
+      }
+    }
+  }
+}
+
 @media (max-width: 990px) {
   .productUser-container {
     .productUser-showProduct {
       .main-show-product {
         .product-item {
-          flex: 0 0 calc((100% / 3) - 10px);
+          flex: 0 0 calc(33.333% - 20px);
         }
       }
     }
@@ -381,24 +489,34 @@
   .productUser-container {
     .productUser-content {
       flex-direction: column;
+      
       .productUser-filter {
         margin-left: 20px;
+        
         .productUser-filter-title {
           .productUser-filter-title-name {
             cursor: pointer;
+            
             .icon-filter-reponsive {
               display: inline;
               margin-right: 6px;
             }
           }
         }
+        
         .productUser-filter-content {
           display: none;
         }
       }
+      
       .productUser-showProduct {
         .main-show-product {
-          margin-left: 10px;
+          margin-left: 0;
+          padding: 0 10px;
+          
+          .product-item {
+            flex: 0 0 calc(50% - 20px);
+          }
         }
       }
     }
@@ -413,44 +531,59 @@
   }
 }
 
+@media (max-width: 480px) {
+  .productUser-container {
+    .productUser-showProduct {
+      .main-show-product {
+        gap: 12px;
+        
+        .product-item {
+          flex: 0 0 calc(50% - 12px);
+          
+          .product-name {
+            font-size: 14px;
+            min-height: 40px;
+          }
+          
+          .product-price {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Range slider styles
 .range {
-  -webkit-appearance: none; /* Tắt style mặc định của Chrome/Safari */
+  -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  background: transparent; /* Làm cho track của input trong suốt */
-  pointer-events: none;    /* Input này chỉ dùng để kéo thumb */
-  position: absolute;      /* Đảm bảo nó nằm đè lên track div */
+  background: transparent;
+  pointer-events: none;
+  position: absolute;
   left: 0;
 }
 
-/* Tắt track mặc định của Firefox */
 .range::-moz-range-track {
   background: transparent;
   border-color: transparent;
 }
 
-/* 2. Style cho nút tròn (thumb) trên Chrome, Safari, Edge 
-*/
 .range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  
-  /* Các thuộc tính này mô phỏng style trong ảnh của bạn */
   height: 20px; 
   width: 20px;
-  border-radius: 50%; /* Làm nó hình tròn */
+  border-radius: 50%;
   border: 2px solid white;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   cursor: pointer;
-  pointer-events: auto; /* Cho phép click và kéo thumb */
-  margin-top: -8px; /* Căn chỉnh thumb vào giữa track (thay đổi nếu cần) */
-  
-  /* --- ĐỔI MÀU Ở ĐÂY --- */
-  background-color: #565656; /* <-- MÀU XÁM BẠN MUỐN */
+  pointer-events: auto;
+  margin-top: -8px;
+  background-color: #565656;
 }
 
-/* 3. Style cho nút tròn (thumb) trên Firefox 
-*/
 .range::-moz-range-thumb {
   height: 20px;
   width: 20px;
@@ -459,7 +592,5 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   cursor: pointer;
   pointer-events: auto;
-
-  /* --- ĐỔI MÀU Ở ĐÂY --- */
-  background-color: #565656; /* <-- MÀU XÁM BẠN MUỐN */
+  background-color: #565656;
 }

@@ -280,7 +280,7 @@ INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '
 INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Chân dung'), (@product_id, 'Tả thực');
 COMMIT;
 -- SP 18
-/*
+
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
 ('Khỏa thân Hiện đại', 'Tranh sơn dầu hiện đại, đường nét táo bạo.', '/images/product/sp18_thumb.jpg', 1, 1, 150);
 SET @product_id = LAST_INSERT_ID();
@@ -713,4 +713,4 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 -- ============================================
 -- KẾT THÚC TRANSACTION
 -- ============================================
-COMMIT;*/
+COMMIT;

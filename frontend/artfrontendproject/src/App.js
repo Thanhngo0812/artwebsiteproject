@@ -18,6 +18,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 
 import ProfilePage from "./pages/profile/ProfilePage";
 import ProductDetail from "./pages/product/ProductDetail"
+import ProductListPage from "./pages/product/ProductListPage";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
@@ -40,6 +41,7 @@ function App() {
             <Route path="cart" element={<Cart />} />
             <Route path="products" element={<ProductUser />} />
             <Route path="products/:id" element={<ProductDetail />} />
+            <Route path="products/list" element={<ProductListPage />} />
             </Route>
           </Route>
           {/*trang đăng nhập/ đăng kí*/}

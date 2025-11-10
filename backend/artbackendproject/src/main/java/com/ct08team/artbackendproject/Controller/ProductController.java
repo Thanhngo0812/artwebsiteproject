@@ -1,29 +1,23 @@
 package com.ct08team.artbackendproject.Controller;
 
 import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
+import com.ct08team.artbackendproject.DTO.ProductDetailDTO;
 import com.ct08team.artbackendproject.DTO.ProductListDTO;
 import com.ct08team.artbackendproject.Service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ct08team.artbackendproject.DAO.ProductVariantRepository;
 import com.ct08team.artbackendproject.DTO.ProductVariantDTO;
 import com.ct08team.artbackendproject.Entity.product.ProductVariant;
 
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -41,48 +35,73 @@ public class ProductController {
             @RequestBody ProductFilterRequestDTO filter,
             @PageableDefault(size = 20, sort = "productName") Pageable pageable)
     {
-        // Frontend sẽ gọi API này, ví dụ:
-        // POST /api/products/search?page=0&size=12&sort=minPrice,asc
-        //
-        // Body sẽ là:
-        // { "categories": [1], "topics": ["Mùa thu"] ... }
-
         Page<ProductListDTO> productPage = productService.searchProducts(filter, pageable);
         return ResponseEntity.ok(productPage);
     }
 
     @GetMapping("/featured")
-    public ResponseEntity<Page<ProductListDTO>> getFeaturedProducts(
+    public ResponseEntity<?> getFeaturedProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size)
+            @RequestParam(defaultValue = "20") int size)
     {
-        Pageable pageable = PageRequest.of(page, size);
+        
+        int limitedSize = Math.min(size, 20);
+        Pageable pageable = PageRequest.of(page, limitedSize);
         Page<ProductListDTO> products = productService.getFeaturedProducts(pageable);
-        return ResponseEntity.ok(products);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", products.getContent());
+        response.put("totalElements", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+        response.put("currentPage", products.getNumber());
+        
+        return ResponseEntity.ok(response);
     }
 
-    // API mới: Sản phẩm mới nhất (theo ID giảm dần)
+
     @GetMapping("/newest")
-    public ResponseEntity<Page<ProductListDTO>> getNewestProducts(
+    public ResponseEntity<?> getNewestProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size)
+            @RequestParam(defaultValue = "20") int size)
     {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        
+        int limitedSize = Math.min(size, 20);
+        Pageable pageable = PageRequest.of(page, limitedSize, Sort.by("id").descending());
         Page<ProductListDTO> products = productService.getNewestProducts(pageable);
-        return ResponseEntity.ok(products);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", products.getContent());
+        response.put("totalElements", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+        response.put("currentPage", products.getNumber());
+        
+        return ResponseEntity.ok(response);
     }
 
-    // API mới: Lấy thông tin nhiều sản phẩm theo danh sách ID
+    /**
+     * ✅ FIX: Giới hạn size tối đa 20
+     */
     @PostMapping("/by-ids")
-    public ResponseEntity<Page<ProductListDTO>> getProductsByIds(
+    public ResponseEntity<?> getProductsByIds(
             @RequestBody java.util.List<Long> ids,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size)
+            @RequestParam(defaultValue = "20") int size)
     {
-        Pageable pageable = PageRequest.of(page, size);
+        
+        int limitedSize = Math.min(size, 20);
+        Pageable pageable = PageRequest.of(page, limitedSize);
         Page<ProductListDTO> products = productService.getProductsByIds(ids, pageable);
-        return ResponseEntity.ok(products);
+        
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", products.getContent());
+        response.put("totalElements", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+        response.put("currentPage", products.getNumber());
+        
+        return ResponseEntity.ok(response);
     }
+
     @GetMapping("/{productId}/variants")
     public ResponseEntity<Page<ProductVariantDTO>> getProductVariants(
             @PathVariable Long productId,
@@ -90,8 +109,6 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size)
     {
         Pageable pageable = PageRequest.of(page, size);
-        
-        // ✅ Gọi Repository với Pageable
         Page<ProductVariant> variantPage = variantRepository.findByProductId(productId, pageable);
         
         if (variantPage.isEmpty()) {
@@ -107,5 +124,52 @@ public class ProductController {
         );
         
         return ResponseEntity.ok(dtoPage);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProductDetail(@PathVariable Long id) {
+        try {
+            ProductDetailDTO dto = productService.getProductDetail(id);
+            
+            if (dto == null) {
+                return ResponseEntity.status(404).body(Map.of(
+                    "message", "Product not found",
+                    "productId", id
+                ));
+            }
+            
+            
+            return ResponseEntity.ok(dto);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "message", "Internal server error: " + e.getMessage(),
+                "productId", id
+            ));
+        }
+    }
+
+    /**
+     * ✅ FIX: Giới hạn size tối đa 20
+     */
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<?> getProductsByCategory(
+            @PathVariable Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        int limitedSize = Math.min(size, 20);
+        Pageable pageable = PageRequest.of(page, limitedSize);
+        Page<ProductListDTO> pageDto = productService.getProductsByCategory(categoryId, pageable);
+        
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", pageDto.getContent());
+        response.put("totalElements", pageDto.getTotalElements());
+        response.put("totalPages", pageDto.getTotalPages());
+        response.put("currentPage", pageDto.getNumber());
+        
+        return ResponseEntity.ok(response);
     }
 }

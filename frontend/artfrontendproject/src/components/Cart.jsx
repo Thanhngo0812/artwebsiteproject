@@ -12,82 +12,155 @@ export default function Cart() {
     getTotal 
   } = useCart();
   
-  const [availableSizes, setAvailableSizes] = useState({});
+  const [availableVariants, setAvailableVariants] = useState({});
   const [loading, setLoading] = useState(false);
-  
   const [editingQuantity, setEditingQuantity] = useState({});
 
   useEffect(() => {
     cartItems.forEach(item => {
-      fetchAvailableSizes(item.productId);
+      fetchAvailableVariants(item.productId);
     });
   }, [cartItems]);
 
-  const fetchAvailableSizes = async (productId) => {
+  const fetchAvailableVariants = async (productId) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://localhost:8888/api/products/${productId}/variants?page=0&size=20`
-      );
+      const response = await fetch(`http://localhost:8888/api/products/${productId}`);
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const data = await response.json();
       
-      let variants = [];
+      const categories = data.categories || [];
+      const variants = data.variants || [];
       
-      if (Array.isArray(data)) {
-        variants = data;
-      } else if (data && Array.isArray(data.content)) {
-        variants = data.content;
-      } else {
-        variants = [];
+      const parents = categories.filter(c => c.id >= 1 && c.id <= 5);
+      const children = categories.filter(c => c.id >= 6);
+      
+      // ✅ XÁC ĐỊNH CATEGORIES HIỂN THỊ (như ProductDetail)
+      let displayCategories = [];
+      if (parents.length >= 2) {
+        displayCategories = parents;
+      } else if (parents.length === 1 && children.length > 0) {
+        displayCategories = children; // ✅ CHỈ HIỂN THỊ CON
+      } else if (children.length > 0) {
+        displayCategories = children;
+      } else if (parents.length === 1) {
+        displayCategories = parents;
       }
       
-      setAvailableSizes(prev => ({
+      const enrichedVariants = [];
+      
+      if (parents.length >= 2) {
+        parents.forEach((cat, catIndex) => {
+          const variantsPerParent = Math.ceil(variants.length / parents.length);
+          const startIndex = catIndex * variantsPerParent;
+          const endIndex = startIndex + variantsPerParent;
+          
+          const parentVariants = variants.slice(startIndex, endIndex);
+          
+          parentVariants.forEach(variant => {
+            enrichedVariants.push({
+              id: variant.id,
+              categoryId: cat.id,
+              categoryName: cat.name,
+              dimensions: variant.dimensions,
+              price: variant.price,
+              stock: variant.stockQuantity
+            });
+          });
+        });
+      } else if (displayCategories.length > 0 && displayCategories[0].id >= 6) {
+        // ✅ Chia variants cho CON
+        displayCategories.forEach((cat, catIndex) => {
+          const variantsPerChild = Math.ceil(variants.length / displayCategories.length);
+          const startIndex = catIndex * variantsPerChild;
+          const endIndex = startIndex + variantsPerChild;
+          
+          const childVariants = variants.slice(startIndex, endIndex);
+          
+          childVariants.forEach(variant => {
+            enrichedVariants.push({
+              id: variant.id,
+              categoryId: cat.id,
+              categoryName: cat.name,
+              dimensions: variant.dimensions,
+              price: variant.price,
+              stock: variant.stockQuantity
+            });
+          });
+        });
+      } else {
+        const singleCat = displayCategories[0] || categories[0];
+        variants.forEach(variant => {
+          enrichedVariants.push({
+            id: variant.id,
+            categoryId: singleCat.id,
+            categoryName: singleCat.name,
+            dimensions: variant.dimensions,
+            price: variant.price,
+            stock: variant.stockQuantity
+          });
+        });
+      }
+      
+      setAvailableVariants(prev => ({
         ...prev,
-        [productId]: variants.map(v => ({
-          dimensions: v.dimensions,
-          price: v.price,
-          stock: v.stockQuantity
-        }))
+        [productId]: {
+          variants: enrichedVariants,
+          categories: displayCategories
+        }
       }));
       
     } catch (error) {
-      setAvailableSizes(prev => ({
-        ...prev,
-        [productId]: []
-      }));
+      console.error('❌ Error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSizeChange = (index, newDimensions) => {
+  const handleCategoryChange = (index, newCategoryId) => {
     const productId = cartItems[index].productId;
-    const sizes = availableSizes[productId];
+    const data = availableVariants[productId];
     
-    if (!sizes || !Array.isArray(sizes)) {
-      console.warn('⚠️ No sizes available for product:', productId);
-      return;
+    if (!data) return;
+    
+    // Lấy variant đầu tiên của category này
+    const firstVariant = data.variants.find(v => v.categoryId === parseInt(newCategoryId));
+    
+    if (firstVariant) {
+      updateSize(
+        index,
+        firstVariant.categoryId,
+        firstVariant.categoryName,
+        firstVariant.dimensions,
+        firstVariant.price
+      );
     }
+  };
+
+  const handleDimensionChange = (index, newVariantId) => {
+    const productId = cartItems[index].productId;
+    const data = availableVariants[productId];
     
-    const sizeInfo = sizes.find(s => s.dimensions === newDimensions);
+    if (!data) return;
     
-    if (sizeInfo) {
-      updateSize(index, newDimensions, sizeInfo.price);
+    const selectedVariant = data.variants.find(v => v.id === parseInt(newVariantId));
+    
+    if (selectedVariant) {
+      updateSize(
+        index,
+        selectedVariant.categoryId,
+        selectedVariant.categoryName,
+        selectedVariant.dimensions,
+        selectedVariant.price
+      );
     }
   };
 
   const handleQuantityInputChange = (index, value) => {
     const numericValue = value.replace(/[^0-9]/g, '');
-    
-    setEditingQuantity(prev => ({
-      ...prev,
-      [index]: numericValue
-    }));
+    setEditingQuantity(prev => ({ ...prev, [index]: numericValue }));
   };
 
   const handleQuantityInputBlur = (index) => {
@@ -109,23 +182,24 @@ export default function Cart() {
     }
     
     const item = cartItems[index];
-    const sizes = availableSizes[item.productId] || [];
-    const currentSize = sizes.find(s => s.dimensions === item.dimensions);
+    const data = availableVariants[item.productId];
     
-    if (currentSize && newQuantity > currentSize.stock) {
-      alert(`Chỉ còn ${currentSize.stock} sản phẩm trong kho!`);
-      newQuantity = currentSize.stock;
+    if (data) {
+      const currentVariant = data.variants.find(v => 
+        v.categoryId === item.categoryId && v.dimensions === item.dimensions
+      );
+      
+      if (currentVariant && newQuantity > currentVariant.stock) {
+        alert(`Chỉ còn ${currentVariant.stock} sản phẩm!`);
+        newQuantity = currentVariant.stock;
+      }
     }
     
-    // Tính delta để cập nhật
-    const currentQuantity = item.quantity;
-    const delta = newQuantity - currentQuantity;
-    
+    const delta = newQuantity - item.quantity;
     if (delta !== 0) {
       updateQuantity(index, delta);
     }
     
-    // Clear editing state
     setEditingQuantity(prev => {
       const newState = { ...prev };
       delete newState[index];
@@ -134,25 +208,22 @@ export default function Cart() {
   };
 
   const handleQuantityKeyPress = (e, index) => {
-    if (e.key === 'Enter') {
-      e.target.blur();
-    }
+    if (e.key === 'Enter') e.target.blur();
   };
 
   const handleQuantityButton = (index, delta) => {
     const item = cartItems[index];
     const newQuantity = item.quantity + delta;
     
-    // Validate min
     if (newQuantity < 1) return;
     
-    // Validate stock
-    const sizes = availableSizes[item.productId] || [];
-    const currentSize = sizes.find(s => s.dimensions === item.dimensions);
-    
-    if (currentSize && newQuantity > currentSize.stock) {
-      // alert(`Chỉ còn ${currentSize.stock} sản phẩm trong kho!`);
-      return;
+    const data = availableVariants[item.productId];
+    if (data) {
+      const currentVariant = data.variants.find(v => 
+        v.categoryId === item.categoryId && v.dimensions === item.dimensions
+      );
+      
+      if (currentVariant && newQuantity > currentVariant.stock) return;
     }
     
     updateQuantity(index, delta);
@@ -197,104 +268,112 @@ export default function Cart() {
         </div>
 
         {cartItems.map((item, index) => {
-          const sizes = availableSizes[item.productId] || [];
-          // ✅ Lấy stock của size hiện tại
-          const currentSize = sizes.find(s => s.dimensions === item.dimensions);
-          const maxStock = currentSize ? currentSize.stock : 999;
+          const data = availableVariants[item.productId];
+          const currentVariant = data?.variants.find(v => 
+            v.categoryId === item.categoryId && v.dimensions === item.dimensions
+          );
+          const maxStock = currentVariant ? currentVariant.stock : 999;
+          
+          // ✅ Lấy categories của item này
+          const itemCategories = data?.categories || [];
+          const currentDimensionVariants = data?.variants.filter(v => v.categoryId === item.categoryId) || [];
           
           return (
-            <div key={`${item.productId}-${item.dimensions}-${index}`} className="cart-item">
+            <div key={`${item.productId}-${item.categoryId}-${item.dimensions}-${index}`} className="cart-item">
               <div className="item-info">
                 <img src={item.thumbnail} alt={item.productname} />
                 <div className="item-details">
                   <h3>{item.productname}</h3>
+                  
+                  {itemCategories.length > 1 && (
+                    <div className="item-category-selector">
+                      <label>Loại:</label>
+                      <select 
+                        value={item.categoryId}
+                        onChange={(e) => handleCategoryChange(index, e.target.value)}
+                        className="category-dropdown"
+                        disabled={loading || !data}
+                      >
+                        {itemCategories.map(cat => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  
                   <p className="item-price">{formatPrice(item.price)}</p>
                 </div>
               </div>
 
               <div className="item-controls">
-                <div className="size-selector">
-                  <label>LOẠI:</label>
-                  <select 
-                    value={item.dimensions}
-                    onChange={(e) => handleSizeChange(index, e.target.value)}
-                    className="size-dropdown"
-                    disabled={loading || sizes.length === 0}
-                  >
-                    {sizes.length === 0 ? (
-                      <option value="">Đang tải...</option>
-                    ) : (
-                      sizes.map(size => (
+                {/* ✅ LAYOUT MỚI: Category + Size NGANG HÀNG */}
+                <div className="controls-row">
+                  {/* ✅ KÍCH THƯỚC */}
+                  <div className="size-selector">
+                    <label>Kích thước:</label>
+                    <select 
+                      value={currentVariant ? currentVariant.id : ''}
+                      onChange={(e) => handleDimensionChange(index, e.target.value)}
+                      className="size-dropdown"
+                      disabled={loading || !data}
+                    >
+                      {currentDimensionVariants.map(variant => (
                         <option 
-                          key={size.dimensions} 
-                          value={size.dimensions}
-                          disabled={size.stock === 0}
+                          key={variant.id} 
+                          value={variant.id}
+                          disabled={variant.stock === 0}
                         >
-                          {size.dimensions} {size.stock === 0 ? '(Hết hàng)' : ''}
+                          {variant.dimensions} {variant.stock === 0 ? '(Hết hàng)' : ''}
                         </option>
-                      ))
-                    )}
-                  </select>
-                </div>
-
-                {/* ✅ NEW: Quantity selector với input trực tiếp */}
-                <div className="quantity-selector">
-                  <label>Số lượng:</label>
-                  <div className="quantity-controls">
-                    <button 
-                      onClick={() => handleQuantityButton(index, -1)}
-                      disabled={item.quantity <= 1}
-                      className="qty-btn"
-                      title="Giảm số lượng"
-                    >
-                      −
-                    </button>
-                    
-                    {/* ✅ NEW: Input có thể nhập trực tiếp */}
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      className="quantity-input"
-                      value={editingQuantity[index] !== undefined ? editingQuantity[index] : item.quantity}
-                      onChange={(e) => handleQuantityInputChange(index, e.target.value)}
-                      onBlur={() => handleQuantityInputBlur(index)}
-                      onKeyPress={(e) => handleQuantityKeyPress(e, index)}
-                      style={{
-                        width: '50px',
-                        textAlign: 'center',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        padding: '4px',
-                        fontSize: '14px'
-                      }}
-                    />
-                    
-                    <button 
-                      onClick={() => handleQuantityButton(index, 1)}
-                      disabled={item.quantity >= maxStock}
-                      className="qty-btn"
-                      title="Tăng số lượng"
-                    >
-                      +
-                    </button>
+                      ))}
+                    </select>
                   </div>
-                  
-                  {currentSize && (
-                    <span className="stock-info" style={{
-                      fontSize: '12px',
-                      color: currentSize.stock < 10 ? '#ff6b6b' : '#666',
-                      marginTop: '4px'
-                    }}>
-                      {currentSize.stock < 10 ? `Chỉ còn ${currentSize.stock}` : `Còn ${currentSize.stock}`}
-                    </span>
-                  )}
+
+                  {/* Quantity */}
+                  <div className="quantity-selector">
+                    <label>Số lượng:</label>
+                    <div className="quantity-controls">
+                      <button 
+                        onClick={() => handleQuantityButton(index, -1)}
+                        disabled={item.quantity <= 1}
+                        className="qty-btn"
+                      >
+                        −
+                      </button>
+                      
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        className="quantity-input"
+                        value={editingQuantity[index] !== undefined ? editingQuantity[index] : item.quantity}
+                        onChange={(e) => handleQuantityInputChange(index, e.target.value)}
+                        onBlur={() => handleQuantityInputBlur(index)}
+                        onKeyPress={(e) => handleQuantityKeyPress(e, index)}
+                      />
+                      
+                      <button 
+                        onClick={() => handleQuantityButton(index, 1)}
+                        disabled={item.quantity >= maxStock}
+                        className="qty-btn"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Stock info */}
+                {currentVariant && (
+                  <span className="stock-info">
+                    {currentVariant.stock < 10 ? `Chỉ còn ${currentVariant.stock}` : `Còn ${currentVariant.stock}`}
+                  </span>
+                )}
 
                 <button 
                   className="remove-btn" 
                   onClick={() => removeItem(index)}
-                  title="Xóa sản phẩm"
                 >
                   🗑️
                 </button>
