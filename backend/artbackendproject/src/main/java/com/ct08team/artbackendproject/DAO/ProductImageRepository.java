@@ -10,6 +10,16 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
-    List<ProductImage> findByProduct(Product product);
-    List<ProductImage> findByProductId(Long productId);
+    // === CÁCH SỬA LẠI (DÙNG ID) ===
+    // Tên phương thức này có nghĩa là:
+    // "Tìm ProductImage BẰNG cách đi vào trường 'variant',
+    // rồi đi vào trường 'product' của variant đó,
+    // rồi lấy trường 'id' của product đó"
+    List<ProductImage> findByVariantProductId(Long productId);
+
+
+    // === CÁC PHƯƠNG THỨC HỮU DỤNG KHÁC ===
+
+    // Lấy tất cả ảnh cho MỘT BIẾN THỂ cụ thể (rất phổ biến)
+    List<ProductImage> findByVariantId(Long variantId);
 }

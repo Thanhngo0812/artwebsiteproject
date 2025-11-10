@@ -14,7 +14,7 @@ public class ProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "variant_id")
-    private Long variantId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
@@ -32,6 +32,9 @@ public class ProductVariant {
     @Column(name = "variant_status", nullable = false)
     private Integer variantStatus = 1;
 
+    @Column(name = "cost_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal costPrice;
+
     // Quan hệ với ProductImage
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProductImage> images = new ArrayList<>();
@@ -40,23 +43,24 @@ public class ProductVariant {
     public ProductVariant() {
     }
 
-    public ProductVariant(Long variantId, Product product, String dimensions,
-                          BigDecimal price, Long stockQuantity, Integer variantStatus) {
-        this.variantId = variantId;
+    public ProductVariant(Long id, Product product, String dimensions,
+                          BigDecimal price, BigDecimal costPrice,Long stockQuantity, Integer variantStatus) {
+        this.id = id;
         this.product = product;
         this.dimensions = dimensions;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.variantStatus = variantStatus;
+        this.costPrice = costPrice;
     }
 
     // Getters and Setters
-    public Long getVariantId() {
-        return variantId;
+    public Long getId() {
+        return id;
     }
 
-    public void setVariantId(Long variantId) {
-        this.variantId = variantId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Product getProduct() {
@@ -82,6 +86,15 @@ public class ProductVariant {
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPricePrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
+
 
     public Long getStockQuantity() {
         return stockQuantity;
@@ -123,11 +136,11 @@ public class ProductVariant {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductVariant that = (ProductVariant) o;
-        return Objects.equals(variantId, that.variantId);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(variantId);
+        return Objects.hash(id);
     }
 }

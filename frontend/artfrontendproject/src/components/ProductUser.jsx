@@ -646,7 +646,7 @@ export default function ProductUser() {
           </div>
         </div>
       </div>
-      <div className="productUser-title">Tất Cả Sản Phẩm</div>
+      <div className="productUser-title">Danh sách "TRANH XỊN"</div>
       <div className="productUser-content">
         <div className="productUser-filter">
           <div className="productUser-filter-title">
@@ -949,7 +949,7 @@ export default function ProductUser() {
               products.map((item, index) => (
                 <div className="product-item" key={item.id}>
                   <div className="product-thumbnail">
-                    <img src={item.thumbnail} alt="img product invalid" />
+                    <img src={"http://localhost:8888"+item.thumbnail} alt="img product invalid" />
                   </div>
                   <div className="product-name">{item.productName}</div>
                   <div className="product-price">
