@@ -10,4 +10,8 @@ public class AuthDtos {
     public record AuthResponse(String token) {}
 
     public record LoginResponse(String message) {}
+    public record ResendOtpRequest(String username) {}
+
+    // Thêm class này vào bên trong file AuthDtos.java của bạn
+
 }

@@ -7,7 +7,7 @@ import PublicRoute from "./components/PublicRoute";
 import MainLayout from "./components/MainLayout";
 import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/LoginPage";
-
+import VerifyOTP from "./pages/auth/VerifyOTP";
 // trang admin
 import AdminLayout from "./components/AdminLayout";
 import Product from "./pages/admin/Product";
@@ -17,6 +17,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import RegisterPage from "./pages/auth/RegisterPage";
 
 import ProfilePage from "./pages/profile/ProfilePage";
+import ProductDetail from "./pages/product/ProductDetail"
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
@@ -34,15 +35,16 @@ function App() {
           {/*trang chưa đăng nhập*/}
           <Route element={<PublicRoute />}>
           <Route path="/" element={<MainLayout />}>
-          
             {/* nên sử dụng index thay cho path="" */}
             <Route index element={<HomePage />} />
             <Route path="cart" element={<Cart />} />
             <Route path="products" element={<ProductUser />} />
+            <Route path="products/:id" element={<ProductDetail />} />
             </Route>
           </Route>
           {/*trang đăng nhập/ đăng kí*/}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/verify-otp" element={<VerifyOTP/>}/>
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin/login" element={<LoginPage />} />
 

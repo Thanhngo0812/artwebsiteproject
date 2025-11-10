@@ -409,3 +409,51 @@
     }
   }
 }
+
+@media (max-width: 990px) {
+  .productUser-container {
+    .productUser-showProduct {
+      .main-show-product {
+        .product-item {
+          flex: 0 0 calc((100% / 3) - 10px);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 721px) {
+  .productUser-container {
+    .productUser-content {
+      flex-direction: column;
+      .productUser-filter {
+        margin-left: 20px;
+        .productUser-filter-title {
+          .productUser-filter-title-name {
+            cursor: pointer;
+            .icon-filter-reponsive {
+              display: inline;
+              margin-right: 6px;
+            }
+          }
+        }
+        .productUser-filter-content {
+          display: none;
+        }
+      }
+      .productUser-showProduct {
+        .main-show-product {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 721px) {
+  .productUser-container {
+    .list-filter-reponsive {
+      display: none;
+    }
+  }
+}

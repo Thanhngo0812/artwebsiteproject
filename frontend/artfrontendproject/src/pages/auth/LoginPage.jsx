@@ -85,10 +85,6 @@ export default function LoginPage() {
       }
 
       // ĐĂNG NHẬP THÀNH CÔNG (Backend đã gửi OTP)
-      
-      // Chuyển hướng đến trang OTP
-      // Chúng ta dùng "state" để truyền username/email qua trang OTP
-      // để trang OTP biết ai đang cần xác thực
       navigate('/verify-otp', { 
         state: { username: formData.emailOrUsername } 
       });
