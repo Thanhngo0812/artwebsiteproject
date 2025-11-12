@@ -16,6 +16,9 @@ import ProductUser from "./components/ProductUser";
 import Dashboard from "./pages/admin/Dashboard";
 import RegisterPage from "./pages/auth/RegisterPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPassword"
+import ProfilePage from "./pages/profile/ProfilePage";
+import ProductDetail from "./pages/product/ProductDetail"
+import ProductListPage from "./pages/product/ProductListPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
@@ -30,8 +33,6 @@ function App() {
     //  <AuthProvider>
     <AuthProvider> 
     <BrowserRouter>
-     
-   
       <div className="App" >
         <Routes>
           {/*trang chưa đăng nhập*/}
@@ -41,6 +42,8 @@ function App() {
             <Route index element={<HomePage />} />
             <Route path="cart" element={<Cart />} />
             <Route path="products" element={<ProductUser />} />
+            <Route path="products/:id" element={<ProductDetail />} />
+            <Route path="products/list" element={<ProductListPage />} />
             </Route>
           </Route>
           {/*trang đăng nhập/ đăng kí*/}
@@ -58,6 +61,10 @@ function App() {
 
           
           <Route path="/admin/login" element={<LoginPage />} />
+
+          <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<ProfilePage />} />
+          </Route>
           {/*admin*/}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />

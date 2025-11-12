@@ -9,34 +9,26 @@ export default function ProductSection({
   viewAllLink, 
   scrollable = false 
 }) {
-  if (!products || products.length === 0) {
-    return null;
-  }
-
   return (
-    <section className="product-section">
-      <div className="product-section-header">
-        <h2 className="product-section-title">{title}</h2>
-        {viewAllLink && !scrollable && (
-          <Link to={viewAllLink} className="product-section-view-all">
-            Xem tất cả →
+    <section className={`product-section ${scrollable ? "scrollable" : ""}`}>
+      <div className="section-header">
+        <h2 className="section-title">{title}</h2>
+        {viewAllLink && (
+          <Link to={viewAllLink} className="view-all-link">
+            Xem thêm →
           </Link>
         )}
       </div>
-      
-      <div className={`product-section-grid ${scrollable ? 'scrollable' : ''}`}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+
+      <div className={`product-grid ${scrollable ? "scroll" : ""}`}>
+        {products && products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        ) : (
+          <p className="no-products">Không có sản phẩm nào</p>
+        )}
       </div>
-      
-      {!scrollable && viewAllLink && (
-        <div className="product-section-footer">
-          <Link to={viewAllLink} className="product-section-btn">
-            Xem thêm
-          </Link>
-        </div>
-      )}
     </section>
   );
 }

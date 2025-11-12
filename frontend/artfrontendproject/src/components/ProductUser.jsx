@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 export default function ProductUser() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -947,6 +947,7 @@ export default function ProductUser() {
           <div className="main-show-product">
             {products && products.length > 0 ? (
               products.map((item, index) => (
+
                 <div className="product-item" key={item.id}>
                 <div className="product-thumbnail">
                     <img src={item.thumbnail} alt="img product invalid" />
@@ -978,6 +979,7 @@ export default function ProductUser() {
                     }
                 </div>
             </div>
+
               ))
             ) : (
               <div className="product-not-found">

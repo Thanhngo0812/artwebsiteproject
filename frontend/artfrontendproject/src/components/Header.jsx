@@ -222,7 +222,7 @@ export default function Header() {
                     <span>{item.name}</span>
                     {hasChildren && (
                       <span className={`arrow ${activeParentId === item.id ? 'active' : ''}`}>
-                        &#9660;
+                        
                       </span>
                     )}
                   </div>

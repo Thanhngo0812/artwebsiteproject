@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import './css/Cart.css';
 
 export default function Cart() {
+  const navigate = useNavigate();
+
   const { 
     cartItems, 
     updateQuantity, 
@@ -12,82 +14,61 @@ export default function Cart() {
     getTotal 
   } = useCart();
   
-  const [availableSizes, setAvailableSizes] = useState({});
+  const [availableVariants, setAvailableVariants] = useState({});
   const [loading, setLoading] = useState(false);
-  
   const [editingQuantity, setEditingQuantity] = useState({});
 
   useEffect(() => {
     cartItems.forEach(item => {
-      fetchAvailableSizes(item.productId);
+      fetchAvailableVariants(item.productId);
     });
   }, [cartItems]);
 
-  const fetchAvailableSizes = async (productId) => {
+  const fetchAvailableVariants = async (productId) => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://localhost:8888/api/products/${productId}/variants?page=0&size=20`
-      );
+      const response = await fetch(`http://localhost:8888/api/products/${productId}`);
       
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const data = await response.json();
       
-      let variants = [];
+      const variants = data.variants || [];
       
-      if (Array.isArray(data)) {
-        variants = data;
-      } else if (data && Array.isArray(data.content)) {
-        variants = data.content;
-      } else {
-        variants = [];
-      }
-      
-      setAvailableSizes(prev => ({
+      setAvailableVariants(prev => ({
         ...prev,
-        [productId]: variants.map(v => ({
-          dimensions: v.dimensions,
-          price: v.price,
-          stock: v.stockQuantity
-        }))
+        [productId]: variants
       }));
       
     } catch (error) {
-      setAvailableSizes(prev => ({
-        ...prev,
-        [productId]: []
-      }));
+      console.error('❌ Error:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSizeChange = (index, newDimensions) => {
+  const handleDimensionChange = (index, newVariantId) => {
     const productId = cartItems[index].productId;
-    const sizes = availableSizes[productId];
+    const variants = availableVariants[productId];
     
-    if (!sizes || !Array.isArray(sizes)) {
-      console.warn('⚠️ No sizes available for product:', productId);
-      return;
-    }
+    if (!variants) return;
     
-    const sizeInfo = sizes.find(s => s.dimensions === newDimensions);
+    const selectedVariant = variants.find(v => v.id === parseInt(newVariantId));
     
-    if (sizeInfo) {
-      updateSize(index, newDimensions, sizeInfo.price);
+    if (selectedVariant) {
+      updateSize(
+        index,
+        cartItems[index].categoryId,
+        cartItems[index].categoryName,
+        selectedVariant.dimensions,
+        selectedVariant.price
+      );
     }
   };
 
   const handleQuantityInputChange = (index, value) => {
     const numericValue = value.replace(/[^0-9]/g, '');
-    
-    setEditingQuantity(prev => ({
-      ...prev,
-      [index]: numericValue
-    }));
+    setEditingQuantity(prev => ({ ...prev, [index]: numericValue }));
   };
 
   const handleQuantityInputBlur = (index) => {
@@ -109,23 +90,22 @@ export default function Cart() {
     }
     
     const item = cartItems[index];
-    const sizes = availableSizes[item.productId] || [];
-    const currentSize = sizes.find(s => s.dimensions === item.dimensions);
+    const variants = availableVariants[item.productId];
     
-    if (currentSize && newQuantity > currentSize.stock) {
-      alert(`Chỉ còn ${currentSize.stock} sản phẩm trong kho!`);
-      newQuantity = currentSize.stock;
+    if (variants) {
+      const currentVariant = variants.find(v => v.dimensions === item.dimensions);
+      
+      if (currentVariant && newQuantity > currentVariant.stockQuantity) {
+        alert(`Chỉ còn ${currentVariant.stockQuantity} sản phẩm!`);
+        newQuantity = currentVariant.stockQuantity;
+      }
     }
     
-    // Tính delta để cập nhật
-    const currentQuantity = item.quantity;
-    const delta = newQuantity - currentQuantity;
-    
+    const delta = newQuantity - item.quantity;
     if (delta !== 0) {
       updateQuantity(index, delta);
     }
     
-    // Clear editing state
     setEditingQuantity(prev => {
       const newState = { ...prev };
       delete newState[index];
@@ -134,28 +114,27 @@ export default function Cart() {
   };
 
   const handleQuantityKeyPress = (e, index) => {
-    if (e.key === 'Enter') {
-      e.target.blur();
-    }
+    if (e.key === 'Enter') e.target.blur();
   };
 
   const handleQuantityButton = (index, delta) => {
     const item = cartItems[index];
     const newQuantity = item.quantity + delta;
     
-    // Validate min
     if (newQuantity < 1) return;
     
-    // Validate stock
-    const sizes = availableSizes[item.productId] || [];
-    const currentSize = sizes.find(s => s.dimensions === item.dimensions);
-    
-    if (currentSize && newQuantity > currentSize.stock) {
-      // alert(`Chỉ còn ${currentSize.stock} sản phẩm trong kho!`);
-      return;
+    const variants = availableVariants[item.productId];
+    if (variants) {
+      const currentVariant = variants.find(v => v.dimensions === item.dimensions);
+      
+      if (currentVariant && newQuantity > currentVariant.stockQuantity) return;
     }
     
     updateQuantity(index, delta);
+  };
+
+  const handleProductClick = (productId) => {
+    navigate(`/products/${productId}`);
   };
 
   const formatPrice = (price) => {
@@ -197,14 +176,17 @@ export default function Cart() {
         </div>
 
         {cartItems.map((item, index) => {
-          const sizes = availableSizes[item.productId] || [];
-          // ✅ Lấy stock của size hiện tại
-          const currentSize = sizes.find(s => s.dimensions === item.dimensions);
-          const maxStock = currentSize ? currentSize.stock : 999;
+          const variants = availableVariants[item.productId] || [];
+          const currentVariant = variants.find(v => v.dimensions === item.dimensions);
+          const maxStock = currentVariant ? currentVariant.stockQuantity : 999;
           
           return (
-            <div key={`${item.productId}-${item.dimensions}-${index}`} className="cart-item">
-              <div className="item-info">
+            <div key={`${item.productId}-${item.categoryId}-${item.dimensions}-${index}`} className="cart-item">
+              <div 
+                className="item-info"
+                onClick={() => handleProductClick(item.productId)}
+                style={{ cursor: 'pointer' }}
+              >
                 <img src={item.thumbnail} alt={item.productname} />
                 <div className="item-details">
                   <h3>{item.productname}</h3>
@@ -213,88 +195,72 @@ export default function Cart() {
               </div>
 
               <div className="item-controls">
-                <div className="size-selector">
-                  <label>LOẠI:</label>
-                  <select 
-                    value={item.dimensions}
-                    onChange={(e) => handleSizeChange(index, e.target.value)}
-                    className="size-dropdown"
-                    disabled={loading || sizes.length === 0}
-                  >
-                    {sizes.length === 0 ? (
-                      <option value="">Đang tải...</option>
-                    ) : (
-                      sizes.map(size => (
+                <div className="controls-row">
+                  <div className="size-selector">
+                    <label>Size:</label>
+                    <select 
+                      value={currentVariant ? currentVariant.id : ''}
+                      onChange={(e) => handleDimensionChange(index, e.target.value)}
+                      className="size-dropdown"
+                      disabled={loading || variants.length === 0}
+                    >
+                      {variants.map(variant => (
                         <option 
-                          key={size.dimensions} 
-                          value={size.dimensions}
-                          disabled={size.stock === 0}
+                          key={variant.id} 
+                          value={variant.id}
+                          disabled={variant.stockQuantity === 0}
                         >
-                          {size.dimensions} {size.stock === 0 ? '(Hết hàng)' : ''}
+                          {variant.dimensions} {variant.stockQuantity === 0 ? '(Hết hàng)' : ''}
                         </option>
-                      ))
-                    )}
-                  </select>
-                </div>
-
-                {/* ✅ NEW: Quantity selector với input trực tiếp */}
-                <div className="quantity-selector">
-                  <label>Số lượng:</label>
-                  <div className="quantity-controls">
-                    <button 
-                      onClick={() => handleQuantityButton(index, -1)}
-                      disabled={item.quantity <= 1}
-                      className="qty-btn"
-                      title="Giảm số lượng"
-                    >
-                      −
-                    </button>
-                    
-                    {/* ✅ NEW: Input có thể nhập trực tiếp */}
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      className="quantity-input"
-                      value={editingQuantity[index] !== undefined ? editingQuantity[index] : item.quantity}
-                      onChange={(e) => handleQuantityInputChange(index, e.target.value)}
-                      onBlur={() => handleQuantityInputBlur(index)}
-                      onKeyPress={(e) => handleQuantityKeyPress(e, index)}
-                      style={{
-                        width: '50px',
-                        textAlign: 'center',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        padding: '4px',
-                        fontSize: '14px'
-                      }}
-                    />
-                    
-                    <button 
-                      onClick={() => handleQuantityButton(index, 1)}
-                      disabled={item.quantity >= maxStock}
-                      className="qty-btn"
-                      title="Tăng số lượng"
-                    >
-                      +
-                    </button>
+                      ))}
+                    </select>
                   </div>
-                  
-                  {currentSize && (
-                    <span className="stock-info" style={{
-                      fontSize: '12px',
-                      color: currentSize.stock < 10 ? '#ff6b6b' : '#666',
-                      marginTop: '4px'
-                    }}>
-                      {currentSize.stock < 10 ? `Chỉ còn ${currentSize.stock}` : `Còn ${currentSize.stock}`}
-                    </span>
-                  )}
+
+                  {/* Số lượng */}
+                  <div className="quantity-selector">
+                    <label>Số lượng:</label>
+                    <div className="quantity-controls">
+                      <button 
+                        onClick={() => handleQuantityButton(index, -1)}
+                        disabled={item.quantity <= 1}
+                        className="qty-btn"
+                      >
+                        −
+                      </button>
+                      
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        className="quantity-input"
+                        value={editingQuantity[index] !== undefined ? editingQuantity[index] : item.quantity}
+                        onChange={(e) => handleQuantityInputChange(index, e.target.value)}
+                        onBlur={() => handleQuantityInputBlur(index)}
+                        onKeyPress={(e) => handleQuantityKeyPress(e, index)}
+                      />
+                      
+                      <button 
+                        onClick={() => handleQuantityButton(index, 1)}
+                        disabled={item.quantity >= maxStock}
+                        className="qty-btn"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Stock info */}
+                {currentVariant && (
+                  <span className="stock-info">
+                    {currentVariant.stockQuantity < 10 
+                      ? `Chỉ còn ${currentVariant.stockQuantity}` 
+                      : `Còn ${currentVariant.stockQuantity}`}
+                  </span>
+                )}
 
                 <button 
                   className="remove-btn" 
                   onClick={() => removeItem(index)}
-                  title="Xóa sản phẩm"
                 >
                   🗑️
                 </button>

@@ -1,12 +1,12 @@
 package com.ct08team.artbackendproject.Service.Product;
 
-
 import com.ct08team.artbackendproject.DAO.CategoryRepository;
+import com.ct08team.artbackendproject.DAO.ProductRepository;
+import com.ct08team.artbackendproject.DTO.ProductDetailDTO;
 import com.ct08team.artbackendproject.DTO.ProductListDTO;
+import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
 import com.ct08team.artbackendproject.Entity.product.Category;
 import com.ct08team.artbackendproject.Entity.product.Product;
-import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
-import com.ct08team.artbackendproject.DAO.ProductRepository;
 import com.ct08team.artbackendproject.Service.Filter.FilterService;
 import com.ct08team.artbackendproject.Service.Promotion.PromotionCalculationService;
 import com.ct08team.artbackendproject.Specification.ProductSpecification;
@@ -32,7 +32,115 @@ public class ProductService {
     private PromotionCalculationService promotionCalculationService;
     // --- Logic danh mục đã được chuyển sang FilterService ---
     @Autowired
-    private FilterService filterService; // Injec FilterService
+    private FilterService filterService; // Inject FilterService
+
+    /**
+     * API mới: Lấy chi tiết sản phẩm theo ID
+     * Dùng cho trang ProductDetail
+     * 
+     * ✅ FIX: Dùng 3 query riêng biệt + load images thủ công
+     */
+    @Transactional(readOnly = true)
+    public ProductDetailDTO getProductDetail(Long id) {
+        try {
+            System.out.println("🔍 [ProductService] Fetching product ID: " + id);
+            
+            // ✅ Query 1: Load Product + Categories + Material
+            Optional<Product> productOpt = productRepository.findByIdWithDetails(id);
+            
+            if (!productOpt.isPresent()) {
+                System.out.println("❌ [ProductService] Product not found: " + id);
+                return null;
+            }
+            
+            Product p = productOpt.get();
+            System.out.println("✅ [ProductService] Product loaded: " + p.getProductName());
+            
+            // ✅ Query 2: Load Variants (KHÔNG load images ở đây)
+            productRepository.findByIdWithVariants(id).ifPresent(productWithVariants -> {
+                p.setVariants(productWithVariants.getVariants());
+            });
+            
+            // ✅ Query 3: Load Colors
+            productRepository.findByIdWithColors(id).ifPresent(productWithColors -> {
+                p.setColors(productWithColors.getColors());
+            });
+            
+            // Build DTO
+            ProductDetailDTO dto = new ProductDetailDTO();
+            dto.id = p.getId();
+            dto.productName = p.getProductName();
+            dto.productname = p.getProductName();
+            dto.description = p.getDescription();
+            dto.thumbnail = p.getThumbnail();
+            dto.minPrice = p.getMinPrice();
+
+            // Categories
+            dto.categories = p.getCategories() == null ? List.of() :
+                p.getCategories().stream()
+                    .map(c -> new ProductDetailDTO.CategoryDTO(c.getId(), c.getName()))
+                    .collect(Collectors.toList());
+            System.out.println("   - Categories: " + dto.categories.size());
+
+            // Variants
+            dto.variants = p.getVariants() == null ? List.of() :
+                p.getVariants().stream()
+                    .filter(v -> v.getVariantStatus() == 1)
+                    .map(v -> new ProductDetailDTO.VariantDTO(
+                        v.getId(),
+                        v.getDimensions(),
+                        v.getPrice() == null ? 0.0 : v.getPrice().doubleValue(),
+                        v.getStockQuantity()
+                    ))
+                    .collect(Collectors.toList());
+            System.out.println("   - Variants: " + dto.variants.size());
+
+            // ✅ Images: Force load trong transaction (Hibernate sẽ tự fetch)
+            List<ProductDetailDTO.ImageDTO> imgs = new ArrayList<>();
+            if (p.getVariants() != null) {
+                for (var variant : p.getVariants()) {
+                    // ✅ Hibernate.initialize() sẽ tự động fetch images
+                    var images = variant.getImages(); // Lazy load trong transaction
+                    if (images != null && !images.isEmpty()) {
+                        for (var img : images) {
+                            imgs.add(new ProductDetailDTO.ImageDTO(img.getImageUrl()));
+                        }
+                    }
+                }
+            }
+            
+            // Fallback: Dùng thumbnail nếu không có ảnh
+            if (imgs.isEmpty() && p.getThumbnail() != null) {
+                imgs.add(new ProductDetailDTO.ImageDTO(p.getThumbnail()));
+            }
+            dto.images = imgs;
+            System.out.println("   - Images: " + dto.images.size());
+
+            // ✅ Colors
+            dto.colors = p.getColors() == null ? List.of() :
+                p.getColors().stream()
+                    .map(productColor -> new ProductDetailDTO.ColorDTO(productColor.getHexCode()))
+                    .collect(Collectors.toList());
+            System.out.println("   - Colors: " + dto.colors.size());
+            
+            System.out.println("✅ [ProductService] DTO created successfully");
+            return dto;
+            
+        } catch (Exception e) {
+            System.err.println("❌ [ProductService] Error: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Could not fetch product: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * API mới: Lấy sản phẩm theo category (dùng cho related products)
+     */
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getProductsByCategory(Long categoryId, Pageable pageable) {
+        Page<Product> page = productRepository.findByCategoryId(categoryId, pageable);
+        return page.map(this::convertToProductListDTO);
+    }
 
     /**
      * API 3: Lấy danh sách sản phẩm (ĐÃ CẬP NHẬT)
@@ -62,6 +170,10 @@ public class ProductService {
         return productPage.map(this::convertToProductListDTO);
     }
 
+    /**
+     * API: Lấy sản phẩm nổi bật
+     * Tính điểm dựa trên view_count và sales_count
+     */
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getFeaturedProducts(Pageable pageable) {
         // Lấy tất cả sản phẩm có product_status = 1
