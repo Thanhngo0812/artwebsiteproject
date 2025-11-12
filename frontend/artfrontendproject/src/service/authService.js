@@ -72,13 +72,13 @@ class AuthService {
 
     try {
       const decodedToken = jwtDecode(user);
-      
+   
       // Lấy thời gian hết hạn (exp) từ token (đơn vị là giây)
       const expirationTime = decodedToken.exp; 
-      
+     
       // Lấy thời gian hiện tại (đơn vị là giây)
       const currentTime = Date.now() / 1000;
-
+     
       // So sánh: nếu thời gian hết hạn nhỏ hơn thời gian hiện tại, token đã hết hạn
       return expirationTime < currentTime;
 

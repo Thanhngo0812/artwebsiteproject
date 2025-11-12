@@ -19,6 +19,7 @@ export default function ProductCard({ product }) {
         />
       </div>
       <div className="product-card-info">
+
         <h3 className="product-card-name">
           {product.productName || product.productname}
         </h3>

@@ -8,6 +8,7 @@ import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
 import com.ct08team.artbackendproject.Entity.product.Category;
 import com.ct08team.artbackendproject.Entity.product.Product;
 import com.ct08team.artbackendproject.Service.Filter.FilterService;
+import com.ct08team.artbackendproject.Service.Promotion.PromotionCalculationService;
 import com.ct08team.artbackendproject.Specification.ProductSpecification;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +28,8 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
-
+    @Autowired
+    private PromotionCalculationService promotionCalculationService;
     // --- Logic danh mục đã được chuyển sang FilterService ---
     @Autowired
     private FilterService filterService; // Inject FilterService
@@ -236,19 +239,26 @@ public class ProductService {
         return new PageImpl<>(dtoList, pageable, products.size());
     }
 
-    /**
+
+     /* === HÀM HELPER ĐÃ ĐƯỢC CẬP NHẬT ===
      * Hàm helper để chuyển đổi Product Entity sang ProductListDTO.
      * @param product Entity sản phẩm lấy từ DB
      * @return DTO rút gọn để hiển thị danh sách
      */
     private ProductListDTO convertToProductListDTO(Product product) {
-        // Hàm này giả định bạn đã có ProductListDTO
-        // với constructor (Long id, String productName, String thumbnail, BigDecimal minPrice)
+        // 1. Lấy giá gốc
+        BigDecimal originalPrice = product.getMinPrice();
+
+        // 2. Gọi service mới để tính giá khuyến mãi
+        Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
+
+        // 3. Trả về DTO mới
         return new ProductListDTO(
                 product.getId(),
                 product.getProductName(),
                 product.getThumbnail(),
-                product.getMinPrice() // Lấy giá đã phi chuẩn hóa
+                originalPrice,              // Luôn là giá gốc
+                promoPriceOpt.orElse(null)  // Giá khuyến mãi (hoặc null nếu không có)
         );
     }
 }

@@ -6,13 +6,16 @@ import com.ct08team.artbackendproject.DTO.Auth.AuthDtos;
 import com.ct08team.artbackendproject.Entity.auth.Role;
 import com.ct08team.artbackendproject.Entity.auth.User;
 import com.ct08team.artbackendproject.security.JwtUtil;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -35,18 +38,35 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder; // Bạn cần Bean này trong SecurityConfig
     @Autowired
+    private UserDetailsService userDetailsService;
+    @Autowired
     private RoleRepository roleRepository;
     private static final long OTP_VALID_DURATION_MINUTES = 5;
 
     // Bước 1: Đăng nhập và Gửi OTP
-    public AuthDtos.LoginResponse loginAndSendOtp(AuthDtos.LoginRequest loginRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public AuthDtos.LoginResponse loginAndSendOtp(AuthDtos.LoginRequest loginRequest) throws MessagingException {
         // 1. Xác thực username/password
-        System.out.println(loginRequest.username());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.username());
 
+        // 2. KIỂM TRA MẬT KHẨU TRƯỚC TIÊN
+        if (!passwordEncoder.matches(loginRequest.password(), userDetails.getPassword())) {
+            // Nếu MẬT KHẨU SAI -> ném lỗi BadCredentialsException
+            // (Lỗi này sẽ bị bắt bởi 'catch (Exception e)' trong AuthController)
+            throw new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không đúng.");
+        }
+
+        // 3. Mật khẩu ĐÚNG. BÂY GIỜ mới kiểm tra 'enabled'
+        if (!userDetails.isEnabled()) {
+            // Ném lỗi 'Disabled' (sẽ được AuthController bắt chính xác)
+            throw new DisabledException("Tài khoản chưa kích hoạt.");
+        }
+
+        // 4. Mật khẩu ĐÚNG, Tài khoản ENABLED. Kiểm tra 'locked'
+        if (!userDetails.isAccountNonLocked()) {
+            // Ném lỗi 'Locked' (sẽ được AuthController bắt chính xác)
+            throw new LockedException("Tài khoản đã bị khóa.");
+        }
         // 2. Tìm User
         User user = userRepository.findByUsernameOrEmail(loginRequest.username(),loginRequest.username())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
@@ -63,8 +83,10 @@ public class AuthService {
         return new AuthDtos.LoginResponse("Mã OTP đã được gửi tới email của bạn. Vui lòng xác thực.");
     }
 
+
+    @Transactional
     // Bước 2: Xác thực OTP và Trả về Token
-    public AuthDtos.AuthResponse verifyOtpAndLogin(AuthDtos.OtpRequest otpRequest) {
+    public AuthDtos.AuthResponse verifyOtpAndLogin(AuthDtos.OtpRequest otpRequest) throws MessagingException {
         // 1. Tìm User
         User user = userRepository.findByUsernameOrEmail(otpRequest.username(),otpRequest.username())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
@@ -105,7 +127,9 @@ public class AuthService {
     // =======================================================
     // MỚI: Phương thức để gửi lại OTP
     // =======================================================
-    public void resendOtp(AuthDtos.ResendOtpRequest resendRequest) {
+    @Transactional(rollbackFor = Exception.class)
+
+    public void resendOtp(AuthDtos.ResendOtpRequest resendRequest) throws MessagingException {
         // 1. Tìm User
         User user = userRepository.findByUsernameOrEmail(resendRequest.username(), resendRequest.username())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + resendRequest.username()));
@@ -132,10 +156,12 @@ public class AuthService {
     // =======================================================
     // MỚI: Phương thức để Đăng ký
     // =======================================================
-    public AuthDtos.LoginResponse registerUser(AuthDtos.RegisterRequest registerRequest) {
+    @Transactional(rollbackFor = Exception.class)
+
+    public AuthDtos.LoginResponse registerUser(AuthDtos.RegisterRequest registerRequest) throws MessagingException {
         // 1. Kiểm tra username đã tồn tại
         if (userRepository.existsByUsername(registerRequest.username())) {
-            throw new RuntimeException("Username đã được sử dụng.");
+            throw new RuntimeException("Tên đăng nhập đã được sử dụng.");
         }
 
         // 2. Kiểm tra email đã tồn tại
@@ -174,5 +200,104 @@ public class AuthService {
         return new AuthDtos.LoginResponse("Đăng ký thành công. Mã OTP đã được gửi tới email của bạn.");
         // 8. (Tùy chọn) Bạn có thể gửi email chào mừng ở đây
         // emailService.sendWelcomeEmail(newUser.getEmail());
+    }
+
+    /**
+     * Bước 1: Xử lý yêu cầu quên mật khẩu
+     * (React: ForgotPassword.jsx)
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void processForgotPassword(String email) throws MessagingException {
+
+
+        User user = userRepository.findByEmail(email) // Cần thêm findByEmail vào UserRepository
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản nào liên kết với email này."));
+// 4. Mật khẩu ĐÚNG, Tài khoản ENABLED. Kiểm tra 'locked'
+        if (!user.isAccountNonLocked()) {
+            // Ném lỗi 'Locked' (sẽ được AuthController bắt chính xác)
+            throw new LockedException("Tài khoản đã bị khóa.");
+        }
+        // 2. Tạo, lưu OTP và gửi
+        String otp = generateOtp();
+        user.setOtp(otp);
+        user.setOtpRequestedTime(Instant.now());
+        userRepository.save(user);
+
+        // 3. Gửi email
+        emailService.sendOtpEmail(user.getEmail(), otp);
+        // (Ghi chú: EmailService nên dùng một mẫu (template) khác cho "Quên mật khẩu")
+    }
+
+    /**
+     * Bước 2: Xác thực OTP quên mật khẩu
+     * (React: VerifyPasswordOTP.jsx)
+     */
+    @Transactional
+    public AuthDtos.AuthResponse verifyForgotPasswordOtp(AuthDtos.OtpEmailRequest otpRequest) {
+        // 1. Tìm User bằng email
+        User user = userRepository.findByEmail(otpRequest.email())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng."));
+
+        // 2. Kiểm tra OTP
+        if (user.getOtp() == null || !user.getOtp().equals(otpRequest.otp())) {
+            throw new RuntimeException("Mã OTP không hợp lệ.");
+        }
+
+        // 3. Kiểm tra thời gian hết hạn
+        Instant otpCreationTime = user.getOtpRequestedTime();
+        if (otpCreationTime == null) {
+            throw new RuntimeException("Vui lòng yêu cầu OTP trước.");
+        }
+        long minutesElapsed = Duration.between(otpCreationTime, Instant.now()).toMinutes();
+        if (minutesElapsed > OTP_VALID_DURATION_MINUTES) {
+            user.setOtp(null); // Xóa OTP hết hạn
+            user.setOtpRequestedTime(null);
+            userRepository.save(user);
+            throw new RuntimeException("Mã OTP đã hết hạn.");
+        }
+
+        // 4. Xác thực thành công -> Xóa OTP
+        user.setOtp(null);
+        user.setOtpRequestedTime(null);
+        userRepository.save(user);
+
+        // 5. TẠO TOKEN RESET TẠM THỜI (Rất quan trọng)
+        // Tạo JWT với thời hạn ngắn (ví dụ: 10 phút)
+        // Chúng ta không cần roles ở đây, chỉ cần username/email
+        // (Giả sử hàm generateToken(username, roles, minutes) đã tồn tại trong JwtUtil)
+        String resetToken = jwtUtil.generateToken(user.getUsername(), List.of("ROLE_RESET_PASSWORD"), 10); // 10 phút
+
+        return new AuthDtos.AuthResponse(resetToken);
+    }
+
+    /**
+     * Bước 3: Đặt lại mật khẩu
+     * (React: ResetPassword.jsx)
+     */
+    @Transactional
+    public void resetPassword(AuthDtos.ResetPasswordRequest resetRequest) {
+        // 1. Xác thực Token reset
+        // (Giả sử JwtUtil của bạn có hàm validateToken(token) đơn giản)
+        if (!jwtUtil.validateToken(resetRequest.token())) {
+            throw new RuntimeException("Token không hợp lệ hoặc đã hết hạn.");
+        }
+
+        // 2. Lấy email/username từ token (để bảo mật)
+        String usernameFromToken = jwtUtil.extractUsername(resetRequest.token());
+
+        // 3. Tìm user bằng username (an toàn hơn email)
+        User user = userRepository.findByUsername(usernameFromToken)
+                .orElseThrow(() -> new RuntimeException("Token hợp lệ nhưng không tìm thấy người dùng."));
+
+        // 4. (Kiểm tra chéo) Đảm bảo email từ request khớp với email của user trong CSDL
+        if (!user.getEmail().equals(resetRequest.email())) {
+            throw new RuntimeException("Token và email không khớp.");
+        }
+
+        // 5. Mọi thứ hợp lệ -> Đổi mật khẩu
+        user.setPassword(passwordEncoder.encode(resetRequest.newPassword()));
+        userRepository.save(user);
+
+        // (Không cần xóa OTP vì nó đã được xóa ở Bước 2)
     }
 }

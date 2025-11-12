@@ -367,6 +367,7 @@
             object-fit: cover;
             transition: transform 0.3s ease;
           }
+      
         }
 
         &:hover .product-thumbnail img {
@@ -592,5 +593,67 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   cursor: pointer;
   pointer-events: auto;
-  background-color: #565656;
+
+  /* --- ĐỔI MÀU Ở ĐÂY --- */
+  background-color: #565656; /* <-- MÀU XÁM BẠN MUỐN */
+}
+
+
+//sale
+/* --- CSS CHO NHÃN SALE --- */
+
+/* Bạn cần thêm 'position: relative' cho thẻ bọc thumbnail
+   để 'sale-badge' hiển thị đúng */
+.product-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Đây là class cho chữ "SALE" */
+.sale-badge {
+    position: absolute;
+    top: 10px; /* Vị trí cách trên 10px */
+    left: 10px; /* Vị trí cách trái 10px */
+    background-color: #D70018; /* Màu đỏ sale */
+    color: white;
+    padding: 3px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* --- CSS CHO GIÁ --- */
+
+.product-price {
+    /* Giúp các giá nằm trên cùng một hàng */
+    display: flex;
+    align-items: baseline; 
+    flex-wrap: wrap; 
+}
+
+/* Giá bình thường (khi không sale) */
+.product-price .normal-price {
+    font-weight: bold;
+    color: #333; 
+}
+
+/* Giá khuyến mãi (màu đỏ) */
+.product-price .promo-price {
+    font-weight: bold;
+    color: #D70018; /* Màu đỏ sale */
+    font-size: 1.1em; /* Cho to hơn một chút */
+}
+
+/* Giá gốc bị gạch ngang (màu xám) */
+.product-price .strikethrough-price {
+    font-size: 0.9em;
+    color: #888; /* Màu xám */
+    text-decoration: line-through; /* Đây là chìa khóa! */
+    margin-left: 8px; /* Khoảng cách với giá sale */
+}
+
+.product-item .product-thumbnail:hover img {
+  transform: scale(1.08); /* Zoom nhẹ ảnh khi hover */
+
 }
