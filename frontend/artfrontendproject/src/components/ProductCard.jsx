@@ -17,7 +17,7 @@ export default function ProductCard({ product }) {
       </div>
       <div className="product-card-info">
         <h3 className="product-card-name">{product.productname}</h3>
-        <p className="product-card-price">{formatPrice(product.minPrice)}</p>
+        <p className="product-card-price">{formatPrice(product.originalPrice)}</p>
       </div>
     </Link>
   );

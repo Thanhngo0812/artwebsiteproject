@@ -75,18 +75,20 @@ export default function LoginPage() {
         })
       });
 
-      const data = await response;
-
+      
       if (!response.ok) {
-        if(response.status==400){
-          setError('Tên đăng nhập hoặc mật khẩu không đúng')
-          return;
-        }
+        const errorText = await response.text(); 
+        
+        // 2. Dùng text đó để set lỗi (toast sẽ tự động hiển thị)
+        // 'errorText' BÂY GIỜ CHÍNH LÀ: "Tài khoản của bạn đã bị khóa..."
+        setError(errorText); 
+        return;
       }
-
+      const data = await response.json();
       // ĐĂNG NHẬP THÀNH CÔNG (Backend đã gửi OTP)
       navigate('/verify-otp', { 
-        state: { username: formData.emailOrUsername } 
+        state: { username: formData.emailOrUsername ,
+        message:data.message} 
       });
 
     } catch (err) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate,useNavigate, Outlet } from 'react-router-dom';
+import authService from '../service/authService';
 
 
 import AuthService from '../service/authService';
@@ -12,29 +13,27 @@ import AuthService from '../service/authService';
  */
 const ProtectedRoute = ({ requiredRole }) => {
     const navigate = useNavigate();
-    const user = AuthService.getCurrentUser();
     const isAuthenticated = AuthService.isLoggedIn();
     const userRole = AuthService.getUserRole();
 
-    // 1. Kiểm tra Đăng nhập
-    // if (!isAuthenticated) {
-    //     // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
-    //     navigate('/', { 
-    //         replace: true, // Tùy chọn: thay thế trang hiện tại trong lịch sử duyệt web
-    //         state: { 
-    //           message: 'Bạn chưa đăng nhập'
-    //         } 
-    //       });
-    // }
+    if (!isAuthenticated) {
+        // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+        navigate('/', { 
+            replace: true, // Tùy chọn: thay thế trang hiện tại trong lịch sử duyệt web
+            state: { 
+              message: 'Bạn chưa đăng nhập'
+            } 
+          });
+    }
       // Đặt logic điều hướng vào trong useEffect
  
     // Chỉ thực hiện khi đã kiểm tra xong (isLoading = false)
     // và người dùng chưa đăng nhập
     if(AuthService.isTokenExpired()){
-      return <Navigate to="/" replace state={{ message: 'Your session has expired.' }} />;
+      return <Navigate to="/" replace state={{ message: 'Phiên đăng nhập của bạn đã hết hạn.' }} />;
   }
     if ( !isAuthenticated) {
-        return <Navigate to="/" replace state={{ message: 'You do not have permission to access this page.' }} />;
+        return <Navigate to="/" replace state={{ message: 'Bạn không có đủ quyền truy cập.' }} />;
       };
     
  
@@ -44,7 +43,7 @@ const ProtectedRoute = ({ requiredRole }) => {
         // Nếu không có quyền cần thiết, chuyển hướng đến trang từ chối truy cập (hoặc trang chủ)
         // Đây là lỗi 403 (Forbidden)
         console.warn(`Access denied. Required role: ${requiredRole}, User role: ${userRole}`);
-        return <Navigate to="/" replace state={{ message: 'You do not have permission to access this page.' }} />;
+        return <Navigate to="/" replace state={{ message: 'Bạn không có đủ quyền truy cập.' }} />;
     }
 
 

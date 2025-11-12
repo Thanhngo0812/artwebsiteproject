@@ -395,7 +395,7 @@ export default function ProductUser() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
+  console.warn(products);
   return (
     <div className="productUser-container">
       <div
@@ -948,22 +948,44 @@ export default function ProductUser() {
             {products && products.length > 0 ? (
               products.map((item, index) => (
                 <div className="product-item" key={item.id}>
-                  <div className="product-thumbnail">
+                <div className="product-thumbnail">
                     <img src={item.thumbnail} alt="img product invalid" />
-                  </div>
-                  <div className="product-name">{item.productName}</div>
-                  <div className="product-price">
-                    Từ {formatCurrency(item.minPrice)}
-                  </div>
+                    
+                    {item.promotionalPrice && (
+                        <span className="sale-badge">SALE</span>
+                    )}
                 </div>
+                <div className="product-name">{item.productName}</div>
+            
+                <div className="product-price">
+                    {
+                        item.promotionalPrice ? 
+                        (
+                            <>
+                                <span className="promo-price">
+                                    Từ {formatCurrency(item.promotionalPrice)}
+                                </span>
+                                <span className="strikethrough-price">
+                                    {formatCurrency(item.originalPrice)}
+                                </span>
+                            </>
+                        ) : 
+                        (
+                            <span className="normal-price">
+                                Từ {formatCurrency(item.originalPrice)}
+                            </span>
+                        )
+                    }
+                </div>
+            </div>
               ))
             ) : (
               <div className="product-not-found">
                 <div className="product-not-found-title">
-                  No Products Found!
+                  Không có sản phẩm nào được tìm thấy!
                 </div>
                 <div className="back-to-shop" onClick={handleBackToShop}>
-                  back to shop
+                  Trở lại
                 </div>
               </div>
             )}

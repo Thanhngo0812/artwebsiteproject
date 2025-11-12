@@ -14,7 +14,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendOtpEmail(String to, String otp) {
+    public void sendOtpEmail(String to, String otp) throws MessagingException {
         // THAY ĐỔI: Sử dụng MimeMessage thay vì SimpleMailMessage
         MimeMessage mimeMessage = mailSender.createMimeMessage();
 

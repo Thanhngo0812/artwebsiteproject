@@ -73,9 +73,13 @@ public class SecurityConfig {
                     .collect(Collectors.toList());
 
             return new org.springframework.security.core.userdetails.User(
-                    user.getUsername(), // Luôn trả về username (vì nó unique)
+                    user.getUsername(),
                     user.getPassword(),
-                    authorities // Sử dụng danh sách quyền đã map
+                    user.isEnabled(), // <-- Lấy trạng thái 'enabled' từ CSDL
+                    true, // accountNonExpired (mặc định là true)
+                    true, // credentialsNonExpired (mặc định là true)
+                    user.isAccountNonLocked(), // <-- Lấy trạng thái 'locked' từ CSDL
+                    authorities
             );
         };
     }

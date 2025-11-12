@@ -3,10 +3,8 @@ package com.ct08team.artbackendproject.DTO;
 import java.math.BigDecimal;
 
 /**
- * DTO (Data Transfer Object) này đại diện cho một sản phẩm
- * khi nó được hiển thị trong một danh sách hoặc lưới (grid).
- * Nó chỉ chứa các thông tin cần thiết để hiển thị,
- * giúp giảm tải dữ liệu truyền về cho frontend.
+ * DTO (Data Transfer Object) để hiển thị sản phẩm trên một danh sách (list).
+ * Chứa thông tin rút gọn, bao gồm cả giá gốc và giá khuyến mãi (nếu có).
  */
 public class ProductListDTO {
 
@@ -14,35 +12,35 @@ public class ProductListDTO {
     private String productName;
     private String thumbnail;
 
-    // Sử dụng minPrice (giá thấp nhất) để hiển thị trong danh sách
-    private BigDecimal minPrice;
+    /**
+     * Giá gốc của sản phẩm (lấy từ product.minPrice).
+     */
+    private BigDecimal originalPrice;
 
     /**
-     * Constructor rỗng
-     * Bắt buộc phải có để Jackson (hoặc các thư viện khác) khởi tạo đối tượng
+     * Giá đã giảm sau khi áp dụng khuyến mãi tự động (SALE).
+     * Sẽ là NULL nếu không có khuyến mãi nào được áp dụng.
+     */
+    private BigDecimal promotionalPrice;
+
+    /**
+     * Constructor rỗng (cần thiết cho JPA/Jackson).
      */
     public ProductListDTO() {
     }
 
     /**
-     * Constructor đầy đủ
-     * Được sử dụng trong ProductService (hàm convertToProductListDTO)
-     *
-     * @param id          ID của sản phẩm
-     * @param productName Tên sản phẩm
-     * @param thumbnail   URL ảnh thumbnail
-     * @param minPrice    Giá thấp nhất (lấy từ trường đã phi chuẩn hóa)
+     * Constructor đầy đủ để ánh xạ từ ProductService.
      */
-    public ProductListDTO(Long id, String productName, String thumbnail, BigDecimal minPrice) {
+    public ProductListDTO(Long id, String productName, String thumbnail, BigDecimal originalPrice, BigDecimal promotionalPrice) {
         this.id = id;
         this.productName = productName;
         this.thumbnail = thumbnail;
-        this.minPrice = minPrice;
+        this.originalPrice = originalPrice;
+        this.promotionalPrice = promotionalPrice;
     }
 
-    // --- Getters and Setters ---
-    // Bắt buộc phải có để Jackson có thể đọc và serialize
-    // các trường private này thành JSON
+    // --- Getters và Setters ---
 
     public Long getId() {
         return id;
@@ -68,12 +66,19 @@ public class ProductListDTO {
         this.thumbnail = thumbnail;
     }
 
-    public BigDecimal getMinPrice() {
-        return minPrice;
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
     }
 
-    public void setMinPrice(BigDecimal minPrice) {
-        this.minPrice = minPrice;
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public BigDecimal getPromotionalPrice() {
+        return promotionalPrice;
+    }
+
+    public void setPromotionalPrice(BigDecimal promotionalPrice) {
+        this.promotionalPrice = promotionalPrice;
     }
 }
-

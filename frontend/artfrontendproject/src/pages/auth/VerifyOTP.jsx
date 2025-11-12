@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // Import các hook từ react-router-dom
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 // URL Backend (giống như trang Login)
 const API_BASE_URL = 'http://localhost:8888';
@@ -25,15 +26,7 @@ const StyleInjector = ({ styles }) => {
   return null; // Component này không render gì cả
 };
 
-// 2. Component LoadingSpinner (thay thế import)
-const LoadingSpinner = ({ isLoading }) => {
-  if (!isLoading) return null;
-  return (
-    <div className="loading-overlay">
-      <div className="loading-spinner"></div>
-    </div>
-  );
-};
+
 
 // 3. Component FontAwesomeIcon và Icon (thay thế import)
 // Đây là SVG cho icon 'faCircleExclamation'
@@ -83,7 +76,7 @@ export default function VerifyOTP() {
   useEffect(() => {
     if (location.state && location.state.username) {
       setUsername(location.state.username);
-      toast.success(`Mã OTP đã được gửi đến email liên kết với ${location.state.username}.`);
+      toast.success(location.state.message);
     } else {
       // Nếu không có username (người dùng tự ý vào trang này)
       // Điều hướng về trang đăng nhập

@@ -15,12 +15,15 @@ import User from "./pages/admin/User";
 import ProductUser from "./components/ProductUser";
 import Dashboard from "./pages/admin/Dashboard";
 import RegisterPage from "./pages/auth/RegisterPage";
-
+import ForgotPasswordPage from "./pages/auth/ForgotPassword"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import "./assets/css/global.css";
 import Cart from "./components/Cart";
+import VerifyPasswordOTP from "./pages/auth/VerifyPasswordOTP";
+import ResetPasswordPage from "./pages/auth/ResetPassword";
+import UserProfilePage from "./pages/user/UserProfilePage";
 
 function App() {
   return (
@@ -44,6 +47,16 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/verify-otp" element={<VerifyOTP/>}/>
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/verify-password-otp" element={<VerifyPasswordOTP />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+
+          <Route path="/user" element={<ProtectedRoute requiredRole="ROLE_USER" />}>
+          <Route path="profile" element={<UserProfilePage />} />
+          </Route>
+
+          
           <Route path="/admin/login" element={<LoginPage />} />
           {/*admin*/}
           <Route path="/admin" element={<AdminLayout />}>
