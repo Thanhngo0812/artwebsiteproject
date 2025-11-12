@@ -5,6 +5,8 @@ import axios from 'axios'; // HomePage của bạn dùng axios, nên tôi cũng 
 import tt from '@tomtom-international/web-sdk-maps';
 import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import Header from '../../components/Header'
+import LoadingSpinner from '../../components/LoadingSpinner';
+
 // Đặt URL backend của bạn ở đây
 const API_BASE_URL = 'http://localhost:8888';
 // Lấy API key từ file .env
@@ -27,14 +29,7 @@ const StyleInjector = ({ styles }) => {
 };
 
 // 2. Component LoadingSpinner
-const LoadingSpinner = ({ isLoading }) => {
-  if (!isLoading) return null;
-  return (
-    <div className="loading-overlay">
-      <div className="loading-spinner"></div>
-    </div>
-  );
-};
+
 
 // 3. Component FontAwesomeIcon và Icons (Giả lập)
 const faUser = (
@@ -194,7 +189,7 @@ export default function UserProfilePage() {
   const [addressToDelete, setAddressToDelete] = useState(null); // Lưu địa chỉ (hoặc ID) sắp xóa
   // Tải TomTom SDK (JS và CSS)
   useEffect(() => {
-    if (isSdkLoaded) return; // Chỉ tải 1 lần
+    if (isSdkLoaded){ setIsLoading(false);return;} // Chỉ tải 1 lần
 
     const loadSDK = () => {
       // 1. Tải CSS

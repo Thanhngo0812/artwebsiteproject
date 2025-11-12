@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 public class ProductFilterRequestDTO {
+    private String productName; // Dùng cho tìm kiếm theo keyword
     private List<Long> categories;
 
     private List<Long> materials;

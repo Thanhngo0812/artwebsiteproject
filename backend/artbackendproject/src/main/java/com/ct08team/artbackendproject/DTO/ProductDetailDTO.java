@@ -14,6 +14,7 @@ public class ProductDetailDTO {
     public List<VariantDTO> variants;
     public List<ImageDTO> images;
     public List<ColorDTO> colors;
+    public List<TopicDTO> topics;
 
     public static class CategoryDTO {
         public Long id;
@@ -43,5 +44,15 @@ public class ProductDetailDTO {
         public String hexCode;
         public ColorDTO() {}
         public ColorDTO(String hexCode) { this.hexCode = hexCode; }
+    }
+
+    // =======================================================
+    // MỚI: Thêm DTO cho Chủ đề (Topic)
+    // (Dựa trên CSDL, chúng ta chỉ cần trả về 'topicName')
+    // =======================================================
+    public static class TopicDTO {
+        public String topicName;
+        public TopicDTO() {}
+        public TopicDTO(String topicName) { this.topicName = topicName; }
     }
 }

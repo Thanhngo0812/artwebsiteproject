@@ -7,6 +7,7 @@ import com.ct08team.artbackendproject.DTO.ProductListDTO;
 import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
 import com.ct08team.artbackendproject.Entity.product.Category;
 import com.ct08team.artbackendproject.Entity.product.Product;
+import com.ct08team.artbackendproject.Entity.product.ProductColor;
 import com.ct08team.artbackendproject.Service.Filter.FilterService;
 import com.ct08team.artbackendproject.Service.Promotion.PromotionCalculationService;
 import com.ct08team.artbackendproject.Specification.ProductSpecification;
@@ -122,7 +123,12 @@ public class ProductService {
                     .map(productColor -> new ProductDetailDTO.ColorDTO(productColor.getHexCode()))
                     .collect(Collectors.toList());
             System.out.println("   - Colors: " + dto.colors.size());
-            
+            dto.topics = p.getTopics() == null ? List.of() :
+                    p.getTopics().stream()
+                            // (Giả sử Entity ProductTopic có hàm .getTopicName())
+                            .map(productTopic -> new ProductDetailDTO.TopicDTO(productTopic.getTopicName()))
+                            .collect(Collectors.toList());
+            System.out.println("   - Topics: " + dto.topics.size());
             System.out.println("✅ [ProductService] DTO created successfully");
             return dto;
             
@@ -147,7 +153,6 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Page<ProductListDTO> searchProducts(ProductFilterRequestDTO filter, Pageable pageable) {
-        System.out.println(filter.getPriceRange().getMaxPrice().toString());
         // --- BƯỚC MỚI: GỌI FILTERSERVICE ĐỂ MỞ RỘNG IDS ---
         // Lấy danh sách ID gốc từ DTO (ví dụ: [1])
         List<Long> originalCategoryIds = filter.getCategories();
@@ -253,14 +258,18 @@ public class ProductService {
 
         // 2. Gọi service mới để tính giá khuyến mãi
         Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
-
+        List<String> hexCodes = product.getColors() // Lấy List<ProductColor>
+                .stream()           // Bắt đầu stream
+                .map(ProductColor::getHexCode) // Trích xuất chuỗi hexCode
+                .collect(Collectors.toList()); // Thu thập thành List<String>
         // 3. Trả về DTO mới
         return new ProductListDTO(
                 product.getId(),
                 product.getProductName(),
                 product.getThumbnail(),
                 originalPrice,              // Luôn là giá gốc
-                promoPriceOpt.orElse(null)  // Giá khuyến mãi (hoặc null nếu không có)
+                promoPriceOpt.orElse(null) , // Giá khuyến mãi (hoặc null nếu không có)
+                hexCodes
         );
     }
 }

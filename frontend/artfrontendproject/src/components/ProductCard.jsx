@@ -24,7 +24,7 @@ export default function ProductCard({ product }) {
           {product.productName || product.productname}
         </h3>
         <p className="product-card-price">
-          {formatPrice(product.minPrice)}
+          {formatPrice(product.originalPrice)}
         </p>
       </div>
     </Link>

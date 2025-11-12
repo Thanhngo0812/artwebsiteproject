@@ -18,7 +18,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
+  const [displayTopics, setDisplayTopics] = useState([]);
   const [displayCategories, setDisplayCategories] = useState([]);
 
   useEffect(() => {
@@ -48,26 +48,28 @@ export default function ProductDetail() {
       } else {
         setMainImage(data.thumbnail);
       }
-
+      if (data.topics&&data.topics.length>0){
+        let topicsToDisplay = data.topics;
+        setDisplayTopics(topicsToDisplay);
+      }
       if (data.categories && data.categories.length > 0) {
-        const parents = data.categories.filter(c => c.id >= 1 && c.id <= 5);
-        const children = data.categories.filter(c => c.id >= 6);
+        // const parents = data.categories.filter(c => c.id >= 1 && c.id <= 5);
+        // const children = data.categories.filter(c => c.id >= 6);
 
-        let categoriesToDisplay = [];
-
-        if (parents.length >= 2) {
-          // Có 2 cha → Hiển thị cả 2
-          categoriesToDisplay = parents;
-        } else if (parents.length === 1 && children.length > 0) {
-          // 1 cha + con → CHỈ hiển thị con
-          categoriesToDisplay = children;
-        } else if (children.length > 0) {
-          // Chỉ có con
-          categoriesToDisplay = children;
-        } else if (parents.length === 1) {
-          // Chỉ có 1 cha
-          categoriesToDisplay = parents;
-        }
+        let categoriesToDisplay = data.categories;
+        // if (parents.length >= 2) {
+        //   // Có 2 cha → Hiển thị cả 2
+        //   categoriesToDisplay = parents;
+        // } else if (parents.length === 1 && children.length > 0) {
+        //   // 1 cha + con → CHỈ hiển thị con
+        //   categoriesToDisplay = children;
+        // } else if (children.length > 0) {
+        //   // Chỉ có con
+        //   categoriesToDisplay = children;
+        // } else if (parents.length === 1) {
+        //   // Chỉ có 1 cha
+        //   categoriesToDisplay = parents;
+        // }
 
         setDisplayCategories(categoriesToDisplay);
       }
@@ -187,7 +189,6 @@ export default function ProductDetail() {
             {selectedVariant ? formatPrice(selectedVariant.price) : formatPrice(product.minPrice)}
           </div>
 
-          
           {/* Variant Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="pd-variant-section">
@@ -272,7 +273,14 @@ export default function ProductDetail() {
                   : (product.categories?.map(c => c.name).join(', ') || '—')}
               </span>
             </div>
-            
+            <div className="pd-info-item">
+              <span className="pd-info-label">Chủ đề:</span>
+              <span className="pd-info-value">
+                {displayTopics.length > 0 
+                  ? displayTopics.map(c => c.topicName).join(', ')
+                  : 'không có'}
+              </span>
+            </div>
             {product.colors && product.colors.length > 0 && (
               <div className="pd-info-item">
                 <span className="pd-info-label">Màu sắc:</span>
