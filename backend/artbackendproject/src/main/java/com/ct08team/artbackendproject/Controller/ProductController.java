@@ -55,22 +55,33 @@ public class ProductController {
     }
 
     @GetMapping("/featured")
-    public ResponseEntity<List<ProductListDTO>> getFeaturedProducts() {
-
-        Pageable pageable = PageRequest.of(0, 20);
+    public ResponseEntity<?> getFeaturedProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<ProductListDTO> products = productService.getFeaturedProducts(pageable);
         
-        return ResponseEntity.ok(products.getContent());
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", products.getContent());
+        response.put("totalElements", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+        
+        return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/newest")
-    public ResponseEntity<List<ProductListDTO>> getNewestProducts() {
-
-        Pageable pageable = PageRequest.of(0, 20, Sort.by("id").descending());
+    public ResponseEntity<?> getNewestProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<ProductListDTO> products = productService.getNewestProducts(pageable);
         
-        return ResponseEntity.ok(products.getContent());
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", products.getContent());
+        response.put("totalElements", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+        
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/by-ids")
