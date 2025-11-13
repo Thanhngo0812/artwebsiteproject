@@ -194,15 +194,7 @@ public class Product {
         this.createdAt = createdAt;
     }
     // Helper methods
-    public void addColor(ProductColor color) {
-        colors.add(color);
-        color.setProduct(this);
-    }
-    
-    public void removeColor(ProductColor color) {
-        colors.remove(color);
-        color.setProduct(null);
-    }
+
     
     public void addCategory(Category category) {
         categories.add(category);
@@ -219,11 +211,52 @@ public class Product {
         variant.setProduct(this);
     }
     
+
+
+    public void addColor(ProductColor color) {
+        // 1. Gán 'product' (this) cho 'color'
+        color.setProduct(this);
+        // 2. Thêm 'color' vào danh sách
+        colors.add(color);
+    }
+
+    public void removeColor(ProductColor color) {
+        colors.remove(color);
+        color.setProduct(null);
+    }
+
+    // ... (code add/remove Category và Variant của bạn) ...
     public void removeVariant(ProductVariant variant) {
         variants.remove(variant);
         variant.setProduct(null);
     }
 
+    // Helper cho Images (được dùng trong ProductService)
+    public void addImage(ProductImage image) {
+        // (Lưu ý: CSDL của bạn đang link Image với Variant, không phải Product)
+        // (Bạn nên tạo addImage trong ProductVariant.java)
+        // images.add(image);
+        // image.setProduct(this);
+        throw new UnsupportedOperationException("Lỗi Logic: Ảnh (Image) phải được thêm vào Phiên bản (Variant), không phải Sản phẩm (Product)");
+    }
+
+    public void removeImage(ProductImage image) {
+        // images.remove(image);
+        // image.setProduct(null);
+    }
+
+    // Helper cho Topics (Bạn đang cần)
+    public void addTopic(ProductTopic topic) {
+        // 1. Gán 'product' (this) cho 'topic'
+        topic.setProduct(this);
+        // 2. Thêm 'topic' vào danh sách
+        topics.add(topic);
+    }
+
+    public void removeTopic(ProductTopic topic) {
+        topics.remove(topic);
+        topic.setProduct(null);
+    }
     
     @Override
     public boolean equals(Object o) {

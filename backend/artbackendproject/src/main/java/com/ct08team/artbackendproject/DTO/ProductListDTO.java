@@ -1,6 +1,8 @@
 package com.ct08team.artbackendproject.DTO;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DTO (Data Transfer Object) để hiển thị sản phẩm trên một danh sách (list).
@@ -22,22 +24,29 @@ public class ProductListDTO {
      * Sẽ là NULL nếu không có khuyến mãi nào được áp dụng.
      */
     private BigDecimal promotionalPrice;
-
+    private List<String> colors;
+    /**
+     * Constructor rỗng (cần thiết cho JPA/Jackson).
+     */
     /**
      * Constructor rỗng (cần thiết cho JPA/Jackson).
      */
     public ProductListDTO() {
+        // SỬA: Khởi tạo list để tránh lỗi NullPointerException
+        this.colors = new ArrayList<>();
     }
 
     /**
      * Constructor đầy đủ để ánh xạ từ ProductService.
+     * SỬA: Thêm 'colors' vào constructor
      */
-    public ProductListDTO(Long id, String productName, String thumbnail, BigDecimal originalPrice, BigDecimal promotionalPrice) {
+    public ProductListDTO(Long id, String productName, String thumbnail, BigDecimal originalPrice, BigDecimal promotionalPrice, List<String> colors) {
         this.id = id;
         this.productName = productName;
         this.thumbnail = thumbnail;
         this.originalPrice = originalPrice;
         this.promotionalPrice = promotionalPrice;
+        this.colors = colors; // <-- Gán giá trị
     }
 
     // --- Getters và Setters ---
@@ -80,5 +89,13 @@ public class ProductListDTO {
 
     public void setPromotionalPrice(BigDecimal promotionalPrice) {
         this.promotionalPrice = promotionalPrice;
+    }
+
+    public List<String> getColors() {
+        return colors;
+    }
+
+    public void setColors(List<String> colors) {
+        this.colors = colors;
     }
 }

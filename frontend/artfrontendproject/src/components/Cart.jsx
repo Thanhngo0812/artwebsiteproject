@@ -15,6 +15,7 @@ export default function Cart() {
   } = useCart();
   
   const [availableVariants, setAvailableVariants] = useState({});
+  const [productStatuses, setProductStatuses] = useState({});
   const [loading, setLoading] = useState(false);
   const [editingQuantity, setEditingQuantity] = useState({});
 
@@ -32,14 +33,19 @@ export default function Cart() {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const data = await response.json();
-      
+
       const variants = data.variants || [];
       
       setAvailableVariants(prev => ({
         ...prev,
         [productId]: variants
       }));
-      
+
+      setProductStatuses(prev => ({
+        ...prev,
+        [productId]: data.productStatus
+      }));
+
     } catch (error) {
       console.error('❌ Error:', error);
     } finally {
@@ -56,13 +62,29 @@ export default function Cart() {
     const selectedVariant = variants.find(v => v.id === parseInt(newVariantId));
     
     if (selectedVariant) {
-      updateSize(
-        index,
-        cartItems[index].categoryId,
-        cartItems[index].categoryName,
-        selectedVariant.dimensions,
-        selectedVariant.price
-      );
+      const currentQuantity = cartItems[index].quantity;
+      
+      if (currentQuantity > selectedVariant.stockQuantity) {
+
+        updateSize(
+          index,
+          cartItems[index].categoryId,
+          cartItems[index].categoryName,
+          selectedVariant.dimensions,
+          selectedVariant.price
+        );
+        
+        const quantityDelta = selectedVariant.stockQuantity - currentQuantity;
+        updateQuantity(index, quantityDelta);
+      } else {
+        updateSize(
+          index,
+          cartItems[index].categoryId,
+          cartItems[index].categoryName,
+          selectedVariant.dimensions,
+          selectedVariant.price
+        );
+      }
     }
   };
 
@@ -133,6 +155,10 @@ export default function Cart() {
     updateQuantity(index, delta);
   };
 
+  const validCartItems = cartItems.filter(item => 
+    productStatuses[item.productId] === 1
+  );
+
   const handleProductClick = (productId) => {
     navigate(`/products/${productId}`);
   };
@@ -144,7 +170,7 @@ export default function Cart() {
     }).format(price);
   };
 
-  if (cartItems.length === 0) {
+  if (validCartItems.length === 0) {
     return (
       <div className="cart-empty">
         <div className="empty-cart-icon">🛒</div>
@@ -175,7 +201,12 @@ export default function Cart() {
           <span className="label-total">THÀNH TIỀN</span>
         </div>
 
-        {cartItems.map((item, index) => {
+        {validCartItems.map((item, index) => {
+          const originalIndex = cartItems.findIndex(
+            ci => ci.productId === item.productId && 
+                  ci.categoryId === item.categoryId && 
+                  ci.dimensions === item.dimensions
+          );
           const variants = availableVariants[item.productId] || [];
           const currentVariant = variants.find(v => v.dimensions === item.dimensions);
           const maxStock = currentVariant ? currentVariant.stockQuantity : 999;
@@ -200,7 +231,7 @@ export default function Cart() {
                     <label>Size:</label>
                     <select 
                       value={currentVariant ? currentVariant.id : ''}
-                      onChange={(e) => handleDimensionChange(index, e.target.value)}
+                      onChange={(e) => handleDimensionChange(originalIndex, e.target.value)}
                       className="size-dropdown"
                       disabled={loading || variants.length === 0}
                     >
@@ -221,7 +252,7 @@ export default function Cart() {
                     <label>Số lượng:</label>
                     <div className="quantity-controls">
                       <button 
-                        onClick={() => handleQuantityButton(index, -1)}
+                        onClick={() => handleQuantityButton(originalIndex, -1)}
                         disabled={item.quantity <= 1}
                         className="qty-btn"
                       >
@@ -232,14 +263,14 @@ export default function Cart() {
                         type="text"
                         inputMode="numeric"
                         className="quantity-input"
-                        value={editingQuantity[index] !== undefined ? editingQuantity[index] : item.quantity}
-                        onChange={(e) => handleQuantityInputChange(index, e.target.value)}
-                        onBlur={() => handleQuantityInputBlur(index)}
-                        onKeyPress={(e) => handleQuantityKeyPress(e, index)}
+                        value={editingQuantity[originalIndex] !== undefined ? editingQuantity[originalIndex] : item.quantity}
+                        onChange={(e) => handleQuantityInputChange(originalIndex, e.target.value)}
+                        onBlur={() => handleQuantityInputBlur(originalIndex)}
+                        onKeyPress={(e) => handleQuantityKeyPress(e, originalIndex)}
                       />
                       
                       <button 
-                        onClick={() => handleQuantityButton(index, 1)}
+                        onClick={() => handleQuantityButton(originalIndex, 1)}
                         disabled={item.quantity >= maxStock}
                         className="qty-btn"
                       >
@@ -260,7 +291,7 @@ export default function Cart() {
 
                 <button 
                   className="remove-btn" 
-                  onClick={() => removeItem(index)}
+                  onClick={() => removeItem(originalIndex)}
                 >
                   🗑️
                 </button>

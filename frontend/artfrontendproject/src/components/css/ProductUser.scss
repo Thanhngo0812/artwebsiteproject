@@ -45,7 +45,11 @@
     font-weight: 700;
     font-size: 25px;
     text-align: center;
+    display: flex;
+  flex-direction: column; /* 1. Xếp các con theo chiều dọc (trên-dưới) */
+  align-items: center;
     padding: 50px 0;
+    align-items: center;
   }
   
   .productUser-content {
@@ -381,7 +385,7 @@
           font-weight: 600;
           color: #333;
           line-height: 1.4;
-          min-height: 48px;
+          min-height: 30px;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -393,6 +397,8 @@
           margin-top: 8px;
           padding: 0 16px 16px;
           font-size: 18px;
+          flex-direction: column;  /* <<< THAY ĐỔI 1: Xếp dọc */
+  align-items: flex-start; /* <<< THAY ĐỔI 2: Căn lề trái */
           font-weight: bold;
           color: #D32F2F;
         }
@@ -448,15 +454,15 @@
     }
 
     .page-num:hover {
-      background: #007bff;
+      background: black;
       color: white;
-      border-color: #007bff;
+      border-color: black;
     }
 
     .active {
-      background: #007bff !important;
+      background: black!important;
       color: white !important;
-      border-color: #007bff !important;
+      border-color: black !important;
     }
   }
 }
@@ -650,10 +656,38 @@
     font-size: 0.9em;
     color: #888; /* Màu xám */
     text-decoration: line-through; /* Đây là chìa khóa! */
-    margin-left: 8px; /* Khoảng cách với giá sale */
+    margin-left: 0; /* <<< THAY ĐỔI 3: Bỏ margin-left */
 }
 
 .product-item .product-thumbnail:hover img {
   transform: scale(1.08); /* Zoom nhẹ ảnh khi hover */
 
+}
+
+.product-item:hover .product-name {
+text-decoration: underline;
+}
+
+/* Thêm CSS này vào file .css của bạn */
+
+/* Container cho các chấm màu */
+.product-colors {
+  /* Đặt giữa tên và giá */
+  margin-top: 8px; 
+  margin-bottom: 8px; 
+  margin-left: 16px;
+  /* Căn giữa các chấm màu */
+  display: flex;
+  justify-content: flex-start;  align-items: center;
+  gap: 6px; /* Khoảng cách giữa các chấm */
+  min-height: 16px; /* Giữ chiều cao cố định (ngay cả khi chưa tải xong) */
+}
+
+/* Từng chấm màu (giống hình ảnh bạn gửi) */
+.color-swatch {
+  width: 16px;  /* Kích thước chấm */
+  height: 16px; /* Kích thước chấm */
+  border-radius: 50%; /* Làm nó hình tròn */
+  border: 1px solid #ddd; /* Thêm viền mờ */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Thêm bóng mờ */
 }

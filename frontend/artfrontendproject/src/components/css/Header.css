@@ -71,8 +71,11 @@
   gap: 4px;
 }
 
+
 .nav-item .arrow {
+  margin-left: 4px; /* Một khoảng cách nhỏ */
   font-size: 12px;
+  color: #FFFFFFD9;
   transition: transform 0.3s ease;
 }
 .nav-item .arrow.active {
@@ -87,6 +90,7 @@
 
 .nav-item.shop:hover {
   color: rgba(255, 255, 255, 1);
+  text-decoration: underline;
 }
 
 .nav-item.category span:first-child {
@@ -96,6 +100,7 @@
 
 .nav-item.category:hover span:first-child {
   color: rgba(255, 255, 255, 1);
+  text-decoration: underline;
 }
 
 .nav-item-children-menu {
@@ -104,7 +109,8 @@
   padding: 12px 0;
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: 70%;
+  
   transform: translateX(-50%);
   background-color: #222222;
   min-width: 220px;
@@ -145,6 +151,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #FFFFFFD9;
 }
 
 .nav-icon {
@@ -365,3 +372,282 @@
     display: none;
   }
 }
+
+
+/* =================================
+   CSS CHO SEARCH OVERLAY THEO YÊU CẦU MỚI
+   ================================= */
+
+/* Đảm bảo header có position: relative */
+
+
+/* Lớp phủ cho nội dung BÊN DƯỚI header */
+.content-overlay {
+  position: fixed; /* Che toàn bộ màn hình */
+  top: var(--header-height, 0); /* Đặt top bằng chiều cao của header */
+  left: 0;
+  width: 100%;
+  height: calc(100% - var(--header-height, 0)); /* Chỉ che phần dưới header */
+  background-color: #F2F2F250;
+  z-index: 1000; /* Dưới header, nhưng trên nội dung khác */
+  backdrop-filter: blur(5px);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.content-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* OVERLAY THANH TÌM KIẾM ĐÈ LÊN HEADER */
+.search-header-overlay {
+  position: absolute; /* Định vị tương đối với .header */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* Chiều cao bằng header */
+  background-color: #111; /* Nền đen của thanh tìm kiếm */
+  z-index: 1002; /* Luôn trên cùng của header */
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-100%); /* Bắt đầu từ trên ra ngoài */
+  transition: opacity 0.3s ease, visibility 0.3s ease,
+    transform 0.3s ease-in-out;
+
+  display: flex; /* Để căn giữa search-box-container */
+  align-items: center; /* Căn giữa dọc */
+  justify-content: center; /* Căn giữa ngang */
+}
+
+.search-header-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0); /* Trượt xuống */
+}
+
+/* Container cho search-box để căn giữa */
+.search-box-container {
+  width: 100%; /* Chiều rộng 100% để search-box có thể căn giữa */
+  padding: 0 20px; /* Padding ngang cho responsive */
+}
+
+/* Hộp tìm kiếm */
+.search-box {
+  display: flex;
+  align-items: center;
+  max-width: 600px; /* Giới hạn chiều rộng */
+  margin: 0 auto; /* Căn giữa */
+  border: 1px solid #555; /* Viền */
+  border-radius: 5px;
+  background-color: #222;
+}
+
+/* Input tìm kiếm */
+.search-input {
+  flex-grow: 1; /* Cho phép input chiếm hết không gian còn lại */
+  padding: 10px 15px; /* Giảm padding cho vừa đủ */
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: #aaa;
+}
+
+/* Icon tìm kiếm */
+.search-icon-btn {
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* Icon đóng (X) */
+.search-close-btn {
+  padding: 10px 15px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.search-close-btn:hover {
+  color: #fff;
+}
+body {
+  --header-height: 70px;
+}
+
+/* =================================
+   LƯU Ý QUAN TRỌNG:
+   Bạn cần định nghĩa chiều cao của header trong CSS.
+   Ví dụ:
+   .header {
+     height: 80px;
+     background-color: #333;
+     width: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     padding: 0 20px;
+     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+   }
+
+   Và gán giá trị đó vào biến CSS custom property `--header-height`
+   ở đâu đó trong CSS của bạn (ví dụ: ở `:root` hoặc `body`):
+
+  
+   Hoặc
+   body {
+     --header-height: 80px;
+   }
+
+   Nếu không, `top: var(--header-height, 0);` và
+   `height: calc(100% - var(--header-height, 0));`
+   cho `.content-overlay` sẽ không hoạt động đúng.
+   Nếu bạn không dùng biến CSS, bạn có thể hardcode giá trị:
+   .content-overlay {
+       top: 80px; // Nếu header cao 80px
+       height: calc(100% - 80px);
+   }
+   ================================= */
+
+
+/* Thêm vào Header.css */
+
+/* Đảm bảo container có thể chứa dropdown */
+.search-box-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px; /* Hoặc bất kỳ độ rộng nào bạn muốn */
+}
+
+/* Dropdown kết quả */
+.search-results-dropdown {
+  position: absolute;
+  top: 100%; /* Nằm ngay dưới search-box */
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-top: none;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1001; /* Phải cao hơn overlay nội dung nhưng dưới search box */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Mỗi item kết quả */
+.search-result-item {
+  display: flex; /* Dùng flex để căn chỉnh (nếu có ảnh) */
+  align-items: center;
+  padding: 12px 16px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background-color: #f9f9f9;
+}
+
+.search-result-item:hover .search-result-name {
+  text-decoration: underline;
+}
+
+/* CSS cho item loading hoặc không có kết quả */
+.search-result-item.loading,
+.search-result-item.no-results {
+  color: #888;
+  font-style: italic;
+  cursor: default;
+}
+
+.search-result-item.no-results:hover {
+  background-color: #fff;
+}
+
+/* Tùy chọn: Thêm CSS cho ảnh thumbnail (nếu bạn có) */
+.search-result-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 12px;
+  border-radius: 4px;
+}
+
+/* Cập nhật lại item cha để căn chỉnh tốt hơn */
+.search-result-item {
+   display: flex;
+   align-items: center; /* Căn giữa ảnh và khối text */
+   padding: 10px 16px;
+   /* ... các style khác của bạn ... */
+  }
+  
+  /* Container mới cho TÊN và GIÁ 
+    (nằm bên phải cái ảnh)
+  */
+  .search-result-info {
+ display: flex;
+   flex-direction: column; /* Xếp tên ở trên, giá ở dưới */
+   flex-grow: 1; /* Chiếm hết phần không gian còn lại */
+   min-width: 0; /* Quan trọng: để text-overflow hoạt động */
+    margin-left: 12px; /* Khoảng cách với ảnh */
+  }
+  
+  /* Style cho tên sản phẩm (thêm xử lý overflow) */
+  .search-result-name {
+   font-size: 0.95rem;
+   font-weight: 500;
+   color: #333;
+ 
+    /* Xử lý nếu tên quá dài */
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+  }
+  
+  /* Container cho giá (để xếp giá sale và giá gốc ngang hàng) */
+  .search-result-price-container {
+   display: flex;
+   align-items: baseline; /* Căn cho các giá thẳng hàng */
+   gap: 8px; /* Khoảng cách giữa giá sale và giá gốc */
+   margin-top: 4px; /* Khoảng cách với tên sản phẩm */
+  }
+  
+  /* Style cơ bản cho giá */
+  .search-result-price {
+   font-size: 0.9rem;
+   font-weight: 500;
+    color: #555; /* Màu giá gốc (khi không sale) */
+  }
+  
+  /* Style cho GIÁ SALE (màu đỏ, đậm) */
+  .search-result-price.sale {
+   color: #D72C2C; /* Màu đỏ cho giá sale */
+ font-weight: 600;
+   font-size: 0.95rem; /* Cho giá sale to hơn 1 chút */
+  }
+  
+  /* Style cho GIÁ GỐC (khi bị sale - mờ, gạch ngang) */
+  .search-result-price.original {
+   color: #888;
+   text-decoration: line-through; /* Gạch ngang */
+   font-size: 0.85rem; /* Cho giá gốc nhỏ hơn */
+  }

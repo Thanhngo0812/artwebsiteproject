@@ -8,8 +8,8 @@ import java.math.BigDecimal;
  */
 public class PriceRangeDTO {
 
-    private BigDecimal minPrice;
-    private BigDecimal maxPrice;
+    private BigDecimal minPrice = new BigDecimal("0");
+    private BigDecimal maxPrice = new BigDecimal("10000000000");
 
     // Constructor rỗng
     public PriceRangeDTO() {

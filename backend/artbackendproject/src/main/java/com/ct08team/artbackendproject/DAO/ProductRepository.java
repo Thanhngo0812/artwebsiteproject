@@ -53,4 +53,15 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
            "OR LOWER(c.name) LIKE :keyword) " +
            "ORDER BY p.viewCount DESC, p.salesCount DESC")
     List<Product> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    
+    @Query("SELECT p FROM Product p JOIN p.categories c WHERE c.id = :categoryId AND p.productStatus = :status")
+    Page<Product> findByCategoryIdAndProductStatus(
+            @Param("categoryId") Long categoryId,
+            @Param("status") Integer status,
+            Pageable pageable
+    );
+    // Tìm tất cả theo Status (dùng cho Newest và Featured)
+    List<Product> findByProductStatus(Integer status); // Trả về List để tính điểm Featured
+    Page<Product> findByProductStatus(Integer status, Pageable pageable); // Trả về Page cho Newest
 }

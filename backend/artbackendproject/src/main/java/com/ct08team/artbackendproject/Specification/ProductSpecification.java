@@ -5,6 +5,8 @@ import com.ct08team.artbackendproject.Entity.product.*;
 import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +63,12 @@ public class ProductSpecification {
                 predicates.add(join.get("id").get("topicName").in(filter.getTopics()));
             }
 
+            if (StringUtils.hasText(filter.getProductName())) {
+                predicates.add(cb.like(
+                        cb.lower(root.get("productName")), // Giả sử trường trong Entity Product là "productName"
+                        "%" + filter.getProductName().toLowerCase() + "%"
+                ));
+            }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

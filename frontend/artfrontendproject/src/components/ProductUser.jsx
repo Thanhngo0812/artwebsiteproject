@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./css/ProductUser.scss";
+import { useNavigate } from 'react-router-dom';
+
 import {
   FaChevronUp,
   FaChevronDown,
   FaCheck,
   FaSlidersH,
   FaTimes,
+  FaSearch
 } from "react-icons/fa";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
@@ -14,7 +17,8 @@ import { Link, useSearchParams } from "react-router-dom";
 export default function ProductUser() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryNameFromUrl = searchParams.get("category");
-
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search'));
+  const navigate = useNavigate();
   const reset = searchParams.get("reset");
   useEffect(() => {
     if (reset === "true") {
@@ -45,6 +49,7 @@ export default function ProductUser() {
 
   const [listFilters, setListFilters] = useState({});
   const [filters, setFilters] = useState({
+    productName:searchQuery?searchQuery:'',
     categories: [],
     materials: [],
     priceRange: {
@@ -277,7 +282,11 @@ export default function ProductUser() {
       return prev;
     });
   };
-
+  const handleChangeSearch = (e)=>{
+    setFilters((prev) =>({ ...prev,
+    productName: e.target.value
+    }))
+  }
   const handleFiltersChangeColor = (key, value) => {
     setFilters((prev) => {
       if (key === "colors") {
@@ -371,6 +380,7 @@ export default function ProductUser() {
   }, [filters, currentPage, pageSize, sort]);
 
   const handlePageClick = (e) => {
+    window.scrollTo(0, 0);
     setCurrentPage(e.selected + 1);
   };
 
@@ -646,7 +656,27 @@ export default function ProductUser() {
           </div>
         </div>
       </div>
-      <div className="productUser-title">Danh sách "TRANH XỊN"</div>
+      <div className="productUser-title">Danh sách "TRANH XỊN"
+      <div className="search-box-container">
+          <div style={{maxWidth:'400px',backgroundColor:'#f2f2f2',marginTop:'20px'}} className="search-box">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Tìm kiếm..."
+             // autoFocus={isSearchOpen}
+              style={{color:"#666666"}}
+              // --- Cập nhật input ---
+              value={searchQuery}
+              onChange={(e) => {handleChangeSearch(e);setSearchQuery(e.target.value)}}
+              //onKeyDown={handleSearchSubmit} // Xử lý Enter
+            />
+            <button className="search-icon-btn">
+              <FaSearch />
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <div className="productUser-content">
         <div className="productUser-filter">
           <div className="productUser-filter-title">
@@ -935,55 +965,77 @@ export default function ProductUser() {
               value={sort}
               onChange={(e) => handleChangeOptionSort(e.target.value)}
             >
-              <option value="new">Mới nhất</option>
+              <option value="createdAt,desc">Mới nhất</option>
               <option value="salesCount,desc">Bán chạy</option>
               <option value="productName,asc">Thứ tự từ A đến Z</option>
               <option value="productName,desc">Thứ tự từ Z đến A</option>
               <option value="minPrice,asc">Giá từ thấp đến cao</option>
               <option value="minPrice,desc">Giá từ cao đến thấp</option>
-              <option value="old">Cũ hơn</option>
+              <option value="createdAt,asc">Cũ hơn</option>
             </select>
           </div>
           <div className="main-show-product">
             {products && products.length > 0 ? (
               products.map((item, index) => (
-                
-                <Link 
-                  to={`/products/${item.id}`} 
-                  className="product-item" 
-                  key={item.id}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <div className="product-thumbnail">
-                      <img src={item.thumbnail} alt="img product invalid" />
-                      
-                      {item.promotionalPrice && (
-                          <span className="sale-badge">SALE</span>
-                      )}
-                  </div>
-                  <div className="product-name">{item.productName}</div>
-              
-                  <div className="product-price">
-                      {
-                          item.promotionalPrice ? 
-                          (
-                              <>
-                                  <span className="promo-price">
-                                      Từ {formatCurrency(item.promotionalPrice)}
-                                  </span>
-                                  <span className="strikethrough-price">
-                                      {formatCurrency(item.originalPrice)}
-                                  </span>
-                              </>
-                          ) : 
-                          (
-                              <span className="normal-price">
-                                  Từ {formatCurrency(item.originalPrice)}
-                              </span>
-                          )
-                      }
-                  </div>
-                </Link>
+
+                <div className="product-item" onClick={() => navigate(`/products/${item.id}`)} key={item.id}>
+  <div className="product-thumbnail">
+    <img src={item.thumbnail} alt="img product invalid" />
+    
+    {item.promotionalPrice && (
+      <span className="sale-badge">SALE</span>
+    )}
+  </div>
+  
+  <div className="product-name">{item.productName}</div>
+
+  {/* ================================== */}
+  {/* MỚI: Thêm khối hiển thị màu sắc */}
+  {/* ================================== */}
+  {/* Chỉ hiển thị khối này nếu item.colors tồn tại và có phần tử */}
+  {item.colors && item.colors.length > 0 && (
+    <div className="product-colors">
+      {/* Lặp qua mảng màu (là mảng string hex code) */}
+      {item.colors.map((colorHex, index) => (
+        <span
+          key={index}
+          className="color-swatch"
+          style={{ backgroundColor: colorHex }}
+          title={colorHex} // Thêm title để hover thấy mã màu
+        ></span>
+      ))}
+    </div>
+  )}
+  {/* ================================== */}
+  {/* KẾT THÚC PHẦN MỚI */}
+  {/* ================================== */}
+
+  <div className="product-price">
+    {
+      item.promotionalPrice ? 
+      (
+        // Kịch bản CÓ KHUYẾN MÃI
+        <>
+          {/* 1. Giá khuyến mãi mới (Không có "Từ") */}
+          <span className="promo-price">
+            {formatCurrency(item.promotionalPrice)}
+          </span>
+          
+          {/* 2. Giá gốc (Có "Từ") bị gạch ngang */}
+          <span className="strikethrough-price">
+            Từ   {formatCurrency(item.originalPrice)}
+          </span>
+        </>
+      ) : 
+      (
+        // Kịch bản KHÔNG CÓ KHUYẾN MÃI
+        <span className="normal-price">
+          Từ {formatCurrency(item.originalPrice)}
+        </span>
+      )
+    }
+  </div>
+</div>
 
               ))
             ) : (

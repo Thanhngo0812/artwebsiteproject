@@ -91,7 +91,7 @@ public class ProductVariant {
         return costPrice;
     }
 
-    public void setCostPricePrice(BigDecimal costPrice) {
+    public void setCostPrice(BigDecimal costPrice) {
         this.costPrice = costPrice;
     }
 
