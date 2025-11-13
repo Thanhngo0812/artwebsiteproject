@@ -10,7 +10,6 @@ public class ProductTopic {
 
     @EmbeddedId
     private ProductTopicId id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId") // Ánh xạ tới trường 'productId' trong ProductTopicId
     @JoinColumn(name = "product_id")
@@ -46,6 +45,13 @@ public class ProductTopic {
     // Getter tiện lợi để lấy topicName
     public String getTopicName() {
         return (this.id != null) ? this.id.getTopicName() : null;
+    }
+    public void setTopicName(String topicName) {
+        // Khởi tạo nếu id vẫn null (an toàn)
+        if (this.id == null) {
+            this.id = new ProductTopicId();
+        }
+        this.id.setTopicName(topicName);
     }
 
     // equals() và hashCode()

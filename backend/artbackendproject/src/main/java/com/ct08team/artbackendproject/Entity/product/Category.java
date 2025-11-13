@@ -1,6 +1,9 @@
 package com.ct08team.artbackendproject.Entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -19,12 +22,18 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore // <-- NGẮT VÒNG LẶP (Con trỏ ngược lên Cha)
+    @ToString.Exclude // Loại trừ khỏi Lombok toString() để tránh lỗi
+    @EqualsAndHashCode.Exclude // Loại trừ khỏi Lombok equals/hashCode
     private Category parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> children;
     
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
+    @JsonIgnore // <-- NGẮT VÒNG LẶP (Con trỏ ngược lên Cha)
+    @ToString.Exclude // Loại trừ khỏi Lombok toString() để tránh lỗi
+    @EqualsAndHashCode.Exclude // Loại trừ khỏi Lombok equals/hashCode
     private Set<Product> products = new HashSet<>();
 
     public Category() {

@@ -281,6 +281,12 @@ export default function ProductDetail() {
                   : 'không có'}
               </span>
             </div>
+            <div className="pd-info-item">
+              <span className="pd-info-label">Chất liệu:</span>
+              <span className="pd-info-value">
+                {product.material.name?product.material.name:'Không có'}
+              </span>
+            </div>
             {product.colors && product.colors.length > 0 && (
               <div className="pd-info-item">
                 <span className="pd-info-label">Màu sắc:</span>

@@ -1,5 +1,6 @@
 package com.ct08team.artbackendproject.Entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Material {
     private String materialName;
     
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // <-- Thêm dòng này để ngắt đệ quy
     private List<Product> products = new ArrayList<>();
     
     public Material() {

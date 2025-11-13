@@ -27,6 +27,7 @@ import Cart from "./components/Cart";
 import VerifyPasswordOTP from "./pages/auth/VerifyPasswordOTP";
 import ResetPasswordPage from "./pages/auth/ResetPassword";
 import UserProfilePage from "./pages/user/UserProfilePage";
+import ProductAdmin_Add from "./pages/admin/ProductAdmin_Add";
 
 function App() {
   return (
@@ -70,6 +71,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="product" element={<Product />} />
             <Route path="user" element={<User />} />
+            <Route path="product/new" element={<ProductAdmin_Add/>}/>
           </Route>
         </Routes>
         <ToastContainer
