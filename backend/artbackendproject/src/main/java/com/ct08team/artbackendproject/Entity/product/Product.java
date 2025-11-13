@@ -55,10 +55,10 @@ public class Product {
     private BigDecimal minPrice;
 
     @Column(name = "sales_count")
-    private Long salesCount;
+    private Long salesCount=0L;
 
     @Column(name = "view_count")
-    private Long viewCount;
+    private Long viewCount=0L;
     public Product() {
     }
 

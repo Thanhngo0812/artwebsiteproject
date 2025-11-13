@@ -208,7 +208,7 @@ public class ProductService {
         // CHỈNH SỬA: Chỉ lấy danh sách status = 1 từ DB để giảm tải bộ nhớ
         // Thay vì findAll().stream().filter(...)
         List<Product> activeProducts = productRepository.findByProductStatus(1);
-
+        System.out.println(activeProducts.get(0).getViewCount());
         // Tính điểm và sắp xếp (Logic giữ nguyên)
         List<Product> sortedProducts = activeProducts.stream()
                 .sorted((p1, p2) -> {

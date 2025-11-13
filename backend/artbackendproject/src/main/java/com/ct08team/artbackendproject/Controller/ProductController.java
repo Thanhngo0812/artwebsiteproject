@@ -173,4 +173,40 @@ public class ProductController {
         
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/suggest")
+    public ResponseEntity<List<ProductListDTO>> getSearchSuggestions(
+            @RequestParam(name = "keyword") String keyword,
+            @RequestParam(name = "limit", defaultValue = "5") int limit)
+    {
+        // 1. Kiểm tra nếu keyword rỗng
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return ResponseEntity.ok(List.of()); // Trả về danh sách rỗng
+        }
+
+        // 2. Giới hạn "limit" để bảo vệ CSDL (ví dụ tối đa 10)
+        int effectiveLimit = Math.min(limit, 10);
+
+        // 3. Tạo một Filter DTO
+        // Chúng ta sẽ tái sử dụng logic search tuyệt vời
+        // mà bạn đã có trong "productService.searchProducts"
+        ProductFilterRequestDTO filter = new ProductFilterRequestDTO();
+
+        // **QUAN TRỌNG**: Giả sử ProductFilterRequestDTO của bạn có
+        // trường 'productName' để tìm kiếm.
+        // Nếu tên trường là 'keyword', hãy đổi thành: filter.setKeyword(keyword);
+        filter.setProductName(keyword);
+
+        // 4. Tạo Pageable
+        // Chúng ta chỉ cần trang đầu tiên (0), với 'effectiveLimit'
+        // Sắp xếp theo 'productName' giống như API search chính
+        Pageable pageable = PageRequest.of(0, effectiveLimit, Sort.by("productName"));
+
+        // 5. Gọi service search hiện có
+        Page<ProductListDTO> productPage = productService.searchProducts(filter, pageable);
+
+        // 6. Trả về nội dung (content) của Page
+        // Đây chính là List<ProductListDTO> mà React cần
+        return ResponseEntity.ok(productPage.getContent());
+    }
 }
