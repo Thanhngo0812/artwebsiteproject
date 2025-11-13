@@ -947,38 +947,43 @@ export default function ProductUser() {
           <div className="main-show-product">
             {products && products.length > 0 ? (
               products.map((item, index) => (
-
-                <div className="product-item" key={item.id}>
-                <div className="product-thumbnail">
-                    <img src={item.thumbnail} alt="img product invalid" />
-                    
-                    {item.promotionalPrice && (
-                        <span className="sale-badge">SALE</span>
-                    )}
-                </div>
-                <div className="product-name">{item.productName}</div>
-            
-                <div className="product-price">
-                    {
-                        item.promotionalPrice ? 
-                        (
-                            <>
-                                <span className="promo-price">
-                                    Từ {formatCurrency(item.promotionalPrice)}
-                                </span>
-                                <span className="strikethrough-price">
-                                    {formatCurrency(item.originalPrice)}
-                                </span>
-                            </>
-                        ) : 
-                        (
-                            <span className="normal-price">
-                                Từ {formatCurrency(item.originalPrice)}
-                            </span>
-                        )
-                    }
-                </div>
-            </div>
+                
+                <Link 
+                  to={`/products/${item.id}`} 
+                  className="product-item" 
+                  key={item.id}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <div className="product-thumbnail">
+                      <img src={item.thumbnail} alt="img product invalid" />
+                      
+                      {item.promotionalPrice && (
+                          <span className="sale-badge">SALE</span>
+                      )}
+                  </div>
+                  <div className="product-name">{item.productName}</div>
+              
+                  <div className="product-price">
+                      {
+                          item.promotionalPrice ? 
+                          (
+                              <>
+                                  <span className="promo-price">
+                                      Từ {formatCurrency(item.promotionalPrice)}
+                                  </span>
+                                  <span className="strikethrough-price">
+                                      {formatCurrency(item.originalPrice)}
+                                  </span>
+                              </>
+                          ) : 
+                          (
+                              <span className="normal-price">
+                                  Từ {formatCurrency(item.originalPrice)}
+                              </span>
+                          )
+                      }
+                  </div>
+                </Link>
 
               ))
             ) : (

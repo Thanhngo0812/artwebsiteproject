@@ -34,7 +34,6 @@ export default function ProductListPage() {
         });
         
         setProducts(response.data);
-        setTotalPages(1);
         setLoading(false);
         return;
       }
@@ -58,16 +57,19 @@ export default function ProductListPage() {
       
       // Handle both array and paginated response
       if (Array.isArray(response.data)) {
+
         setProducts(response.data);
-        setTotalPages(1);
+      } else if (response.data.content) {
+
+        setProducts(response.data.content);
       } else {
-        setProducts(response.data.content || []);
-        setTotalPages(response.data.totalPages || 1);
+        setProducts([]);
       }
 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("❌ Error fetching products:", error);
+      setProducts([]);
       setLoading(false);
     }
   };
@@ -106,21 +108,31 @@ export default function ProductListPage() {
 
   return (
     <div className="product-list-page">
-      {/* Breadcrumb */}
       <div className="breadcrumb">
         <Link to="/">Trang chủ</Link>
         <span> / </span>
-        <span>{getTitleBySortType()}</span>
+        <Link to="/products">Sản phẩm</Link>
+        {(searchQuery || sortType) && (
+          <>
+            <span> / </span>
+            <span>
+              {sortType === 'featured' ? 'Nổi bật' : 
+               sortType === 'newest' ? 'Mới nhất' : 
+               'Tìm kiếm'}
+            </span>
+          </>
+        )}
       </div>
 
-      {/* Title */}
       <h1 className="page-title">{getTitleBySortType()}</h1>
 
-      {searchQuery && (
-        <p className="search-count">
-          {products.length > 0 
-            ? `Tìm thấy ${products.length} sản phẩm` 
-            : 'Không có kết quả nào'}
+      {products.length > 0 && (
+        <p className="product-count">
+          {sortType === 'featured' || sortType === 'newest' 
+            ? ` ${products.length} sản phẩm `
+            : searchQuery 
+              ? `Tìm thấy ${products.length} sản phẩm`
+              : `${products.length} sản phẩm`}
         </p>
       )}
 

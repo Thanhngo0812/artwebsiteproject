@@ -185,7 +185,7 @@ public class ProductService {
                 .sorted((p1, p2) -> {
                     double score1 = p1.getViewCount() * 0.3 + p1.getSalesCount() * 0.7;
                     double score2 = p2.getViewCount() * 0.3 + p2.getSalesCount() * 0.7;
-                    return Double.compare(score2, score1); // Giảm dần
+                    return Double.compare(score2, score1);
                 })
                 .collect(Collectors.toList());
 

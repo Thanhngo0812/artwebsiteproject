@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios'; // HomePage của bạn dùng axios, nên tôi cũng dùng
-import tt from '@tomtom-international/web-sdk-maps';
-import '@tomtom-international/web-sdk-maps/dist/maps.css';
+import axios from 'axios';
+// import tt from '@tomtom-international/web-sdk-maps';
+// import '@tomtom-international/web-sdk-maps/dist/maps.css';
 import Header from '../../components/Header'
-// Đặt URL backend của bạn ở đây
+// URL backend 
 const API_BASE_URL = 'http://localhost:8888';
 // Lấy API key từ file .env
 const TOMTOM_API_KEY = process.env.REACT_APP_TOMTOM_API_KEY;
@@ -305,7 +305,7 @@ export default function UserProfilePage() {
       const markerEl = document.createElement('div');
       markerEl.className = 'custom-marker'; // Gán class (đã định nghĩa trong allStyles)
       
-      const marker = new tt.Marker({ 
+      const marker = new window.tt.Marker({ 
           element: markerEl, 
           anchor: 'bottom', 
           draggable: true 

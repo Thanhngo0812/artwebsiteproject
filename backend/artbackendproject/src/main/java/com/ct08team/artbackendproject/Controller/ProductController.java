@@ -55,42 +55,22 @@ public class ProductController {
     }
 
     @GetMapping("/featured")
-    public ResponseEntity<?> getFeaturedProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size)
-    {
-        
-        int limitedSize = Math.min(size, 20);
-        Pageable pageable = PageRequest.of(page, limitedSize);
+    public ResponseEntity<List<ProductListDTO>> getFeaturedProducts() {
+
+        Pageable pageable = PageRequest.of(0, 20);
         Page<ProductListDTO> products = productService.getFeaturedProducts(pageable);
         
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", products.getContent());
-        response.put("totalElements", products.getTotalElements());
-        response.put("totalPages", products.getTotalPages());
-        response.put("currentPage", products.getNumber());
-        
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(products.getContent());
     }
 
 
     @GetMapping("/newest")
-    public ResponseEntity<?> getNewestProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size)
-    {
-        
-        int limitedSize = Math.min(size, 20);
-        Pageable pageable = PageRequest.of(page, limitedSize, Sort.by("id").descending());
+    public ResponseEntity<List<ProductListDTO>> getNewestProducts() {
+
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<ProductListDTO> products = productService.getNewestProducts(pageable);
         
-        Map<String, Object> response = new HashMap<>();
-        response.put("content", products.getContent());
-        response.put("totalElements", products.getTotalElements());
-        response.put("totalPages", products.getTotalPages());
-        response.put("currentPage", products.getNumber());
-        
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(products.getContent());
     }
 
     @PostMapping("/by-ids")
