@@ -1,0 +1,159 @@
+.category-container {
+  background-color: #f9fafb;
+  //   padding: 20px; /* Thêm padding cho container ngoài để nhìn rõ hơn */
+  //   min-height: 100vh; /* Chỉ để demo */
+
+  .category-content {
+    background-color: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+
+    .category-parent-item {
+      flex: 0 0 calc(50% - 5px); /* Điều chỉnh lại để tổng cộng là 100% với gap 10px */
+      text-align: center;
+      border-radius: 12px;
+      padding: 30px;
+      font-weight: bold;
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #e0f2fe;
+      transition: 0.2s;
+      user-select: none; // Ngăn chặn chọn văn bản
+
+      /* CHỈNH SỬA QUAN TRỌNG: Chỉ áp dụng hover khi KHÔNG có class 'open' */
+      &:not(.open):hover {
+        font-size: 22px;
+      }
+
+      /* Đảm bảo category cha không thay đổi khi đang mở */
+      &.open {
+        // Bạn có thể thêm style đặc biệt cho trạng thái mở nếu cần
+        cursor: default;
+      }
+
+      .category-child-item {
+        position: fixed;
+        background-color: rgba(104, 102, 102, 0.5);
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        z-index: 99;
+        display: flex; /* Dùng flex để căn giữa dễ hơn */
+        align-items: center;
+        justify-content: center;
+
+        .category-child-item-content {
+          background-color: #fff;
+          width: 90%; // Rộng hơn trên màn hình nhỏ
+          width: 900px;
+          margin: 0 auto;
+          padding: 20px; /* Tăng padding nội dung */
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          position: relative;
+
+          .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+          }
+
+          .icon-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #333;
+            transition: color 0.2s;
+            &:hover {
+              color: #ff0000;
+            }
+          }
+          .table-show {
+            width: 100%;
+            border: 1px solid;
+            transition: 0.2s;
+            th {
+              text-align: center;
+              padding: 10px;
+            }
+            td {
+              font-weight: normal;
+              font-size: 17px;
+              padding: 20px;
+            }
+            tr:hover {
+              background-color: rgba(119, 118, 118, 0.5);
+            }
+            .edit-category {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              input {
+                padding: 10px;
+                border: 1px solid #ddd; /* đường viền mảnh */
+                border-radius: 6px; /* bo góc nhẹ */
+                outline: none;
+                &:focus {
+                  border-color: #6c5ce7; /* màu viền khi focus */
+                  box-shadow: 0 0 4px rgba(108, 92, 231, 0.3);
+                }
+              }
+              button {
+                padding: 10px 20px;
+                cursor: pointer;
+                border-radius: 7px;
+                border: none;
+                background-color: rgb(29, 204, 29);
+                color: #fff;
+                font-weight: bold;
+                margin-left: 10px;
+              }
+            }
+          }
+          .btn-add-category {
+            margin-top: 20px;
+            button {
+              padding: 10px 20px;
+              cursor: pointer;
+              border-radius: 7px;
+              border: none;
+              background-color: rgb(29, 204, 29);
+              color: #fff;
+              font-weight: bold;
+            }
+          }
+          .add-new {
+            margin-top: 20px;
+            input {
+              padding: 10px;
+              border: 1px solid #ddd; /* đường viền mảnh */
+              border-radius: 6px; /* bo góc nhẹ */
+              outline: none;
+              &:focus {
+                border-color: #6c5ce7; /* màu viền khi focus */
+                box-shadow: 0 0 4px rgba(108, 92, 231, 0.3);
+              }
+            }
+            button {
+              padding: 10px 20px;
+              cursor: pointer;
+              border-radius: 7px;
+              border: none;
+              background-color: rgb(29, 204, 29);
+              color: #fff;
+              font-weight: bold;
+              margin-left: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
