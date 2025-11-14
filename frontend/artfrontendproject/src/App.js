@@ -26,7 +26,6 @@ import "./assets/css/global.css";
 import Cart from "./components/Cart";
 import VerifyPasswordOTP from "./pages/auth/VerifyPasswordOTP";
 import ResetPasswordPage from "./pages/auth/ResetPassword";
-import UserProfilePage from "./pages/user/UserProfilePage";
 import ProductAdmin_Add from "./pages/admin/ProductAdmin_Add";
 
 function App() {
@@ -55,10 +54,6 @@ function App() {
           <Route path="/verify-password-otp" element={<VerifyPasswordOTP />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-
-          <Route path="/user" element={<ProtectedRoute requiredRole="ROLE_USER" />}>
-          <Route path="profile" element={<UserProfilePage />} />
-          </Route>
 
           
           <Route path="/admin/login" element={<LoginPage />} />

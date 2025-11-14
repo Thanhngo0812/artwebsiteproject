@@ -95,19 +95,19 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Sản phẩm nổi bật */}
+
       <ProductSection
         title="Sản Phẩm Nổi Bật"
         products={featuredProducts}
         viewAllLink="/products/search?sort=featured"
       />
 
-      {/* Sản phẩm mới */}
       <ProductSection
         title="Sản Phẩm Mới"
         products={newestProducts}
         viewAllLink="/products/search?sort=newest"
       />
+
 
       {/* Sản phẩm đã xem
       {viewedProducts.length > 0 && (

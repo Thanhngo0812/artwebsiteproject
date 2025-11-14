@@ -14,7 +14,13 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 import { Link, useSearchParams } from "react-router-dom";
 
-export default function ProductUser() {
+export default function ProductUser({
+  pageTitle = "Danh sách \"TRANH XỊN\"",
+  hideFilters = false,
+  showSearch = true,
+  apiEndpoint = null,
+  initialSort = "productName,asc"
+}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryNameFromUrl = searchParams.get("category");
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search'));
@@ -61,7 +67,7 @@ export default function ProductUser() {
     topics: [],
   });
   // const [sort, setSort] = useState("new");
-  const [sort, setSort] = useState("productName,asc");
+  const [sort, setSort] = useState(initialSort);
   const handleChangeOptionSort = (value) => {
     setSort(value);
   };
@@ -350,18 +356,45 @@ export default function ProductUser() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const params = {
-          // page: currentPage,
-          // size: pageSize,
-          categories: filters.categories.join(","),
-          materials: filters.materials.join(","),
-          minPrice: filters.priceRange.minPrice,
-          maxPrice: filters.priceRange.maxPrice,
-          colors: filters.colors.join(","),
-          dimensions: filters.dimensions.join(","),
-          topics: filters.topics.join(","),
-        };
+        if (apiEndpoint) {
+          const hasActiveFilters = 
+            filters.categories.length > 0 ||
+            filters.materials.length > 0 ||
+            filters.colors.length > 0 ||
+            filters.dimensions.length > 0 ||
+            filters.topics.length > 0 ||
+            filters.priceRange.minPrice > 0 ||
+            filters.priceRange.maxPrice < 30000000 ||
+            (filters.productName && filters.productName.length > 0);
 
+          if (hasActiveFilters) {
+            const response = await axios.post(
+              `http://localhost:8888/api/products/${apiEndpoint}/filter?page=${currentPage - 1}&size=${pageSize}&sort=${sort}`,
+              filters
+            );
+            
+            setProducts(response.data.content);
+            setTotalPages(response.data.totalPages);
+            return;
+          }
+
+          const response = await axios.get(
+            `http://localhost:8888/api/products/${apiEndpoint}`,
+            {
+              params: {
+                page: currentPage - 1,
+                size: pageSize,
+                sort: sort
+              }
+            }
+          );
+          
+          setProducts(response.data.content);
+          setTotalPages(response.data.totalPages);
+          return;
+        }
+
+        // API search bình thường
         const response = await axios.post(
           `http://localhost:8888/api/products/search?page=${
             currentPage - 1
@@ -370,14 +403,12 @@ export default function ProductUser() {
         );
         setProducts(response.data.content);
         setTotalPages(response.data.totalPages);
-        console.log(response.data.content);
-        // console.log("Params gửi API tìm kiếm:", params);
       } catch (error) {
         console.error("lỗi khi lọc sản phẩm: ", error);
       }
     };
     fetchProducts();
-  }, [filters, currentPage, pageSize, sort]);
+  }, [filters, currentPage, pageSize, sort, apiEndpoint]);
 
   const handlePageClick = (e) => {
     window.scrollTo(0, 0);

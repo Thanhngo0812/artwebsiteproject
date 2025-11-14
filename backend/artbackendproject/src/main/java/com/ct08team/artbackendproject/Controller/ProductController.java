@@ -57,14 +57,21 @@ public class ProductController {
     @GetMapping("/featured")
     public ResponseEntity<?> getFeaturedProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ProductListDTO> products = productService.getFeaturedProducts(pageable);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        
+        int limitedSize = Math.min(size, 10);
+        
+        Pageable pageable = PageRequest.of(page, limitedSize);
+        Page<ProductListDTO> products = productService.getFeaturedProductsWithSort(pageable, sort);
+        
+        long totalElements = Math.min(products.getTotalElements(), 20);
+        int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
         
         Map<String, Object> response = new HashMap<>();
         response.put("content", products.getContent());
-        response.put("totalElements", products.getTotalElements());
-        response.put("totalPages", products.getTotalPages());
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalPages);
         
         return ResponseEntity.ok(response);
     }
@@ -72,14 +79,77 @@ public class ProductController {
     @GetMapping("/newest")
     public ResponseEntity<?> getNewestProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Page<ProductListDTO> products = productService.getNewestProducts(pageable);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        
+        int limitedSize = Math.min(size, 10);
+        
+        Pageable pageable = PageRequest.of(page, limitedSize, Sort.by("id").descending());
+        Page<ProductListDTO> products = productService.getNewestProductsWithSort(pageable, sort);
+        
+        long totalElements = Math.min(products.getTotalElements(), 20);
+        int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
         
         Map<String, Object> response = new HashMap<>();
         response.put("content", products.getContent());
-        response.put("totalElements", products.getTotalElements());
-        response.put("totalPages", products.getTotalPages());
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalPages);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/featured/filter")
+    public ResponseEntity<?> getFeaturedProductsWithFilter(
+            @RequestBody ProductFilterRequestDTO filterRequest,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        
+        int limitedSize = Math.min(size, 10);
+        Pageable pageable = PageRequest.of(page, limitedSize);
+        
+        // Lấy featured products có filter
+        Page<ProductListDTO> filteredProducts = productService.getFeaturedProductsWithFilter(
+            filterRequest, 
+            pageable,
+            sort
+        );
+        
+        long totalElements = Math.min(filteredProducts.getTotalElements(), 20);
+        int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", filteredProducts.getContent());
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalPages);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/newest/filter")
+    public ResponseEntity<?> getNewestProductsWithFilter(
+            @RequestBody ProductFilterRequestDTO filterRequest,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        
+        int limitedSize = Math.min(size, 10);
+        Pageable pageable = PageRequest.of(page, limitedSize);
+        
+        // Lấy newest products có filter
+        Page<ProductListDTO> filteredProducts = productService.getNewestProductsWithFilter(
+            filterRequest, 
+            pageable,
+            sort
+        );
+        
+        long totalElements = Math.min(filteredProducts.getTotalElements(), 20);
+        int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", filteredProducts.getContent());
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalPages);
         
         return ResponseEntity.ok(response);
     }

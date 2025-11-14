@@ -233,6 +233,7 @@ export default function Header() {
 
   return (
     <>
+    {/* <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} /> */}
     <header className="header">
       <div className={`nav-sidebar ${menuOpen ? "active" : ""}`}>
         <ul className="nav-sidebar-menu">

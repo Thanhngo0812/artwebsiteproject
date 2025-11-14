@@ -19,7 +19,9 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -467,5 +469,202 @@ public class ProductService {
                 promoPriceOpt.orElse(null) , // Giá khuyến mãi (hoặc null nếu không có)
                 hexCodes
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getFeaturedProductsWithSort(Pageable pageable, String sortParam) {
+        List<Product> activeProducts = productRepository.findByProductStatus(1);
+        
+        // Tính điểm featured
+        List<Product> sortedProducts = activeProducts.stream()
+                .sorted((p1, p2) -> {
+                    double score1 = p1.getViewCount() * 0.3 + p1.getSalesCount() * 0.7;
+                    double score2 = p2.getViewCount() * 0.3 + p2.getSalesCount() * 0.7;
+                    return Double.compare(score2, score1);
+                })
+                .limit(20)
+                .collect(Collectors.toList());
+        
+        // Áp dụng sort nếu có
+        if (sortParam != null && !sortParam.isEmpty()) {
+            sortedProducts = applySortToList(sortedProducts, sortParam);
+        }
+        
+        return paginateProducts(sortedProducts, pageable);
+    }
+
+    // ← ← ← THÊM METHOD MỚI: getNewestProductsWithSort
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getNewestProductsWithSort(Pageable pageable, String sortParam) {
+        Pageable top20 = PageRequest.of(0, 20, Sort.by("id").descending());
+        Page<Product> newestPage = productRepository.findByProductStatus(1, top20);
+        List<Product> newestProducts = newestPage.getContent();
+        
+        // Áp dụng sort nếu có
+        if (sortParam != null && !sortParam.isEmpty()) {
+            newestProducts = applySortToList(newestProducts, sortParam);
+        }
+        
+        return paginateProducts(newestProducts, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getFeaturedProductsWithFilter(
+            ProductFilterRequestDTO filter, 
+            Pageable pageable,
+            String sortParam) {
+        
+        List<Product> activeProducts = productRepository.findByProductStatus(1);
+        
+        List<Product> sortedProducts = activeProducts.stream()
+                .sorted((p1, p2) -> {
+                    double score1 = p1.getViewCount() * 0.3 + p1.getSalesCount() * 0.7;
+                    double score2 = p2.getViewCount() * 0.3 + p2.getSalesCount() * 0.7;
+                    return Double.compare(score2, score1);
+                })
+                .limit(20)
+                .collect(Collectors.toList());
+        
+        List<Product> filteredProducts = applyFilters(sortedProducts, filter);
+
+        if (sortParam != null && !sortParam.isEmpty()) {
+            filteredProducts = applySortToList(filteredProducts, sortParam);
+        }
+        
+        return paginateProducts(filteredProducts, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getNewestProductsWithFilter(
+            ProductFilterRequestDTO filter, 
+            Pageable pageable,
+            String sortParam) {
+        
+
+        Pageable top20 = PageRequest.of(0, 20, Sort.by("id").descending());
+        Page<Product> newestPage = productRepository.findByProductStatus(1, top20);
+        List<Product> newestProducts = newestPage.getContent();
+
+        List<Product> filteredProducts = applyFilters(newestProducts, filter);
+        
+        if (sortParam != null && !sortParam.isEmpty()) {
+            filteredProducts = applySortToList(filteredProducts, sortParam);
+        }
+
+        return paginateProducts(filteredProducts, pageable);
+    }
+
+
+    private List<Product> applyFilters(List<Product> products, ProductFilterRequestDTO filter) {
+        return products.stream()
+            .filter(product -> {
+                // Filter by categories
+                if (filter.getCategories() != null && !filter.getCategories().isEmpty()) {
+                    List<Long> expandedCategoryIds = filterService.expandCategoryIds(filter.getCategories());
+                    boolean hasCategory = product.getCategories().stream()
+                        .anyMatch(cat -> expandedCategoryIds.contains(cat.getId()));
+                    if (!hasCategory) return false;
+                }
+                
+                // Filter by materials
+                if (filter.getMaterials() != null && !filter.getMaterials().isEmpty()) {
+                    if (!filter.getMaterials().contains(product.getMaterial().getId())) {
+                        return false;
+                    }
+                }
+                
+                // Filter by price range
+                if (filter.getPriceRange() != null) {
+                    BigDecimal minPrice = filter.getPriceRange().getMinPrice();
+                    BigDecimal maxPrice = filter.getPriceRange().getMaxPrice();
+                    if (product.getMinPrice().compareTo(minPrice) < 0 || 
+                        product.getMinPrice().compareTo(maxPrice) > 0) {
+                        return false;
+                    }
+                }
+                
+                // Filter by colors
+                if (filter.getColors() != null && !filter.getColors().isEmpty()) {
+                    boolean hasColor = product.getColors().stream()
+                        .anyMatch(color -> filter.getColors().contains(color.getHexCode()));
+                    if (!hasColor) return false;
+                }
+                
+                // Filter by dimensions
+                if (filter.getDimensions() != null && !filter.getDimensions().isEmpty()) {
+                    boolean hasDimension = product.getVariants().stream()
+                        .anyMatch(variant -> filter.getDimensions().contains(variant.getDimensions()));
+                    if (!hasDimension) return false;
+                }
+                
+                // Filter by topics
+                if (filter.getTopics() != null && !filter.getTopics().isEmpty()) {
+                    boolean hasTopic = product.getTopics().stream()
+                        .anyMatch(topic -> filter.getTopics().contains(topic.getTopicName()));
+                    if (!hasTopic) return false;
+                }
+                
+                // Filter by product name
+                if (filter.getProductName() != null && !filter.getProductName().isEmpty()) {
+                    if (!product.getProductName().toLowerCase()
+                            .contains(filter.getProductName().toLowerCase())) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            })
+            .collect(Collectors.toList());
+    }
+
+
+    private Page<ProductListDTO> paginateProducts(List<Product> products, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), products.size());
+        
+        if (start > products.size()) {
+            return Page.empty(pageable);
+        }
+        
+        List<Product> pageContent = products.subList(start, end);
+        List<ProductListDTO> dtoList = pageContent.stream()
+            .map(this::convertToProductListDTO)
+            .collect(Collectors.toList());
+        
+        return new PageImpl<>(dtoList, pageable, products.size());
+    }
+
+    private List<Product> applySortToList(List<Product> products, String sortParam) {
+        if (sortParam == null || sortParam.isEmpty()) {
+            return products;
+        }
+        
+        String[] sortParts = sortParam.split(",");
+        String field = sortParts[0];
+        boolean isAscending = sortParts.length > 1 && "asc".equalsIgnoreCase(sortParts[1]);
+        
+        return products.stream()
+            .sorted((p1, p2) -> {
+                int result = 0;
+                switch (field) {
+                    case "productName":
+                        result = p1.getProductName().compareTo(p2.getProductName());
+                        break;
+                    case "minPrice":
+                        result = p1.getMinPrice().compareTo(p2.getMinPrice());
+                        break;
+                    case "salesCount":
+                        result = Long.compare(p1.getSalesCount(), p2.getSalesCount());
+                        break;
+                    case "createdAt":
+                    case "id":
+                        result = p1.getId().compareTo(p2.getId());
+                        break;
+                    default:
+                        result = 0;
+                }
+                return isAscending ? result : -result;
+            })
+            .collect(Collectors.toList());
     }
 }
