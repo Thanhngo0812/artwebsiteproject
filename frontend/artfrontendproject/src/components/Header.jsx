@@ -16,7 +16,6 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeParentId, setActiveParentId] = useState(null);
   const [activeSidebarParentId, setActiveSidebarParentId] = useState(null);
-  const [searchOpen, setSearchOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -26,7 +25,25 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate(); // Hook để điều hướng
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('user');
+      setIsLoggedIn(!!token);
+    };
+    
+    checkAuth();
+    
+    window.addEventListener('storage', checkAuth);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
+
   const formatCurrency = (amount) => {
     if (typeof amount !== "number") {
       return "";
@@ -136,7 +153,11 @@ export default function Header() {
 
   const navigateLogin = useNavigate();
   const handleNavigateLogin = () => {
-    navigateLogin("/login");
+    if (isLoggedIn) {
+      navigateLogin("/user/profile");
+    } else {
+      navigateLogin("/login");
+    }
     setMenuOpen(false);
   };
 
@@ -233,7 +254,6 @@ export default function Header() {
 
   return (
     <>
-    {/* <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} /> */}
     <header className="header">
       <div className={`nav-sidebar ${menuOpen ? "active" : ""}`}>
         <ul className="nav-sidebar-menu">
@@ -286,7 +306,7 @@ export default function Header() {
         <div className="footer-sidebar">
           <div className="footer-sidebar-login" onClick={handleNavigateLogin}>
             <img src="/user.png" alt="User" className="nav-sidebar-icon" />
-            <span>Đăng Nhập</span>
+            <span>{isLoggedIn ? "Tài Khoản" : "Đăng Nhập"}</span>
           </div>
         </div>
       </div>
@@ -374,9 +394,9 @@ export default function Header() {
           <button className="icon-button" onClick={openSearch}>
             <img src="/search.png" alt="Search" className="nav-icon" />
           </button>
-          <Link to="/login" className="icon-button">
+          <button className="icon-button" onClick={handleNavigateLogin}>
             <img src="/user.png" alt="User" className="nav-icon" />
-          </Link>
+          </button>
           <Link to="/cart" className="icon-button">
             <img src="/cart.png" alt="Cart" className="nav-icon" />
           </Link>
@@ -412,66 +432,63 @@ export default function Header() {
             </button>
           </div>
 
-          {/* --- Dropdown kết quả tìm kiếm --- */}
-          {/* Chỉ hiển thị dropdown nếu có query */}
+ 
           {searchQuery.trim() !== "" && (
             <div className="search-results-dropdown">
               {isLoading ? (
                 <div className="search-result-item loading">Đang tìm kiếm...</div>
               ) : searchResults.length > 0 ? (
                 searchResults.map((product) => (
-                  // *** Cập nhật `to` thành link chi tiết sản phẩm của bạn ***
-                  // Ví dụ: /products/123
                   <Link
-  key={product.id}
-  to={`/products/${product.id}`}
-  className="search-result-item"
-  onClick={handleResultClick}
->
-  <img 
-    src={product.thumbnail} 
-    alt={product.productName} 
-  />
+                    key={product.id}
+                    to={`/products/${product.id}`}
+                    className="search-result-item"
+                    onClick={handleResultClick}
+                  >
+                    <img 
+                      src={product.thumbnail} 
+                      alt={product.productName} 
+                    />
 
-  {/* Container mới cho thông tin (tên + giá) */}
-  <div className="search-result-info">
-    <span className="search-result-name">{product.productName}</span>
+                    {/* Container mới cho thông tin (tên + giá) */}
+                    <div className="search-result-info">
+                      <span className="search-result-name">{product.productName}</span>
 
-    {/* Container cho giá */}
-    <div className="search-result-price-container">
-      {/* Kiểm tra xem CÓ giá khuyến mãi (promotionalPrice) 
-        và giá đó > 0 không 
-      */}
-      {product.promotionalPrice && product.promotionalPrice > 0 ? (
-        <>
-          {/* Giá sale */}
-          <span className="search-result-price sale">
-            {formatCurrency(product.promotionalPrice)}
-          </span>
-          {/* Giá gốc (bị gạch) */}
-          <span className="search-result-price original">
-            {formatCurrency(product.originalPrice)}
-          </span>
-        </>
-      ) : (
-        // Nếu không có sale, chỉ hiện giá gốc
-        <span className="search-result-price">
-          {formatCurrency(product.originalPrice)}
-        </span>
-      )}
-    </div>
-  </div>
-</Link>
+                      {/* Container cho giá */}
+                      <div className="search-result-price-container">
+                        {/* Kiểm tra xem CÓ giá khuyến mãi (promotionalPrice) 
+                          và giá đó > 0 không 
+                        */}
+                        {product.promotionalPrice && product.promotionalPrice > 0 ? (
+                          <>
+                            {/* Giá sale */}
+                            <span className="search-result-price sale">
+                              {formatCurrency(product.promotionalPrice)}
+                            </span>
+                            {/* Giá gốc (bị gạch) */}
+                            <span className="search-result-price original">
+                              {formatCurrency(product.originalPrice)}
+                            </span>
+                          </>
+                        ) : (
+                          // Nếu không có sale, chỉ hiện giá gốc
+                          <span className="search-result-price">
+                            {formatCurrency(product.originalPrice)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
                 ))
               ) : (
-                // Không loading, không có kết quả
+
                 <div className="search-result-item no-results">
                   Không tìm thấy kết quả nào.
                 </div>
               )}
             </div>
           )}
-          {/* --- Kết thúc dropdown --- */}
+
 
         </div>
       </div>

@@ -23,11 +23,7 @@ const PublicRoute = () => {
     } else if (userRoles.includes('ROLE_SCHOOL')) {
     redirectPath = '/school';
     return <Navigate to={redirectPath} replace />;
-  }
-    // Thêm các else if khác cho các role khác nếu cần
-    
-    // Thực hiện chuyển hướng
-    
+    }   
   }
 
   // Nếu người dùng chưa đăng nhập, cho phép họ truy cập
