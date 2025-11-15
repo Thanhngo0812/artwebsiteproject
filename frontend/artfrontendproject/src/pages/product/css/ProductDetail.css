@@ -449,6 +449,141 @@
   color: #333;
 }
 
+.pd-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+/* ← ← ← THÊM: Price Section */
+.pd-price-section {
+  margin: 20px 0;
+}
+
+.pd-price-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.pd-price {
+  font-size: 28px;
+  font-weight: bold;
+  color: #D32F2F;
+}
+
+.pd-price-promo {
+  font-size: 32px;
+  color: #D32F2F;
+}
+
+.pd-price-original {
+  font-size: 18px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.pd-discount-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* ← ← ← Variant Section */
+.pd-variant-section {
+  margin: 24px 0;
+}
+
+.pd-variant-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.pd-variant-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pd-variant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 140px;
+}
+
+.pd-variant-btn:hover:not(:disabled) {
+  border-color: #FBD865;
+  background-color: #fffbf0;
+}
+
+.pd-variant-btn.active {
+  border-color: #FBD865;
+  background-color: #FBD865;
+}
+
+.pd-variant-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.variant-size {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.variant-price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.variant-price {
+  font-size: 14px;
+  color: #666;
+}
+
+.variant-price-promo {
+  font-size: 15px;
+  color: #D32F2F;
+  font-weight: 600;
+}
+
+.variant-price-original {
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.variant-discount {
+  font-size: 11px;
+  color: #D32F2F;
+  font-weight: 700;
+}
+
+.variant-soldout {
+  font-size: 12px;
+  color: #e74c3c;
+  margin-top: 4px;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .pd-container {
@@ -497,6 +632,44 @@
   .pd-related-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
+  }
+  
+  .pd-title {
+    font-size: 22px;
+  }
+
+  .pd-price {
+    font-size: 24px;
+  }
+
+  .pd-price-promo {
+    font-size: 28px;
+  }
+
+  .pd-price-original {
+    font-size: 16px;
+  }
+
+  .pd-discount-badge {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .pd-variant-btn {
+    min-width: 120px;
+    padding: 10px 12px;
+  }
+
+  .variant-size {
+    font-size: 14px;
+  }
+
+  .variant-price-promo {
+    font-size: 13px;
+  }
+
+  .variant-price-original {
+    font-size: 11px;
   }
 }
 

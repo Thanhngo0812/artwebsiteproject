@@ -16,16 +16,18 @@ export default function Cart() {
   
   const [availableVariants, setAvailableVariants] = useState({});
   const [productStatuses, setProductStatuses] = useState({});
+  const [productPromotions, setProductPromotions] = useState({});
   const [loading, setLoading] = useState(false);
   const [editingQuantity, setEditingQuantity] = useState({});
 
   useEffect(() => {
     cartItems.forEach(item => {
-      fetchAvailableVariants(item.productId);
+      fetchProductData(item.productId);
     });
   }, [cartItems]);
 
-  const fetchAvailableVariants = async (productId) => {
+
+  const fetchProductData = async (productId) => {
     try {
       setLoading(true);
       const response = await fetch(`http://localhost:8888/api/products/${productId}`);
@@ -46,11 +48,37 @@ export default function Cart() {
         [productId]: data.productStatus
       }));
 
+
+      setProductPromotions(prev => ({
+        ...prev,
+        [productId]: {
+          minPrice: data.minPrice,
+          promotionalPrice: data.promotionalPrice
+        }
+      }));
+
     } catch (error) {
       console.error('❌ Error:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateVariantPromotion = (productId, variantPrice) => {
+    const promo = productPromotions[productId];
+    if (!promo || !promo.promotionalPrice || !promo.minPrice) {
+      return { price: variantPrice, originalPrice: variantPrice, promotionalPrice: null };
+    }
+
+    const discountPercent = (promo.minPrice - promo.promotionalPrice) / promo.minPrice;
+    const discount = variantPrice * discountPercent;
+    const promoPrice = variantPrice - discount;
+
+    return {
+      price: promoPrice,
+      originalPrice: variantPrice,
+      promotionalPrice: promoPrice
+    };
   };
 
   const handleDimensionChange = (index, newVariantId) => {
@@ -64,14 +92,17 @@ export default function Cart() {
     if (selectedVariant) {
       const currentQuantity = cartItems[index].quantity;
       
+      const priceData = calculateVariantPromotion(productId, selectedVariant.price);
+      
       if (currentQuantity > selectedVariant.stockQuantity) {
-
         updateSize(
           index,
           cartItems[index].categoryId,
           cartItems[index].categoryName,
           selectedVariant.dimensions,
-          selectedVariant.price
+          priceData.price,
+          priceData.originalPrice,
+          priceData.promotionalPrice
         );
         
         const quantityDelta = selectedVariant.stockQuantity - currentQuantity;
@@ -82,7 +113,9 @@ export default function Cart() {
           cartItems[index].categoryId,
           cartItems[index].categoryName,
           selectedVariant.dimensions,
-          selectedVariant.price
+          priceData.price,
+          priceData.originalPrice,
+          priceData.promotionalPrice
         );
       }
     }
@@ -170,6 +203,12 @@ export default function Cart() {
     }).format(price);
   };
 
+
+  const calculateDiscount = (original, promo) => {
+    if (!promo || !original || promo >= original) return 0;
+    return Math.round((1 - promo / original) * 100);
+  };
+
   if (validCartItems.length === 0) {
     return (
       <div className="cart-empty">
@@ -211,6 +250,9 @@ export default function Cart() {
           const currentVariant = variants.find(v => v.dimensions === item.dimensions);
           const maxStock = currentVariant ? currentVariant.stockQuantity : 999;
           
+          const hasPromotion = item.promotionalPrice && item.promotionalPrice < item.originalPrice;
+          const discountPercent = hasPromotion ? calculateDiscount(item.originalPrice, item.promotionalPrice) : 0;
+          
           return (
             <div key={`${item.productId}-${item.categoryId}-${item.dimensions}-${index}`} className="cart-item">
               <div 
@@ -221,7 +263,20 @@ export default function Cart() {
                 <img src={item.thumbnail} alt={item.productname} />
                 <div className="item-details">
                   <h3>{item.productname}</h3>
-                  <p className="item-price">{formatPrice(item.price)}</p>
+                  
+                  {hasPromotion ? (
+                    <div className="item-price-container">
+                      <p className="item-price item-price-promo">
+                        {formatPrice(item.promotionalPrice)}
+                        <span className="item-discount-badge">-{discountPercent}%</span>
+                      </p>
+                      <p className="item-price-original">
+                        {formatPrice(item.originalPrice)}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="item-price">{formatPrice(item.price)}</p>
+                  )}
                 </div>
               </div>
 
@@ -247,7 +302,6 @@ export default function Cart() {
                     </select>
                   </div>
 
-                  {/* Số lượng */}
                   <div className="quantity-selector">
                     <label>Số lượng:</label>
                     <div className="quantity-controls">
@@ -280,7 +334,6 @@ export default function Cart() {
                   </div>
                 </div>
                 
-                {/* Stock info */}
                 {currentVariant && (
                   <span className="stock-info">
                     {currentVariant.stockQuantity < 10 

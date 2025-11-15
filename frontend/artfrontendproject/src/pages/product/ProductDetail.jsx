@@ -4,12 +4,13 @@ import { toast } from 'react-toastify';
 import productService from '../../service/productService';
 import ProductCard from '../../components/ProductCard';
 import { useCart } from '../../hooks/useCart';
+import MiniCart from '../../components/MiniCart';
 import './css/ProductDetail.css';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems, showMiniCart, lastAddedItem, closeMiniCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -53,23 +54,8 @@ export default function ProductDetail() {
         setDisplayTopics(topicsToDisplay);
       }
       if (data.categories && data.categories.length > 0) {
-        // const parents = data.categories.filter(c => c.id >= 1 && c.id <= 5);
-        // const children = data.categories.filter(c => c.id >= 6);
 
         let categoriesToDisplay = data.categories;
-        // if (parents.length >= 2) {
-        //   // Có 2 cha → Hiển thị cả 2
-        //   categoriesToDisplay = parents;
-        // } else if (parents.length === 1 && children.length > 0) {
-        //   // 1 cha + con → CHỈ hiển thị con
-        //   categoriesToDisplay = children;
-        // } else if (children.length > 0) {
-        //   // Chỉ có con
-        //   categoriesToDisplay = children;
-        // } else if (parents.length === 1) {
-        //   // Chỉ có 1 cha
-        //   categoriesToDisplay = parents;
-        // }
 
         setDisplayCategories(categoriesToDisplay);
       }
@@ -111,7 +97,7 @@ export default function ProductDetail() {
     const categoryName = displayCategories.length > 0 ? displayCategories[0].name : product.categories[0].name;
 
     addToCart(product, categoryId, categoryName, selectedVariant.dimensions, quantity);
-    toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
+    
   };
 
   const handleBuyNow = () => {
@@ -129,6 +115,11 @@ export default function ProductDetail() {
       style: 'currency',
       currency: 'VND'
     }).format(price);
+  };
+
+  const calculateDiscount = (original, promo) => {
+    if (!promo || !original || promo >= original) return 0;
+    return Math.round((1 - promo / original) * 100);
   };
 
   if (loading) {
@@ -149,10 +140,40 @@ export default function ProductDetail() {
     );
   }
 
+  const calculateVariantPromoPrice = (variantPrice) => {
+    if (!product.promotionalPrice || !product.minPrice) return null;
+  
+  // Tính % giảm giá từ product
+  const discountPercent = (product.minPrice - product.promotionalPrice) / product.minPrice;
+  
+  const discount = variantPrice * discountPercent;
+    return variantPrice - discount;
+  };
+
   const inStock = selectedVariant && selectedVariant.stockQuantity > 0;
+
+  const displayPrice = selectedVariant 
+    ? (calculateVariantPromoPrice(selectedVariant.price) || selectedVariant.price)
+    : (product.promotionalPrice || product.minPrice);
+
+  const originalPrice = selectedVariant 
+    ? selectedVariant.price 
+    : product.minPrice;
+
+  const hasPromotion = product.promotionalPrice && product.promotionalPrice < product.minPrice;
+
+  const discountPercent = hasPromotion 
+    ? calculateDiscount(originalPrice, displayPrice)
+    : 0;
 
   return (
     <div className="product-detail-page">
+      <MiniCart 
+        isOpen={showMiniCart}
+        onClose={closeMiniCart}
+        cartItems={cartItems}
+        lastAddedItem={lastAddedItem}
+      />
       <div className="pd-breadcrumb">
         <Link to="/">Trang chủ</Link>
         <span> / </span>
@@ -185,8 +206,26 @@ export default function ProductDetail() {
         <div className="pd-right">
           <h1 className="pd-title">{product.productName || product.productname}</h1>
           
-          <div className="pd-price">
-            {selectedVariant ? formatPrice(selectedVariant.price) : formatPrice(product.minPrice)}
+          <div className="pd-price-section">
+            {hasPromotion ? (
+              <>
+                {/* Giá khuyến mãi */}
+                <div className="pd-price-row">
+                  <span className="pd-price pd-price-promo">
+                    {formatPrice(displayPrice)}
+                  </span>
+                  {discountPercent > 0 && (
+                    <span className="pd-discount-badge">-{discountPercent}%</span>
+                  )}
+                </div>
+                {/* Giá gốc gạch ngang */}
+                <span className="pd-price-original">
+                  {formatPrice(originalPrice)}
+                </span>
+              </>
+            ) : (
+              <span className="pd-price">{formatPrice(displayPrice)}</span>
+            )}
           </div>
 
           {/* Variant Selection */}
@@ -194,18 +233,44 @@ export default function ProductDetail() {
             <div className="pd-variant-section">
               <label>Chọn kích thước:</label>
               <div className="pd-variant-options">
-                {product.variants.map((variant) => (
-                  <button
-                    key={variant.id}
-                    className={`pd-variant-btn ${selectedVariant?.id === variant.id ? 'active' : ''} ${variant.stockQuantity <= 0 ? 'out-of-stock' : ''}`}
-                    onClick={() => setSelectedVariant(variant)}
-                    disabled={variant.stockQuantity <= 0}
-                  >
-                    <span className="variant-size">{variant.dimensions}</span>
-                    <span className="variant-price">{formatPrice(variant.price)}</span>
-                    {variant.stockQuantity <= 0 && <span className="variant-soldout">Hết hàng</span>}
-                  </button>
-                ))}
+                {product.variants.map((variant) => {
+                  const variantPromoPrice = calculateVariantPromoPrice(variant.price);
+                  const variantHasPromo = variantPromoPrice && variantPromoPrice < variant.price;
+                  const variantDiscount = variantHasPromo 
+                    ? calculateDiscount(variant.price, variantPromoPrice)
+                    : 0;
+
+                  return (
+                    <button
+                      key={variant.id}
+                      className={`pd-variant-btn ${selectedVariant?.id === variant.id ? 'active' : ''} ${variant.stockQuantity <= 0 ? 'out-of-stock' : ''}`}
+                      onClick={() => setSelectedVariant(variant)}
+                      disabled={variant.stockQuantity <= 0}
+                    >
+                      <span className="variant-size">{variant.dimensions}</span>
+                      
+                      {variantHasPromo ? (
+                        <div className="variant-price-container">
+                          <span className="variant-price variant-price-promo">
+                            {formatPrice(variantPromoPrice)}
+                          </span>
+                          <span className="variant-price-original">
+                            {formatPrice(variant.price)}
+                          </span>
+                          {variantDiscount > 0 && (
+                            <span className="variant-discount">-{variantDiscount}%</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="variant-price">{formatPrice(variant.price)}</span>
+                      )}
+                      
+                      {variant.stockQuantity <= 0 && (
+                        <span className="variant-soldout">Hết hàng</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

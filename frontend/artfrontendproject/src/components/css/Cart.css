@@ -279,6 +279,38 @@
   text-align: right;
 }
 
+.item-price-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-price-promo {
+  color: #d32f2f !important;
+  font-size: 1.2rem !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-discount-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.item-price-original {
+  font-size: 0.9rem;
+  color: #999;
+  text-decoration: line-through;
+  margin: 0;
+}
+
 /* ============================================
    CART FOOTER
    ============================================ */
@@ -442,12 +474,10 @@
     font-size: 1.5rem;
   }
 
-  /* Hide labels on mobile */
   .cart-labels {
     display: none;
   }
 
-  /* Stack cart items vertically */
   .cart-item {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -544,6 +574,19 @@
   .checkout-btn {
     font-size: 1rem;
     padding: 0.9rem;
+  }
+
+  .item-price-promo {
+    font-size: 1.1rem !important;
+  }
+
+  .item-discount-badge {
+    font-size: 10px;
+    padding: 2px 5px;
+  }
+
+  .item-price-original {
+    font-size: 0.85rem;
   }
 }
 

@@ -15,6 +15,8 @@ export default function ProductListPage() {
         return "Sản Phẩm Mới Nhất";
       case "bestseller":
         return "Sản Phẩm Bán Chạy";
+      case "on-sale":
+        return "Sản Phẩm Khuyến Mãi";
       default:
         return "Tất Cả Sản Phẩm";
     }
@@ -26,6 +28,8 @@ export default function ProductListPage() {
         return "featured";
       case "newest":
         return "newest";
+      case "on-sale":
+        return "on-sale";
       default:
         return null;
     }
@@ -35,6 +39,8 @@ export default function ProductListPage() {
     switch (sortType) {
       case "bestseller":
         return "salesCount,desc";
+      case "on-sale":
+        return "discount,desc";
       default:
         return "createdAt,desc";
     }

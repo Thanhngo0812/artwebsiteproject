@@ -94,6 +94,31 @@
   scroll-snap-align: start;
 }
 
+.product-section:has(.section-title:contains("Khuyến Mãi")) {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+  padding: 40px 20px;
+  border-radius: 12px;
+  margin: 30px 0;
+}
+
+.product-section:has(.section-title:contains("Khuyến Mãi")) .section-title {
+  color: #ff4444;
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.promo-badge {
+  animation: pulse 2s infinite;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .product-section {

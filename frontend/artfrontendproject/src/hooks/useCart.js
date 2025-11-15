@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 export const useCart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [showMiniCart, setShowMiniCart] = useState(false);
+  const [lastAddedItem, setLastAddedItem] = useState(null);
 
   useEffect(() => {
     loadCart();
@@ -26,9 +28,6 @@ export const useCart = () => {
     }
   };
 
-  /**
-   * ✅ addToCart với categoryId, categoryName
-   */
   const addToCart = (product, categoryId, categoryName, dimensions, quantity = 1) => {
     console.log('🛒 [addToCart] Input:', { product, categoryId, categoryName, dimensions, quantity });
     
@@ -37,15 +36,40 @@ export const useCart = () => {
                      (product.images && product.images.length > 0 ? product.images[0].imageUrl : '') ||
                      '/placeholder.jpg';
     
-    // ✅ Tìm giá từ variant
     let price = 0;
+    let originalPrice = 0;
+    let promotionalPrice = null;
+    
     if (product.variants && Array.isArray(product.variants)) {
       const variant = product.variants.find(v => v.dimensions === dimensions);
-      price = variant ? variant.price : 0;
+      if (variant) {
+        originalPrice = variant.price;
+        
+        if (product.promotionalPrice && product.minPrice && product.minPrice > 0) {
+          const discountPercent = (product.minPrice - product.promotionalPrice) / product.minPrice;
+          const discount = originalPrice * discountPercent;
+          promotionalPrice = originalPrice - discount;
+          price = promotionalPrice;
+        } else {
+          price = originalPrice;
+        }
+      }
     }
     
+    const newItem = {
+      productId: product.id,
+      productname: productName,
+      thumbnail: thumbnail,
+      categoryId: categoryId,
+      categoryName: categoryName,
+      dimensions: dimensions,
+      price: price,
+      originalPrice: originalPrice,
+      promotionalPrice: promotionalPrice,
+      quantity: quantity
+    };
+
     setCartItems(prevCart => {
-      // ✅ Check trùng lặp: productId + categoryId + dimensions
       const existingIndex = prevCart.findIndex(
         item => item.productId === product.id && 
                 item.categoryId === categoryId && 
@@ -55,21 +79,17 @@ export const useCart = () => {
       if (existingIndex !== -1) {
         const newCart = [...prevCart];
         newCart[existingIndex].quantity += quantity;
+        
+        setLastAddedItem({ ...newCart[existingIndex] });
         return newCart;
       } else {
-        const newItem = {
-          productId: product.id,
-          productname: productName,
-          thumbnail: thumbnail,
-          categoryId: categoryId,
-          categoryName: categoryName,
-          dimensions: dimensions,
-          price: price,
-          quantity: quantity
-        };
+
+        setLastAddedItem(newItem);
         return [...prevCart, newItem];
       }
     });
+
+    setShowMiniCart(true);
   };
 
   const updateQuantity = (index, change) => {
@@ -88,10 +108,7 @@ export const useCart = () => {
     });
   };
 
-  /**
-   * ✅ updateSize với categoryId + categoryName
-   */
-  const updateSize = (index, newCategoryId, newCategoryName, newDimensions, price) => {
+  const updateSize = (index, newCategoryId, newCategoryName, newDimensions, price, originalPrice = null, promotionalPrice = null) => {
     setCartItems(prevCart => {
       const newCart = [...prevCart];
       const productId = newCart[index].productId;
@@ -101,7 +118,9 @@ export const useCart = () => {
         categoryId: newCategoryId,
         categoryName: newCategoryName,
         dimensions: newDimensions,
-        price: price
+        price: price,
+        originalPrice: originalPrice || price,
+        promotionalPrice: promotionalPrice
       };
       
       const duplicateIndex = newCart.findIndex((item, i) => 
@@ -137,6 +156,10 @@ export const useCart = () => {
     return cartItems.reduce((sum, item) => sum + item.quantity, 0);
   };
 
+  const closeMiniCart = () => {
+    setShowMiniCart(false);
+  };
+
   return {
     cartItems,
     addToCart,
@@ -145,6 +168,9 @@ export const useCart = () => {
     removeItem,
     clearCart,
     getTotal,
-    getItemCount
+    getItemCount,
+    showMiniCart,
+    lastAddedItem,
+    closeMiniCart
   };
 };

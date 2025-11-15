@@ -9,19 +9,26 @@ export default function HomePage() {
   
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newestProducts, setNewestProducts] = useState([]);
-  const [viewedProducts, setViewedProducts] = useState([]);
+  // const [viewedProducts, setViewedProducts] = useState([]);
+  const [onSaleProducts, setOnSaleProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
-    loadViewedProducts();
+    // loadViewedProducts();
   }, []);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       
+      // Fetch sản phẩm khuyến mãi
+      const onSaleRes = await axios.get(
+        "http://localhost:8888/api/products/on-sale?page=0&size=8"
+      );
+      setOnSaleProducts(onSaleRes.data.content || []);
+
       // Fetch sản phẩm nổi bật
       const featuredRes = await axios.get(
         "http://localhost:8888/api/products/featured?page=0&size=8"
@@ -42,25 +49,25 @@ export default function HomePage() {
   };
 
   // Load sản phẩm đã xem từ localStorage
-  const loadViewedProducts = async () => {
-    const viewed = localStorage.getItem("viewedProducts");
-    if (viewed) {
-      try {
-        const productIds = JSON.parse(viewed);
-        if (productIds && productIds.length > 0) {
-          // Lấy tối đa 8 sản phẩm
-          const idsToFetch = productIds.slice(0, 8);
-          const response = await axios.post(
-            "http://localhost:8888/api/products/by-ids?page=0&size=8",
-            idsToFetch
-          );
-          setViewedProducts(response.data.content || []);
-        }
-      } catch (error) {
-        console.error("Error fetching viewed products:", error);
-      }
-    }
-  };
+  // const loadViewedProducts = async () => {
+  //   const viewed = localStorage.getItem("viewedProducts");
+  //   if (viewed) {
+  //     try {
+  //       const productIds = JSON.parse(viewed);
+  //       if (productIds && productIds.length > 0) {
+  //         // Lấy tối đa 8 sản phẩm
+  //         const idsToFetch = productIds.slice(0, 8);
+  //         const response = await axios.post(
+  //           "http://localhost:8888/api/products/by-ids?page=0&size=8",
+  //           idsToFetch
+  //         );
+  //         setViewedProducts(response.data.content || []);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching viewed products:", error);
+  //     }
+  //   }
+  // };
 
   const handleViewAllProducts = () => {
     navigate("/products");
@@ -97,6 +104,12 @@ export default function HomePage() {
 
 
       <ProductSection
+        title="Sản Phẩm Khuyến Mãi"
+        products={onSaleProducts}
+        viewAllLink="/products/search?sort=on-sale"
+      />
+
+      <ProductSection
         title="Sản Phẩm Nổi Bật"
         products={featuredProducts}
         viewAllLink="/products/search?sort=featured"
@@ -108,15 +121,6 @@ export default function HomePage() {
         viewAllLink="/products/search?sort=newest"
       />
 
-
-      {/* Sản phẩm đã xem
-      {viewedProducts.length > 0 && (
-        <ProductSection
-          title="Sản Phẩm Đã Xem"
-          products={viewedProducts}
-          scrollable={true}
-        />
-      )} */}
     </div>
   );
 }

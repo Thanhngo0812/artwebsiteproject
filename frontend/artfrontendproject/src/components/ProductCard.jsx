@@ -9,10 +9,11 @@ export default function ProductCard({ product }) {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
+      maximumFractionDigits: 0
     }).format(price);
   };
 
-
+  
   const originalPrice = product.originalPrice;
   const promoPrice = product.promotionalPrice;
 
@@ -21,27 +22,25 @@ export default function ProductCard({ product }) {
 
   const hasPromotion = promoPrice && originalPrice && promoPrice < originalPrice;
 
+  const discountPercent = hasPromotion 
+    ? Math.round((1 - promoPrice / originalPrice) * 100)
+    : 0;
+
   return (
     <Link to={`/products/${product.id}`} className="product-card">
-      <div className="product-card-image">
-        <img 
-          src={product.thumbnail} 
-          alt={product.productName || product.productname} 
-        />
-        
-        {/* Badge khuyến mãi */}
-        {hasPromotion && !isOutOfStock && (
-          <div className="promo-badge">
-            SALE {Math.round((1 - promoPrice / originalPrice) * 100)}%
-          </div>
-        )}
-
-        {/* Badge hết hàng */}
-        {isOutOfStock && (
-          <div className="out-of-stock-badge">
-            HẾT HÀNG
-          </div>
-        )}
+      <div className="product-card-image" data-discount={hasPromotion && !isOutOfStock ? `-${discountPercent}%` : ''}>
+        <div className="image-wrapper">
+          <img 
+            src={product.thumbnail} 
+            alt={product.productName || product.productname} 
+          />
+          
+          {isOutOfStock && (
+            <div className="out-of-stock-badge">
+              HẾT HÀNG
+            </div>
+          )}
+        </div>
       </div>
       
       <div className="product-card-info">
@@ -49,7 +48,6 @@ export default function ProductCard({ product }) {
           {product.productName || product.productname}
         </h3>
         
-        {/* Hiển thị giá */}
         <div className="product-card-pricing">
           {isOutOfStock ? (
             <p className="product-card-price out-of-stock-price">
