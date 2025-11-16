@@ -9,11 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ct08team.artbackendproject.DAO.ProductVariantRepository;
 import com.ct08team.artbackendproject.DTO.ProductVariantDTO;
+import com.ct08team.artbackendproject.Entity.product.Product;
 import com.ct08team.artbackendproject.Entity.product.ProductVariant;
 
 import java.util.HashMap;
@@ -138,6 +140,56 @@ public class ProductController {
         
         // Lấy newest products có filter
         Page<ProductListDTO> filteredProducts = productService.getNewestProductsWithFilter(
+            filterRequest, 
+            pageable,
+            sort
+        );
+        
+        long totalElements = Math.min(filteredProducts.getTotalElements(), 20);
+        int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", filteredProducts.getContent());
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalPages);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/on-sale")
+    public ResponseEntity<?> getOnSaleProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        
+        int limitedSize = Math.min(size, 10);
+        
+        Pageable pageable = PageRequest.of(page, limitedSize);
+        Page<ProductListDTO> products = productService.getOnSaleProductsWithSort(pageable, sort);
+        
+        long totalElements = Math.min(products.getTotalElements(), 20);
+        int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", products.getContent());
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalPages);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    // ← ← ← THÊM API MỚI: Lấy sản phẩm khuyến mãi có filter
+    @PostMapping("/on-sale/filter")
+    public ResponseEntity<?> getOnSaleProductsWithFilter(
+            @RequestBody ProductFilterRequestDTO filterRequest,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        
+        int limitedSize = Math.min(size, 10);
+        Pageable pageable = PageRequest.of(page, limitedSize);
+        
+        Page<ProductListDTO> filteredProducts = productService.getOnSaleProductsWithFilter(
             filterRequest, 
             pageable,
             sort

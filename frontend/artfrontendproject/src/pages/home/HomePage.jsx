@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import ProductSection from "../../components/ProductSection";
+import ProductSection from "../../components/product/ProductSection/ProductSection";
 import "./css/HomePage.css";
 
 export default function HomePage() {

@@ -14,6 +14,8 @@ public class ProductDetailDTO {
     public BigDecimal minPrice;
     public Integer productStatus;
     public MaterialDTO material;
+    public BigDecimal originalPrice;
+    public BigDecimal promotionalPrice;
     public List<CategoryDTO> categories;
     public List<VariantDTO> variants;
     public List<ImageDTO> images;

@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import tt from '@tomtom-international/web-sdk-maps';
 import '@tomtom-international/web-sdk-maps/dist/maps.css';
-import Header from '../../components/Header'
-import LoadingSpinner from '../../components/LoadingSpinner';
+import Header from '../../components/layout/Header/Header'
+import LoadingSpinner from '../../components/common/LoadingSpinner/LoadingSpinner';
 
 // Đặt URL backend của bạn ở đây
 const API_BASE_URL = 'http://localhost:8888';

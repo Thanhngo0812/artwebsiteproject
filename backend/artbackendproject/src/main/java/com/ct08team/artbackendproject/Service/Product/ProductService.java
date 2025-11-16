@@ -95,6 +95,10 @@ public class ProductService {
             dto.minPrice = p.getMinPrice();
             dto.productStatus = p.getProductStatus();
 
+            dto.originalPrice = p.getMinPrice();
+            Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(p);
+            dto.promotionalPrice = promoPriceOpt.orElse(null);
+
             // Categories
             dto.categories = p.getCategories() == null ? List.of() :
                 p.getCategories().stream()
@@ -666,5 +670,59 @@ public class ProductService {
                 return isAscending ? result : -result;
             })
             .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getOnSaleProductsWithSort(Pageable pageable, String sortParam) {
+        List<Product> activeProducts = productRepository.findByProductStatus(1);
+        
+        // Lọc các sản phẩm có khuyến mãi
+        List<Product> onSaleProducts = activeProducts.stream()
+                .filter(product -> {
+                    Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
+                    return promoPriceOpt.isPresent() && 
+                           promoPriceOpt.get().compareTo(product.getMinPrice()) < 0;
+                })
+                .limit(20)
+                .collect(Collectors.toList());
+        
+        // Áp dụng sort nếu có
+        if (sortParam != null && !sortParam.isEmpty()) {
+            onSaleProducts = applySortToList(onSaleProducts, sortParam);
+        }
+        
+        return paginateProducts(onSaleProducts, pageable);
+    }
+
+    /**
+     * Lấy sản phẩm khuyến mãi có filter
+     */
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> getOnSaleProductsWithFilter(
+            ProductFilterRequestDTO filter, 
+            Pageable pageable,
+            String sortParam) {
+        
+        List<Product> activeProducts = productRepository.findByProductStatus(1);
+        
+        // Lọc sản phẩm có khuyến mãi
+        List<Product> onSaleProducts = activeProducts.stream()
+                .filter(product -> {
+                    Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
+                    return promoPriceOpt.isPresent() && 
+                           promoPriceOpt.get().compareTo(product.getMinPrice()) < 0;
+                })
+                .limit(20)
+                .collect(Collectors.toList());
+        
+        // Áp dụng filter
+        List<Product> filteredProducts = applyFilters(onSaleProducts, filter);
+
+        // Áp dụng sort
+        if (sortParam != null && !sortParam.isEmpty()) {
+            filteredProducts = applySortToList(filteredProducts, sortParam);
+        }
+        
+        return paginateProducts(filteredProducts, pageable);
     }
 }
