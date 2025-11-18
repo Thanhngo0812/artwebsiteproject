@@ -35,7 +35,7 @@ export default function Cart() {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const data = await response.json();
-
+      console.log(data)
       const variants = data.variants || [];
       
       setAvailableVariants(prev => ({

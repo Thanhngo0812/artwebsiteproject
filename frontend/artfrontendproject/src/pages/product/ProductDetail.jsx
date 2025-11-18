@@ -42,6 +42,7 @@ export default function ProductDetail() {
     setLoading(true);
     try {
       const data = await productService.getProductById(id);
+      console.log(data)
       setProduct(data);
       
       if (data.images && data.images.length > 0) {
