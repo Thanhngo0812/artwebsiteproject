@@ -314,7 +314,7 @@ export default function ProductUser({
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   // const [pageSize, setPageSize] = useState(10);
-  const pageSize = 10;
+  const pageSize = 8;
 
   const formatCurrency = (value) =>
     value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });

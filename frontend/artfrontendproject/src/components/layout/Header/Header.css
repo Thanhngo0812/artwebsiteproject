@@ -651,3 +651,144 @@ body {
    text-decoration: line-through; /* Gạch ngang */
    font-size: 0.85rem; /* Cho giá gốc nhỏ hơn */
   }
+
+  /* --- User Dropdown Menu CSS --- */
+.user-menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: 120%; /* Đẩy menu xuống dưới icon */
+  right: -10px; /* Căn phải */
+  width: 220px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 8px 0;
+  animation: fadeIn 0.2s ease-in-out;
+  border: 1px solid #eee;
+}
+
+/* Mũi tên tam giác nhỏ chỉ lên trên (tùy chọn) */
+.user-dropdown-arrow {
+  position: absolute;
+  top: -6px;
+  right: 20px;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  transform: rotate(45deg);
+  border-left: 1px solid #eee;
+  border-top: 1px solid #eee;
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit; /* Giữ font chữ */
+}
+
+.user-dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: black;
+}
+
+.dropdown-icon {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #888;
+}
+
+.user-dropdown-item:hover .dropdown-icon {
+  color: black;
+}
+
+.user-dropdown-divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 6px 0;
+}
+
+.logout-btn {
+  color: #d32f2f; /* Màu đỏ cho nút đăng xuất */
+}
+
+.logout-btn:hover {
+  background-color: #fff0f0;
+  color: #b71c1c;
+}
+
+.logout-btn .dropdown-icon {
+  color: #ef5350;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- User Hover Tooltip CSS --- */
+.user-hover-tooltip {
+  position: absolute;
+  
+  top: 110%; /* Hiện ngay dưới icon */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+    max-width: 200px;  /* tuỳ chỉnh */
+white-space: normal;       /* Đảm bảo văn bản được phép xuống dòng */
+  word-wrap: break-word;     /* Bắt buộc xuống dòng đối với từ quá dài (như email) */
+  overflow-wrap: break-word; /* Chuẩn mới hỗ trợ các trình duyệt hiện đại */
+  text-align: center;        /* (Tuỳ chọn) Canh giữa nội dung cho đẹp */
+  /* Ẩn mặc định */
+  opacity: 0;
+  text-align: left;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  font-size: 15px;
+  /* Luôn nằm trên các phần tử khác */
+  z-index: 1001;
+  pointer-events: none; /* Để chuột không bắt sự kiện khi lướt qua */
+}
+
+/* Mũi tên nhỏ cho tooltip */
+.user-hover-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%; /* Nằm trên tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+/* Hiện tooltip khi hover vào container */
+.user-menu-container:hover .user-hover-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

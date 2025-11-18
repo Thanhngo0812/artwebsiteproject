@@ -65,7 +65,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
 };
 
 const API_BASE_URL = "http://localhost:8888";
-const getAuthToken = () => localStorage.getItem('accessToken');
+const getAuthToken = () => localStorage.getItem('user');
 const createAuthHeaders = () => {
     const token = getAuthToken();
     return token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -170,7 +170,7 @@ export default function ProductAdmin() {
         toast.success("Đã xóa sản phẩm!");
         fetchProducts();
     } catch (error) {
-        toast.error("Xóa thất bại.");
+        toast.error("Xóa thất bại. Sản phẩm này đã được bán và không thể xóa.");
     }
   };
 

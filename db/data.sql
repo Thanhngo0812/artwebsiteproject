@@ -1,7 +1,7 @@
 use artdbproject;
 
 -- ============================================
--- CHÈN DỮ LIỆU MẪU (50 SẢN PHẨM)
+-- CHÈN DỮ LIỆU MẪU (50 SẢN PHẨM) - CẬP NHẬT MÔ TẢ
 -- ============================================
 START TRANSACTION;
 
@@ -9,37 +9,34 @@ START TRANSACTION;
 -- 1. CHÈN LIỆU (MATERIALS)
 -- ============================================
 INSERT INTO `material` (`materialname`) VALUES
-('Sơn dầu'),       -- ID 1
-('Acrylic'),               -- ID 2
-('Màu nước'), -- ID 3
-('Gỗ Tự Nhiên'),         -- ID 4
-('Kim loại'),      -- ID 5
-('Vải canvas'),   -- ID 6
-('Giấy mỹ thuật'),     -- ID 7
-('Composite');             -- ID 8
+('Sơn dầu'),          -- ID 1
+('Acrylic'),          -- ID 2
+('Màu nước'),         -- ID 3
+('Gỗ Tự Nhiên'),      -- ID 4
+('Kim loại'),         -- ID 5
+('Vải canvas'),       -- ID 6
+('Giấy mỹ thuật'),    -- ID 7
+('Composite');        -- ID 8
 
 -- ============================================
 -- SẢN PHẨM 1: Tranh Trừu Tượng (2 variants)
 -- ============================================
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Bình minh rực rỡ', 'Tranh trừu tượng hiện đại mô tả cảnh bình minh với gam màu nóng, sử dụng chất liệu sơn dầu.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product1_thumb_frlue9.jpg', 1, 1, 150);
--- Gán ID sản phẩm
+('Bình minh rực rỡ', 
+'Tác phẩm trừu tượng hiện đại "Bình minh rực rỡ" là bản giao hưởng của những gam màu nóng đầy năng lượng. Với kỹ thuật sơn dầu đắp nổi, nghệ sĩ đã khéo léo tái hiện khoảnh khắc mặt trời vừa ló dạng, mang lại cảm giác hứng khởi, ấm áp và tràn đầy sức sống cho không gian phòng khách hoặc văn phòng làm việc.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product1_thumb_frlue9.jpg', 1, 1, 150);
+
 SET @product_id = LAST_INSERT_ID();
--- Gán Danh mục
-INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES
-(@product_id, 1), -- Tranh Trừu Tượng
-(@product_id, 2); -- Tranh Trường màu
--- Gán Biến thể
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 2);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '60x80cm', 1800000, 10, 1200000),
 (@product_id, '70x60cm', 2500000, 5, 1700000);
--- Gán Hình ảnh
+
 SET @variant1_id = LAST_INSERT_ID();
 SET @variant2_id = @variant1_id + 1;
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES
 (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777459/product1_variant1_rzkhad.jpg'),
 (@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777463/product1_variant2_fmisum.jpg');
--- Gán Màu sắc & Chủ đề
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FF5733'), (@product_id, '#FFC300');
 INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bình minh'), (@product_id, 'Trừu tượng');
 
@@ -47,13 +44,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 -- SẢN PHẨM 2: Tranh Phong Cảnh (1 variant)
 -- ============================================
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Hoàng hôn trên biển', 'Tranh phong cảnh biển buổi chiều tà, chất liệu acrylic trên canvas.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product2_thumb_zbopzv.jpg', 2, 1, 220);
+('Hoàng hôn trên biển', 
+'Bức tranh bắt trọn khoảnh khắc hoàng hôn buông xuống mặt biển tĩnh lặng. Sự hòa quyện tinh tế giữa sắc tím, cam đỏ và xanh thẫm của chất liệu Acrylic cao cấp trên nền canvas tạo nên chiều sâu hun hút, gợi lên cảm giác bình yên, thư thái và lãng mạn sau một ngày dài.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product2_thumb_zbopzv.jpg', 2, 1, 220);
+
 SET @product_id = LAST_INSERT_ID();
-INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES
-(@product_id, 2), -- Tranh Phong Cảnh
-(@product_id, 10); -- Tranh Biển
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 10);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '50x70cm', 950000, 15, 600000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES
 (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777464/product2_variant1_qowaeg.jpg'),
@@ -65,15 +64,17 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 -- SẢN PHẨM 3: Khung Tranh (3 variants)
 -- ============================================
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Khung Gỗ Sồi Cổ Điển', 'Khung tranh làm từ gỗ sồi tự nhiên, hoa văn cổ điển, phù hợp với tranh sơn dầu.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product3_thumb_spqhbl.jpg', 4, 1, 80);
+('Khung Gỗ Sồi Cổ Điển', 
+'Được chế tác thủ công từ gỗ sồi tự nhiên nhập khẩu, mẫu khung này sở hữu những đường vân gỗ sang trọng cùng hoa văn chạm khắc tinh xảo theo phong cách cổ điển Châu Âu. Sản phẩm bền bỉ theo thời gian, là lớp áo hoàn hảo để tôn vinh vẻ đẹp của những bức tranh sơn dầu quý giá.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product3_thumb_spqhbl.jpg', 4, 1, 80);
+
 SET @product_id = LAST_INSERT_ID();
-INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES
-(@product_id, 5), -- Khung Tranh
-(@product_id, 21); -- Khung Gỗ Cổ điển
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 21);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '40x60cm', 450000, 30, 300000),
 (@product_id, '50x70cm', 550000, 25, 350000),
 (@product_id, '60x90cm', 700000, 20, 450000);
+
 SET @variant1_id = LAST_INSERT_ID();
 SET @variant2_id = @variant1_id + 1;
 SET @variant3_id = @variant1_id + 2;
@@ -91,13 +92,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 -- SẢN PHẨM 4: Tranh Sơn Dầu Chân dung (1 variant)
 -- ============================================
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Thiếu nữ bên hoa Huệ', 'Tranh sơn dầu phục dựng phong cách cổ điển, mô tả thiếu nữ mặc áo dài trắng.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777546/product4_thumb_xv7s3r.jpg', 1, 1, 310);
+('Thiếu nữ bên hoa Huệ', 
+'Tác phẩm sơn dầu phục dựng kiệt tác nghệ thuật Việt Nam, khắc họa vẻ đẹp dịu dàng, đài các của người thiếu nữ trong tà áo dài trắng tinh khôi bên hoa huệ tây. Từng nét cọ mềm mại làm toát lên nét duyên dáng, e ấp và hoài niệm của vẻ đẹp Á Đông truyền thống.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777546/product4_thumb_xv7s3r.jpg', 1, 1, 310);
+
 SET @product_id = LAST_INSERT_ID();
-INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES
-(@product_id, 3), -- Tranh Sơn Dầu
-(@product_id, 14); -- Sơn Dầu Chân dung
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 14);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '70x100cm', 4500000, 3, 3000000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES
 (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777455/product4_variant1_c7ccnp.jpg');
@@ -108,13 +111,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 -- SẢN PHẨM 5: Tranh Lập Thể (1 variant)
 -- ============================================
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Góc phố Lập thể', 'Tranh nghệ thuật theo trường phái lập thể, sử dụng chất liệu Acrylic.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777496/product5_thumb_xrrocj.jpg', 2, 1, 120);
+('Góc phố Lập thể', 
+'Một cái nhìn độc đáo và táo bạo về phố thị qua lăng kính Lập thể. Sự phân mảnh, sắp xếp lại các khối hình học sắc cạnh kết hợp cùng chất liệu Acrylic rực rỡ tạo nên một không gian đa chiều, thách thức thị giác và kích thích trí tưởng tượng phong phú của người xem.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777496/product5_thumb_xrrocj.jpg', 2, 1, 120);
+
 SET @product_id = LAST_INSERT_ID();
-INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES
-(@product_id, 4), -- Tranh Nghệ Thuật
-(@product_id, 18); -- Tranh Lập Thể
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 18);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '60x80cm', 30000000, 5, 20000000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES
 (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777454/product5_variant1_egi5el.jpg');
@@ -127,25 +132,32 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 6
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Rừng thông Sương mờ', 'Tranh phong cảnh núi rừng Đà Lạt buổi sớm, chất liệu màu nước.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product6_thumb_pxv9l4.jpg', 3, 1, 180);
+('Rừng thông Sương mờ', 
+'Bức tranh màu nước trong trẻo tái hiện khung cảnh rừng thông Đà Lạt chìm trong sương sớm. Những vệt màu loang nhẹ nhàng, tinh tế tạo nên độ mờ ảo, huyền bí, mang lại không khí se lạnh và tĩnh mịch đặc trưng của phố núi mộng mơ.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product6_thumb_pxv9l4.jpg', 3, 1, 180);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 11);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '40x60cm', 700000, 12, 400000),
 (@product_id, '60x90cm', 1100000, 7, 700000);
+
 SET @variant1_id = LAST_INSERT_ID();
-SET @variant2_id = @variant1_id + 1;
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777455/product6_variant1_ajtdzr.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#B0D1C5'), (@product_id, '#4E6C50');
 INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Rừng'), (@product_id, 'Sương mờ');
 
 -- SP 7
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Cánh đồng lúa chín', 'Tranh đồng quê Việt Nam mùa gặt, sơn dầu trên canvas.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777497/product7_thumb_w3bp6d.jpg', 1, 1, 250);
+('Cánh đồng lúa chín', 
+'Bức tranh sơn dầu rực rỡ sắc vàng óng ả của cánh đồng lúa chín trải dài bất tận. Hình ảnh làng quê Việt Nam vào mùa gặt hiện lên mộc mạc, no ấm và thanh bình qua từng nét vẽ chân thực, gợi nhớ về những ký ức tuổi thơ êm đềm.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777497/product7_thumb_w3bp6d.jpg', 1, 1, 250);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 12);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '60x80cm', 2800000, 8, 1800000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777454/product7_variant1_s9rzaf.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777455/product7_variant1_1_xuvjnu.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product7_variant1_2_rvy7a4.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product7_variant1_3_xyc1z8.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#F4B400'), (@product_id, '#34A853');
@@ -153,11 +165,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 8
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Phố cổ Hội An về đêm', 'Tranh thành phố cổ với ánh đèn lồng, chất liệu acrylic.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777497/product8_thumb_qb7kye.jpg', 2, 1, 300);
+('Phố cổ Hội An về đêm', 
+'Vẻ đẹp lung linh, huyền ảo của Hội An về đêm được tái hiện sống động qua chất liệu Acrylic. Ánh sáng ấm áp từ những chiếc đèn lồng phản chiếu xuống dòng sông Hoài tạo nên một khung cảnh lãng mạn, đậm chất thơ và hoài cổ, điểm tô cho không gian sống thêm phần ấm cúng.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777497/product8_thumb_qb7kye.jpg', 2, 1, 300);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 13);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '100x80cm', 1600000, 10, 1000000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product8_variant1_tvcbjz.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#DB4437'), (@product_id, '#F4B400');
@@ -165,11 +181,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 9
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Vịnh Hạ Long', 'Tranh sơn dầu phong cảnh Vịnh Hạ Long hùng vĩ.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777497/product9_thumb_wovsmy.jpg', 1, 1, 190);
+('Vịnh Hạ Long', 
+'Tuyệt tác thiên nhiên Vịnh Hạ Long được thu nhỏ trong bức tranh sơn dầu hoành tráng. Những ngọn núi đá vôi sừng sững giữa làn nước xanh ngọc bích được miêu tả tỉ mỉ, toát lên vẻ đẹp hùng vĩ, tráng lệ của di sản thiên nhiên thế giới, mang lại cảm giác khoáng đạt.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777497/product9_thumb_wovsmy.jpg', 1, 1, 190);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 10);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '80x120cm', 3500000, 5, 2500000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product9_variant1_ivm1qm.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4285F4'), (@product_id, '#0F9D58');
@@ -177,11 +197,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 10
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Suối trong rừng', 'Tranh màu nước cảnh suối và rừng cây.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product10_thumb_ghigsi.jpg', 3, 1, 110);
+('Suối trong rừng', 
+'Sự tươi mát của thiên nhiên được gửi gắm trọn vẹn qua bức tranh màu nước tinh tế. Dòng suối róc rách chảy qua những tảng đá rêu phong dưới tán cây xanh mát tạo nên một không gian thư giãn tuyệt đối, giúp gột rửa mọi ưu phiền của cuộc sống bận rộn.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product10_thumb_ghigsi.jpg', 3, 1, 110);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 11);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '50x70cm', 4500000, 20, 3500000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product10_variant1_fme2ah.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#92B4A7'), (@product_id, '#638889');
@@ -193,11 +217,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 11
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Vũ điệu của màu sắc', 'Tranh trừu tượng hành động, thể hiện sự ngẫu hứng.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product11_thumb_uvsrzg.jpg', 2, 1, 130);
+('Vũ điệu của màu sắc', 
+'Một tác phẩm bùng nổ cảm xúc thuộc trường phái Trừu tượng hành động (Action Painting). Những vệt màu được vẩy, tạt đầy ngẫu hứng và mạnh mẽ tạo nên một vũ điệu thị giác đầy mê hoặc, thể hiện sự tự do phóng khoáng không giới hạn của tâm hồn nghệ sĩ.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product11_thumb_uvsrzg.jpg', 2, 1, 130);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 6);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '70x70cm', 1900000, 8, 1200000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777457/product11_variant1_1_fdhmwo.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg'), (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777456/product11_variant1_vldbim.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#DB4437'), (@product_id, '#4285F4'), (@product_id, '#F4B400');
@@ -205,11 +233,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 12
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Hình học Giao thoa', 'Tranh trừu tượng hình học với các khối màu sắc nét.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product12_thumb_qpoquw.jpg', 2, 1, 90);
+('Hình học Giao thoa', 
+'Sự cân bằng hoàn hảo giữa các khối hình học cơ bản và mảng màu tương phản mạnh mẽ. Tác phẩm mang phong cách tối giản nhưng hiện đại, tạo điểm nhấn thị giác ấn tượng và mang lại vẻ đẹp ngăn nắp, tinh tế cho không gian kiến trúc đương đại.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product12_thumb_qpoquw.jpg', 2, 1, 90);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 8);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '50x70cm', 1300000, 15, 800000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777457/product12_variant1_iqbklv.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#000000'), (@product_id, '#FFFFFF'), (@product_id, '#FF0000');
@@ -217,11 +249,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 13
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Nỗi buồn Trữ tình', 'Tranh trừu tượng trữ tình, gam màu lạnh.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product13_thumb_qxcvnm.jpg', 1, 1, 160);
+('Nỗi buồn Trữ tình', 
+'Tác phẩm trừu tượng trữ tình sử dụng gam màu lạnh chủ đạo, gợi lên những cung bậc cảm xúc sâu lắng và nội tâm. Những đường nét mềm mại, uyển chuyển như những giai điệu buồn man mác, mời gọi người xem chìm đắm vào suy tư và chiêm nghiệm.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777498/product13_thumb_qxcvnm.jpg', 1, 1, 160);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 9);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '80x140cm', 2200000, 6, 1500000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777457/product13_variant1_p7zthy.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777457/product13_variant1_1_mp6opa.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#3C4043'), (@product_id, '#AECBFA');
@@ -229,12 +265,16 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 14
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Khoảng lặng Màu Vàng', 'Tranh trường màu (color field) với sắc vàng chủ đạo.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777499/product14_thumb_f7kbak.jpg', 1, 1, 75);
+('Khoảng lặng Màu Vàng', 
+'Đại diện tiêu biểu cho nghệ thuật Trường màu (Color Field), tác phẩm là một mảng màu vàng thuần khiết, ấm áp bao phủ toàn bộ không gian. Bức tranh tạo ra một khoảng lặng thiền định, mang lại cảm giác lạc quan và mở rộng không gian thị giác đến vô tận.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777499/product14_thumb_f7kbak.jpg', 1, 1, 75);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 7);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '220x100cm', 7000000, 12, 4000000),
 (@product_id, '100x150cm', 11000000, 7, 7000000);
+
 SET @variant1_id = LAST_INSERT_ID();
 SET @variant2_id = @variant1_id + 1;
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777458/product14_variant2_pkd06m.jpg'),(@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777457/product14_variant1_ppkkpt.jpg')
@@ -244,11 +284,15 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 15
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Hỗn mang Có Sắp đặt', 'Tranh trừu tượng hành động, canvas.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777535/product15_thumb_vohox3.jpg', 6, 1, 105);
+('Hỗn mang Có Sắp đặt', 
+'Thoạt nhìn như một sự hỗn độn của màu sắc và đường nét, nhưng tác phẩm trừu tượng này lại ẩn chứa một trật tự ngầm đầy tính nghệ thuật. Sự tương phản giữa nóng và lạnh, giữa các lớp màu dày và mỏng trên canvas tạo nên một kết cấu bề mặt phong phú, đầy khiêu khích và tò mò.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777535/product15_thumb_vohox3.jpg', 6, 1, 105);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 6);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '80x100cm', 1700000, 9, 1100000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777458/product15_variant1_u5hydm.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#D94F3D'), (@product_id, '#4A5C4A');
@@ -260,23 +304,31 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 
 -- SP 16
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Tĩnh vật Bình hoa Cúc', 'Tranh sơn dầu tĩnh vật, phong cách cổ điển.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777544/product16_thumb_zrbpgq.jpg', 1, 1, 280);
+('Tĩnh vật Bình hoa Cúc', 
+'Bức tĩnh vật sơn dầu mang đậm hơi hướng cổ điển, khắc họa vẻ đẹp giản dị nhưng thanh cao của bình hoa cúc vàng. Ánh sáng và bóng đổ được xử lý tinh tế, tạo nên độ khối chân thực và sự tĩnh lặng tuyệt đối, rất hợp để treo tại phòng ăn hoặc góc đọc sách.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777544/product16_thumb_zrbpgq.jpg', 1, 1, 280);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 15);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '50x60cm', 1800000, 10, 1200000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777458/product16_variant1_xcm0ti.jpg');
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#F4B400'), (@product_id, '#8B4513');
 INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Tĩnh vật'), (@product_id, 'Hoa');
--- SP 17
 
+-- SP 17
 INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
-('Chân dung Bác Giáp', 'Tranh sơn dầu chân dung tả thực, thể hiện nếp nhăn thời gian.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product17_thumb_wrf4e3.jpg', 1, 1, 210);
+('Chân dung Bác Giáp', 
+'Bức chân dung sơn dầu tả thực khắc họa thần thái uy nghiêm nhưng vô cùng đôn hậu của Đại tướng. Từng nếp nhăn, ánh mắt tinh anh và vầng trán cao được nghệ sĩ chăm chút tỉ mỉ, thể hiện sự kính trọng sâu sắc và ghi dấu ấn thời gian oai hùng lên vị tướng huyền thoại của dân tộc.', 
+'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/product17_thumb_wrf4e3.jpg', 1, 1, 210);
+
 SET @product_id = LAST_INSERT_ID();
 INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 14);
 INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
 (@product_id, '40x50cm', 5500000, 2, 4000000);
+
 SET @variant1_id = LAST_INSERT_ID();
 INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777459/product17_variant1_buxg5l.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777458/product17_variant1_1_lhlx3w.jpg');
 INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Chân dung'), (@product_id, 'Tả thực');

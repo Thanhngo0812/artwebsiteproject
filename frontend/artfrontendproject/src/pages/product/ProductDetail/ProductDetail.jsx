@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate,useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import productService from '../../../services/productService';
 import ProductCard from '../../../components/product/ProductCard/ProductCard';
@@ -9,6 +9,9 @@ import './ProductDetail.css';
 
 export default function ProductDetail() {
   const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const responseCode = searchParams.get('vnp_ResponseCode');
+
   const navigate = useNavigate();
   const { addToCart, cartItems, showMiniCart, lastAddedItem, closeMiniCart } = useCart();
 

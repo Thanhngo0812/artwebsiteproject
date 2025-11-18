@@ -1,6 +1,7 @@
 package com.ct08team.artbackendproject.Entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "material")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // <--- Thêm dòng này
 public class Material {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -20,6 +20,8 @@ import ProfilePage from "./pages/profile/ProfilePage";
 import UserProfilePage from "./pages/user/UserProfilePage";
 import ProductDetail from "./pages/product/ProductDetail/ProductDetail";
 import ProductListPage from "./pages/product/ProductList/ProductListPage";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
+import PaymentCallback from "./pages/checkout/PaymentCallback";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
@@ -42,6 +44,8 @@ function App() {
               <Route path="products" element={<ProductUser />} />
               <Route path="products/:id" element={<ProductDetail />} />
               <Route path="products/search" element={<ProductListPage />} />
+               <Route path="checkout" element={<CheckoutPage />} />
+
             </Route>
 
             {/*trang đăng nhập/ đăng kí*/}
@@ -59,6 +63,7 @@ function App() {
             {/* ← ← ← ROUTE USER (CẦN LOGIN) */}
             <Route element={<ProtectedRoute requiredRole="ROLE_USER" />}>
               <Route path="/user/profile" element={<UserProfilePage />} />
+              <Route path="/user/paymentcallback" element={<PaymentCallback />} />
             </Route>
 
 

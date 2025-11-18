@@ -2,6 +2,7 @@ package com.ct08team.artbackendproject.DAO;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant,L
 
     // Giữ nguyên, query method này hoạt động dựa trên quan hệ @ManyToOne
     List<ProductVariant> findByProduct(Product product);
+    Optional<ProductVariant> findByProductIdAndDimensions(Long productId, String dimensions);
 
     // Giữ nguyên, hoạt động tốt
     List<ProductVariant> findByVariantStatus(Integer variantStatus);

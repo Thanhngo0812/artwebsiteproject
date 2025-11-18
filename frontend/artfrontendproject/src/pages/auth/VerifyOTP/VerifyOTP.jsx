@@ -244,7 +244,7 @@ export default function VerifyOTP() {
       // Bạn sẽ cần lưu chúng vào localStorage hoặc context
       // Ví dụ: authService.handleLoginSuccess(data);
       localStorage.setItem('user', data.token);// Giả sử
-
+      localStorage.setItem('username',username);
       toast.success("Xác thực thành công! Đang đăng nhập...");
 
       // Điều hướng đến trang chính của ứng dụng

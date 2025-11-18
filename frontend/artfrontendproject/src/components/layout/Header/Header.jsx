@@ -8,6 +8,9 @@ import {
   FaChevronUp,
   FaSearch,
   FaTimes,
+  FaUser,
+  FaHistory,
+  FaSignOutAlt
 } from "react-icons/fa";
 
 export default function Header() {
@@ -16,23 +19,47 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeParentId, setActiveParentId] = useState(null);
   const [activeSidebarParentId, setActiveSidebarParentId] = useState(null);
+  
+  // Ref cho danh mục sản phẩm
   const dropdownRef = useRef(null);
+  // --- Ref mới cho User Dropdown ---
+  const userDropdownRef = useRef(null);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isContentOverlayActive, setIsContentOverlayActive] = useState(false);
 
-  // --- State mới cho chức năng tìm kiếm ---
+  // --- State tìm kiếm ---
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // --- State mới để lưu tên người dùng ---
+  const [username, setUsername] = useState(""); 
+  // --- State mới để bật tắt menu User ---
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const navigate = useNavigate();
 
+  // --- Cập nhật useEffect checkAuth để lấy tên người dùng ---
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('user');
-      setIsLoggedIn(!!token);
+      const userStr = localStorage.getItem('username');
+      if (userStr) {
+        setIsLoggedIn(true);
+        try {
+          // Thử parse JSON nếu 'user' lưu dạng object { token:..., username:... }
+          // Ưu tiên lấy các trường tên thông dụng
+          const name = userStr || "Bạn";
+          setUsername(name);
+        } catch (e) {
+          // Nếu không phải JSON (ví dụ chỉ lưu token string), set mặc định
+          setUsername("Bạn");
+        }
+      } else {
+        setIsLoggedIn(false);
+        setUsername("");
+      }
     };
     
     checkAuth();
@@ -44,23 +71,21 @@ export default function Header() {
     };
   }, []);
 
+  // ... (Giữ nguyên formatCurrency) ...
   const formatCurrency = (amount) => {
-    if (typeof amount !== "number") {
-      return "";
-    }
-    // Định dạng tiền tệ kiểu Việt Nam (VND)
+    if (typeof amount !== "number") return "";
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-      minimumFractionDigits: 0, // Bỏ phần ,00
+      minimumFractionDigits: 0,
     }).format(amount);
   };
+
+  // ... (Giữ nguyên useEffect fetchCategoriesAndChildren) ...
   useEffect(() => {
     const fetchCategoriesAndChildren = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:8888/api/v1/categories/parents"
-        );
+        const res = await fetch("http://localhost:8888/api/v1/categories/parents");
         const parentsData = await res.json();
         setCategories(parentsData);
 
@@ -74,23 +99,19 @@ export default function Header() {
               newChildrenMap[parent.id] = response.data;
             }
           } catch (error) {
-            console.log(
-              `Error fetching children for ${parent.id}:`,
-              error.message
-            );
+            console.log(`Error fetching children for ${parent.id}:`, error.message);
           }
         });
-
         await Promise.all(fetchChildrenPromises);
         setChildrenMap(newChildrenMap);
       } catch (error) {
         console.log("Error fetching parent categories:", error.message);
       }
     };
-
     fetchCategoriesAndChildren();
   }, []);
 
+  // ... (Giữ nguyên handleResize) ...
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 990) {
@@ -102,10 +123,16 @@ export default function Header() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // ... (Giữ nguyên handleClickOutside) ...
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Đóng menu danh mục
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setActiveParentId(null);
+      }
+      // Đóng menu user
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
       }
     };
 
@@ -113,58 +140,61 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- useEffect mới để fetch API tìm kiếm (Debounce) ---
+  // ... (Giữ nguyên useEffect tìm kiếm) ...
   useEffect(() => {
-    // Nếu ô tìm kiếm rỗng, dọn dẹp kết quả
     if (searchQuery.trim() === "") {
       setSearchResults([]);
       setIsLoading(false);
       return;
     }
-
     setIsLoading(true);
-
-    // Tạo timer
     const timerId = setTimeout(() => {
       const fetchSearchResults = async () => {
         try {
-          // *** THAY ĐỔI URL NÀY thành endpoint API tìm kiếm của bạn ***
           const response = await axios.get(
             `http://localhost:8888/api/products/suggest?keyword=${searchQuery}&limit=5`
           );
-          
           setSearchResults(response.data);
         } catch (error) {
           console.error("Error fetching search results:", error);
-          setSearchResults([]); // Xóa kết quả nếu lỗi
+          setSearchResults([]);
         } finally {
           setIsLoading(false);
         }
       };
-
       fetchSearchResults();
-    }, 300); // Chờ 300ms sau khi người dùng ngừng gõ
+    }, 300);
+    return () => clearTimeout(timerId);
+  }, [searchQuery]);
 
-    // Cleanup: Hủy timer cũ nếu người dùng gõ tiếp
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [searchQuery]); // Chạy lại khi searchQuery thay đổi
-
+  // --- LOGIC USER ACTION ---
   const navigateLogin = useNavigate();
-  const handleNavigateLogin = () => {
+  
+  const handleUserIconClick = () => {
     if (isLoggedIn) {
-      navigateLogin("/user/profile");
+      // Nếu đã đăng nhập -> Toggle menu
+      setIsUserMenuOpen(!isUserMenuOpen);
     } else {
+      // Chưa đăng nhập -> Chuyển trang login
       navigateLogin("/login");
+      setMenuOpen(false);
     }
-    setMenuOpen(false);
   };
 
+  // Hàm đăng xuất
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('username');
+    setIsLoggedIn(false);
+    setUsername(""); // Xóa tên user
+    setIsUserMenuOpen(false);
+    navigateLogin("/");
+  };
+
+  // ... (Giữ nguyên các hàm điều hướng shop/category) ...
   const navigateShop = useNavigate();
   const handleToShop = () => {
     setActiveParentId(null);
-
     const unique = Date.now();
     navigateShop(`/products?reset=true&_=${unique}`);
     setActiveSidebarParentId(null);
@@ -180,10 +210,8 @@ export default function Header() {
   };
 
   const navigateCategoryParent = useNavigate();
-
   const handleParentClick = (parentId, parentName) => {
     const hasChildren = childrenMap[parentId] && childrenMap[parentId].length > 0;
-
     if (hasChildren) {
       setActiveParentId(activeParentId === parentId ? null : parentId);
     } else {
@@ -194,11 +222,8 @@ export default function Header() {
 
   const handleSidebarParentClick = (parentId, parentName) => {
     const hasChildren = childrenMap[parentId] && childrenMap[parentId].length > 0;
-
     if (hasChildren) {
-      setActiveSidebarParentId(
-        activeSidebarParentId === parentId ? null : parentId
-      );
+      setActiveSidebarParentId(activeSidebarParentId === parentId ? null : parentId);
     } else {
       setActiveSidebarParentId(null);
       navigateCategoryParent(`/products?category=${parentName}`);
@@ -212,7 +237,7 @@ export default function Header() {
     setMenuOpen(false);
   };
 
-  // Hàm mở thanh tìm kiếm
+  // ... (Giữ nguyên logic search) ...
   const openSearch = () => {
     setIsSearchOpen(true);
     setTimeout(() => {
@@ -221,34 +246,24 @@ export default function Header() {
     }, 100);
   };
 
-  // Hàm đóng thanh tìm kiếm (cập nhật)
   const closeSearch = () => {
     setIsSearchOpen(false);
     setIsContentOverlayActive(false);
     document.body.style.overflow = "";
-
-    // Reset state tìm kiếm khi đóng
     setSearchQuery("");
     setSearchResults([]);
     setIsLoading(false);
   };
 
-  // --- Hàm mới: Xử lý nhấn Enter ---
   const handleSearchSubmit = (event) => {
     if (event.key === "Enter" && searchQuery.trim() !== "") {
-      event.preventDefault(); // Ngăn submit form (nếu có)
-      
-      // Chuyển trang với query
+      event.preventDefault();
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      
-      // Đóng và reset
       closeSearch();
     }
   };
 
-  // --- Hàm mới: Xử lý khi nhấp vào kết quả ---
   const handleResultClick = () => {
-    // Chỉ cần đóng, <Link> sẽ tự điều hướng
     closeSearch();
   };
 
@@ -256,15 +271,13 @@ export default function Header() {
     <>
     <header className="header">
       <div className={`nav-sidebar ${menuOpen ? "active" : ""}`}>
+        {/* ... (Giữ nguyên sidebar) ... */}
         <ul className="nav-sidebar-menu">
           <li onClick={handleToShop}>
             <div className="nav-sidebar-item shop">Shop</div>
           </li>
-
           {categories.map((item) => {
-            const hasChildren =
-              childrenMap[item.id] && childrenMap[item.id].length > 0;
-
+            const hasChildren = childrenMap[item.id] && childrenMap[item.id].length > 0;
             return (
               <li key={item.id}>
                 <div
@@ -273,16 +286,11 @@ export default function Header() {
                 >
                   <span>{item.name}</span>
                   {hasChildren && (
-                    <span
-                      className={`arrow ${
-                        activeSidebarParentId === item.id ? "active" : ""
-                      }`}
-                    >
+                    <span className={`arrow ${activeSidebarParentId === item.id ? "active" : ""}`}>
                       &#9660;
                     </span>
                   )}
                 </div>
-
                 {activeSidebarParentId === item.id && hasChildren && (
                   <ul className="nav-sidebar-children-menu">
                     {childrenMap[item.id].map((child) => (
@@ -304,7 +312,9 @@ export default function Header() {
         </ul>
 
         <div className="footer-sidebar">
-          <div className="footer-sidebar-login" onClick={handleNavigateLogin}>
+          <div className="footer-sidebar-login" onClick={() => {
+             if(isLoggedIn) navigate("/user/profile"); else navigate("/login");
+          }}>
             <img src="/user.png" alt="User" className="nav-sidebar-icon" />
             <span>{isLoggedIn ? "Tài Khoản" : "Đăng Nhập"}</span>
           </div>
@@ -312,72 +322,42 @@ export default function Header() {
       </div>
 
       <nav className="nav">
-        <button
-          className={`hamburger ${menuOpen ? "active" : ""}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
+        {/* ... (Giữ nguyên hamburger và logo) ... */}
+        <button className={`hamburger ${menuOpen ? "active" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
           <span></span>
           <span></span>
           <span></span>
         </button>
 
         <div className="nav-logo">
-          <Link
-            to="/"
-            style={{ display: "flex", alignItems: "center" }}
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link to="/" style={{ display: "flex", alignItems: "center" }} onClick={() => setMenuOpen(false)}>
             <img src="/logo.png" alt="Logo" />
           </Link>
         </div>
 
+        {/* ... (Giữ nguyên nav-center) ... */}
         <div className="nav-center">
           <ul className="nav-menu" ref={dropdownRef}>
             <li>
-              <Link
-                to="#"
-                className="nav-item shop"
-                onClick={handleCategoryChildOpen}
-              >
-                Shop
-              </Link>
+              <Link to="#" className="nav-item shop" onClick={handleCategoryChildOpen}>Shop</Link>
             </li>
-
             {categories.map((item) => {
-              const hasChildren =
-                childrenMap[item.id] && childrenMap[item.id].length > 0;
-
+              const hasChildren = childrenMap[item.id] && childrenMap[item.id].length > 0;
               return (
                 <li key={item.id} className="nav-menu-item">
-                  <div
-                    className="nav-item category"
-                    onClick={() => handleParentClick(item.id, item.name)}
-                  >
+                  <div className="nav-item category" onClick={() => handleParentClick(item.id, item.name)}>
                     <span>{item.name}</span>
                     {hasChildren && (
-                      <span
-                        className={`arrow ${
-                          activeParentId === item.id ? "active" : ""
-                        }`}
-                      >
-                        {activeSidebarParentId === item.id ? (
-                          <FaChevronUp style={{ paddingTop: "4px" }} />
-                        ) : (
-                          <FaChevronDown style={{ paddingTop: "4px" }} />
-                        )}
+                      <span className={`arrow ${activeParentId === item.id ? "active" : ""}`}>
+                        {activeSidebarParentId === item.id ? <FaChevronUp style={{ paddingTop: "4px" }} /> : <FaChevronDown style={{ paddingTop: "4px" }} />}
                       </span>
                     )}
                   </div>
-
                   {activeParentId === item.id && hasChildren && (
                     <ul className="nav-item-children-menu">
                       {childrenMap[item.id].map((child) => (
                         <li key={child.id}>
-                          <Link
-                            to={`/products?category=${child.name}`}
-                            className="nav-item-child-item"
-                            onClick={handleChildClick}
-                          >
+                          <Link to={`/products?category=${child.name}`} className="nav-item-child-item" onClick={handleChildClick}>
                             {child.name}
                           </Link>
                         </li>
@@ -394,22 +374,46 @@ export default function Header() {
           <button className="icon-button" onClick={openSearch}>
             <img src="/search.png" alt="Search" className="nav-icon" />
           </button>
-          <button className="icon-button" onClick={handleNavigateLogin}>
-            <img src="/user.png" alt="User" className="nav-icon" />
-          </button>
+
+          {/* --- KHU VỰC USER CẬP NHẬT --- */}
+          <div className="user-menu-container" ref={userDropdownRef} style={{ position: 'relative' }}>
+            <button className="icon-button" onClick={handleUserIconClick}>
+              <img src="/user.png" alt="User" className="nav-icon" />
+            </button>
+            
+            {/* Tooltip hiện khi hover (chỉ hiện khi menu không mở) */}
+            {!isUserMenuOpen && (
+              <div className="user-hover-tooltip">
+                {isLoggedIn ? `Xin chào, ${username}` : "Đăng nhập/Đăng kí ngay"}
+              </div>
+            )}
+
+            {/* Menu Dropdown */}
+            {isLoggedIn && isUserMenuOpen && (
+              <div className="user-dropdown-menu">
+                <div className="user-dropdown-arrow"></div>
+                <Link to="/user/profile" className="user-dropdown-item" onClick={() => setIsUserMenuOpen(false)}>
+                  <FaUser className="dropdown-icon" /> Thông tin cá nhân
+                </Link>
+                <Link to="/user/orders" className="user-dropdown-item" onClick={() => setIsUserMenuOpen(false)}>
+                  <FaHistory className="dropdown-icon" /> Lịch sử đơn hàng
+                </Link>
+                <div className="user-dropdown-divider"></div>
+                <button className="user-dropdown-item logout-btn" onClick={handleLogout}>
+                  <FaSignOutAlt className="dropdown-icon" /> Đăng xuất
+                </button>
+              </div>
+            )}
+          </div>
+
           <Link to="/cart" className="icon-button">
             <img src="/cart.png" alt="Cart" className="nav-icon" />
           </Link>
         </div>
       </nav>
 
-      {/* OVERLAY NỘI DUNG DƯỚI HEADER */}
-      <div
-        className={`content-overlay ${isContentOverlayActive ? "active" : ""}`}
-        onClick={closeSearch}
-      ></div>
-
-      {/* OVERLAY THANH TÌM KIẾM (Đã cập nhật) */}
+      {/* ... (Giữ nguyên search overlay) ... */}
+      <div className={`content-overlay ${isContentOverlayActive ? "active" : ""}`} onClick={closeSearch}></div>
       <div className={`search-header-overlay ${isSearchOpen ? "active" : ""}`}>
         <div className="search-box-container">
           <div className="search-box">
@@ -418,78 +422,41 @@ export default function Header() {
               className="search-input"
               placeholder="Tìm kiếm..."
               autoFocus={isSearchOpen}
-              
-              // --- Cập nhật input ---
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearchSubmit} // Xử lý Enter
+              onKeyDown={handleSearchSubmit}
             />
-            <button className="search-icon-btn">
-              <FaSearch />
-            </button>
-            <button className="search-close-btn" onClick={closeSearch}>
-              <FaTimes />
-            </button>
+            <button className="search-icon-btn"><FaSearch /></button>
+            <button className="search-close-btn" onClick={closeSearch}><FaTimes /></button>
           </div>
-
- 
           {searchQuery.trim() !== "" && (
             <div className="search-results-dropdown">
               {isLoading ? (
                 <div className="search-result-item loading">Đang tìm kiếm...</div>
               ) : searchResults.length > 0 ? (
                 searchResults.map((product) => (
-                  <Link
-                    key={product.id}
-                    to={`/products/${product.id}`}
-                    className="search-result-item"
-                    onClick={handleResultClick}
-                  >
-                    <img 
-                      src={product.thumbnail} 
-                      alt={product.productName} 
-                    />
-
-                    {/* Container mới cho thông tin (tên + giá) */}
+                  <Link key={product.id} to={`/products/${product.id}`} className="search-result-item" onClick={handleResultClick}>
+                    <img src={product.thumbnail} alt={product.productName} />
                     <div className="search-result-info">
                       <span className="search-result-name">{product.productName}</span>
-
-                      {/* Container cho giá */}
                       <div className="search-result-price-container">
-                        {/* Kiểm tra xem CÓ giá khuyến mãi (promotionalPrice) 
-                          và giá đó > 0 không 
-                        */}
                         {product.promotionalPrice && product.promotionalPrice > 0 ? (
                           <>
-                            {/* Giá sale */}
-                            <span className="search-result-price sale">
-                              {formatCurrency(product.promotionalPrice)}
-                            </span>
-                            {/* Giá gốc (bị gạch) */}
-                            <span className="search-result-price original">
-                              {formatCurrency(product.originalPrice)}
-                            </span>
+                            <span className="search-result-price sale">{formatCurrency(product.promotionalPrice)}</span>
+                            <span className="search-result-price original">{formatCurrency(product.originalPrice)}</span>
                           </>
                         ) : (
-                          // Nếu không có sale, chỉ hiện giá gốc
-                          <span className="search-result-price">
-                            {formatCurrency(product.originalPrice)}
-                          </span>
+                          <span className="search-result-price">{formatCurrency(product.originalPrice)}</span>
                         )}
                       </div>
                     </div>
                   </Link>
                 ))
               ) : (
-
-                <div className="search-result-item no-results">
-                  Không tìm thấy kết quả nào.
-                </div>
+                <div className="search-result-item no-results">Không tìm thấy kết quả nào.</div>
               )}
             </div>
           )}
-
-
         </div>
       </div>
     </header>
