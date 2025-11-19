@@ -1,0 +1,74 @@
+/* Suppliers admin styles — aligned with User.scss theme variables */
+
+.user-container h2 {
+  margin: 0 0 8px 0;
+  color: var(--text-dark);
+}
+
+.table-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(21,24,28,0.04);
+  border: 1px solid rgba(16,24,40,0.04);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    background: #f8fafc;
+    color: var(--text-light);
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid #eef2f6;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease, transform 0.12s ease;
+    &:hover { background: #fbfdff; transform: translateY(-1px); }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-dark);
+      vertical-align: middle;
+    }
+  }
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-edit, .btn-delete {
+  margin-right: 6px;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-edit { background: #f59e0b; color: #fff; }
+.btn-delete { background: #ef4444; color: #fff; }
+
+.confirm-modal-body textarea { min-height: 80px; }
+
+@media (max-width: 720px) {
+  .users-table thead { display: none; }
+  .users-table, .users-table tbody, .users-table tr, .users-table td { display: block; width: 100%; }
+  .users-table tr { margin-bottom: 12px; border: 1px solid #eef2f6; border-radius: 8px; padding: 12px; }
+  .users-table td { text-align: right; position: relative; padding-left: 40%; }
+  .users-table td::before { content: attr(data-label); position: absolute; left: 12px; top: 12px; font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 0.75rem; }
+}

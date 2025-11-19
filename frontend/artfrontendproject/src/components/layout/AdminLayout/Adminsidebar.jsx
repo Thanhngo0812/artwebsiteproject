@@ -1,12 +1,14 @@
 import React from "react";
 import "./Adminsidebar.scss";
-import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers } from "react-icons/fa";
+import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
 
 export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar }) {
   const menuItem = [
     { path: "", name: "Dashboard", icon: <FaChartLine /> },
     { path: "product", name: "Products", icon: <FaBoxOpen /> },
+    { path: "suppliers", name: "Suppliers", icon: <FaTruck /> },
+    { path: "goods-receipts", name: "Goods Receipts", icon: <FaReceipt /> },
     { path: "user", name: "Users", icon: <FaUsers /> },
   ];
 

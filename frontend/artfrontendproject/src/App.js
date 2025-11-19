@@ -16,7 +16,7 @@ import ProductUser from "./components/product/ProductUser/ProductUser";
 import Dashboard from "./pages/admin/Dashboard/Dashboard";
 import RegisterPage from "./pages/auth/Register/RegisterPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPassword/ForgotPassword";
-import ProfilePage from "./pages/profile/ProfilePage";
+// import ProfilePage from "./pages/profile/ProfilePage";
 import UserProfilePage from "./pages/user/UserProfilePage";
 import ProductDetail from "./pages/product/ProductDetail/ProductDetail";
 import ProductListPage from "./pages/product/ProductList/ProductListPage";
@@ -30,6 +30,8 @@ import Cart from "./components/cart/Cart/Cart";
 import VerifyPasswordOTP from "./pages/auth/VerifyOTP/VerifyPasswordOTP";
 import ResetPasswordPage from "./pages/auth/ResetPassword/ResetPassword";
 import ProductAdmin_Add from "./pages/admin/ProductManagement/ProductAdmin_Add";
+import Suppliers from "./pages/admin/Suppliers/Suppliers";
+import GoodsReceipts from "./pages/admin/Suppliers/GoodsReceipts";
 
 function App() {
   return (
@@ -81,6 +83,8 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="product" element={<Product />} />
               <Route path="user" element={<User />} />
+              <Route path="suppliers" element={<Suppliers />} />
+              <Route path="goods-receipts" element={<GoodsReceipts />} />
               <Route path="product/new" element={<ProductAdmin_Add/>}/>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

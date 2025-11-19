@@ -331,4 +331,17 @@ public class ProductController {
         // Đây chính là List<ProductListDTO> mà React cần
         return ResponseEntity.ok(productPage.getContent());
     }
+    @GetMapping("/admin/list")
+    public ResponseEntity<Page<ProductListDTO>> getProductsForAdmin(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "50") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        
+        // ===== SỬA: Dùng searchProducts với filter rỗng =====
+        ProductFilterRequestDTO emptyFilter = new ProductFilterRequestDTO();
+        Page<ProductListDTO> products = productService.searchProducts(emptyFilter, pageable);
+        
+        return ResponseEntity.ok(products);
+    }
 }
