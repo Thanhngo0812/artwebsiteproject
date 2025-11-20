@@ -497,7 +497,6 @@ public class ProductService {
         return paginateProducts(sortedProducts, pageable);
     }
 
-    // ← ← ← THÊM METHOD MỚI: getNewestProductsWithSort
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getNewestProductsWithSort(Pageable pageable, String sortParam) {
         Pageable top20 = PageRequest.of(0, 20, Sort.by("id").descending());

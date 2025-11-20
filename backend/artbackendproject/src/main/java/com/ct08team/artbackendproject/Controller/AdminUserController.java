@@ -4,6 +4,7 @@ import com.ct08team.artbackendproject.DTO.User.UserDTO;
 import com.ct08team.artbackendproject.DTO.User.UserFilterRequestDTO;
 import com.ct08team.artbackendproject.DTO.User.UserUpdateDTO;
 import com.ct08team.artbackendproject.Service.Admin.AdminUserService;
+import com.ct08team.artbackendproject.DTO.User.UserCreateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -85,5 +86,11 @@ public class AdminUserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         adminUserService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createUser(@RequestBody UserCreateDTO createDTO) {
+        UserDTO created = adminUserService.createUser(createDTO);
+        return ResponseEntity.ok(created);
     }
 }

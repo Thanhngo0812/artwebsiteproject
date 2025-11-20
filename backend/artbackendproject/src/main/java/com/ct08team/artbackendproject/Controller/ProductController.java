@@ -178,7 +178,6 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    // ← ← ← THÊM API MỚI: Lấy sản phẩm khuyến mãi có filter
     @PostMapping("/on-sale/filter")
     public ResponseEntity<?> getOnSaleProductsWithFilter(
             @RequestBody ProductFilterRequestDTO filterRequest,
@@ -338,7 +337,6 @@ public class ProductController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         
-        // ===== SỬA: Dùng searchProducts với filter rỗng =====
         ProductFilterRequestDTO emptyFilter = new ProductFilterRequestDTO();
         Page<ProductListDTO> products = productService.searchProducts(emptyFilter, pageable);
         

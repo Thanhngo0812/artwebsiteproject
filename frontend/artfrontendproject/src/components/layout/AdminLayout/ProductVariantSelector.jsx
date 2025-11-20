@@ -30,7 +30,7 @@ export default function ProductVariantSelector({ isOpen, onClose, onSelect }) {
       const res = await axios.get(`${API_BASE_URL}/api/products/admin/list`, {
         params: { 
           page: 0, 
-          size: 50
+          size: 25
         },
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });

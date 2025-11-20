@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./User.scss";
-import { FaChevronUp, FaChevronDown, FaTrash, FaLock, FaUnlock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaChevronUp, FaChevronDown, FaEdit, FaTrash, FaPlus, FaLock, FaUnlock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+
+const API_BASE_URL = 'http://localhost:8888';
 
 export default function User() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [availableRoles, setAvailableRoles] = useState(['ROLE_USER', 'ROLE_ADMIN']); 
   const [openFilter, setOpenFilter] = useState(true);
   const [filters, setFilters] = useState({
     id: "",
@@ -31,6 +35,73 @@ export default function User() {
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
   };
 
+  const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState(false);
+  const [editRoleForm, setEditRoleForm] = useState({
+    userId: null,
+    username: '',
+    currentRole: '',
+    newRole: 'ROLE_USER'
+  });
+
+  const [createForm, setCreateForm] = useState({
+    username: '',
+    password: '',
+    email: '',
+    fullName: '',
+    phoneNumber: '',
+    roles: ['ROLE_USER'] // Default
+  });
+
+
+  const handleCreateUser = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('user');
+      
+      await axios.post(`${API_BASE_URL}/api/admin/users`, createForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      showToast('Tạo user thành công!', 'success');
+      setIsCreateModalOpen(false);
+      setCreateForm({
+        username: '',
+        password: '',
+        email: '',
+        fullName: '',
+        phoneNumber: '',
+        roles: ['ROLE_USER']
+      });
+      fetchUsers();
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Lỗi khi tạo user';
+      showToast(msg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditRole = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('user');
+      
+      await axios.put(
+        `${API_BASE_URL}/api/admin/users/${editRoleForm.userId}`,
+        { roles: [editRoleForm.newRole] },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      showToast('Cập nhật role thành công!', 'success');
+      setIsEditRoleModalOpen(false);
+      fetchUsers();
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Lỗi khi cập nhật role';
+      showToast(msg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleResetFilters = () => {
     setFilters({
       id: "",
@@ -66,37 +137,35 @@ export default function User() {
     return "ACTIVE";
   };
 
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage - 1,
+        size: pageSize,
+        ...(filters.id && { id: filters.id }),
+        ...(filters.username && { username: filters.username }),
+        ...(filters.email && { email: filters.email }),
+        ...(filters.fullname && { fullname: filters.fullname }),
+        ...(filters.role && { role: filters.role }),
+        ...(filters.status && { status: filters.status }),
+      };
+      const token = localStorage.getItem("user");
+      const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
+        params,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(response.data.content);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách người dùng:", error);
+      showToast("Không thể tải danh sách người dùng!", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const params = {
-          page: currentPage - 1,
-          size: pageSize,
-          ...(filters.id && { id: filters.id }),
-          ...(filters.username && { username: filters.username }),
-          ...(filters.email && { email: filters.email }),
-          ...(filters.fullname && { fullname: filters.fullname }),
-          ...(filters.role && { role: filters.role }),
-          ...(filters.status && { status: filters.status }),
-        };
-
-        const token = localStorage.getItem("user");
-        const response = await axios.get("http://localhost:8888/api/admin/users", {
-          params,
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setUsers(response.data.content);
-        setTotalPages(response.data.totalPages);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách người dùng:", error);
-        showToast("Không thể tải danh sách người dùng!", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, [filters, currentPage, pageSize]);
 
@@ -168,6 +237,147 @@ export default function User() {
         <div className={`toast-notification ${toast.type}`}>
           {toast.type === "success" ? <FaCheckCircle /> : <FaTimesCircle />}
           <span>{toast.message}</span>
+        </div>
+      )}
+
+      {isCreateModalOpen && (
+        <div className="confirm-modal-overlay" onClick={() => setIsCreateModalOpen(false)}>
+          <div className="confirm-modal-box create-user-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-modal-header">
+              <FaPlus /> Tạo User Mới
+            </div>
+            
+            <div className="confirm-modal-body">
+              <div className="form-row">
+                <label>Username <span className="required">*</span></label>
+                <input
+                  type="text"
+                  value={createForm.username}
+                  onChange={(e) => setCreateForm({...createForm, username: e.target.value})}
+                  placeholder="Nhập username..."
+                />
+              </div>
+
+              <div className="form-row">
+                <label>Email <span className="required">*</span></label>
+                <input
+                  type="email"
+                  value={createForm.email}
+                  onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
+                  placeholder="email@example.com"
+                />
+              </div>
+
+              <div className="form-row">
+                <label>Password <span className="required">*</span></label>
+                <input
+                  type="password"
+                  value={createForm.password}
+                  onChange={(e) => setCreateForm({...createForm, password: e.target.value})}
+                  placeholder="Nhập password..."
+                />
+              </div>
+
+              <div className="form-row">
+                <label>Họ tên</label>
+                <input
+                  type="text"
+                  value={createForm.fullName}
+                  onChange={(e) => setCreateForm({...createForm, fullName: e.target.value})}
+                  placeholder="Nguyễn Văn A"
+                />
+              </div>
+
+              <div className="form-row">
+                <label>Số điện thoại</label>
+                <input
+                  type="text"
+                  value={createForm.phoneNumber}
+                  onChange={(e) => setCreateForm({...createForm, phoneNumber: e.target.value})}
+                  placeholder="0901234567"
+                />
+              </div>
+
+              <div className="form-row">
+                <label>Role <span className="required">*</span></label>
+                <div className="role-radios">
+                  {availableRoles.map(role => (
+                    <label key={role} className="role-radio">
+                      <input
+                        type="radio"
+                        name="role"
+                        checked={createForm.roles[0] === role}
+                        onChange={() => setCreateForm({...createForm, roles: [role]})}
+                      />
+                      <span className="radio-custom"></span>
+                      <span className="role-label">{role.replace('ROLE_', '')}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setIsCreateModalOpen(false)}>
+                Hủy
+              </button>
+              <button className="btn-primary" onClick={handleCreateUser}>
+                <FaCheckCircle /> Tạo User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditRoleModalOpen && (
+        <div className="confirm-modal-overlay" onClick={() => setIsEditRoleModalOpen(false)}>
+          <div className="confirm-modal-box edit-role-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-modal-header">
+              <FaEdit /> Sửa Role User
+            </div>
+            
+            <div className="confirm-modal-body">
+              <div className="user-info-box">
+                <strong>Username:</strong> {editRoleForm.username}
+                <br />
+                <strong>Role hiện tại:</strong> 
+                <span className={`role-badge ${editRoleForm.currentRole.toLowerCase()}`}>
+                  {editRoleForm.currentRole.replace('ROLE_', '')}
+                </span>
+              </div>
+
+              <div className="form-row">
+                <label>Role mới <span className="required">*</span></label>
+                <div className="role-radios">
+                  {availableRoles.map(role => (
+                    <label key={role} className="role-radio">
+                      <input
+                        type="radio"
+                        name="newRole"
+                        checked={editRoleForm.newRole === role}
+                        onChange={() => setEditRoleForm({...editRoleForm, newRole: role})}
+                      />
+                      <span className="radio-custom"></span>
+                      <span className="role-label">{role.replace('ROLE_', '')}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setIsEditRoleModalOpen(false)}>
+                Hủy
+              </button>
+              <button 
+                className="btn-primary" 
+                onClick={handleEditRole}
+                disabled={editRoleForm.newRole === editRoleForm.currentRole}
+              >
+                <FaCheckCircle /> Cập nhật
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -268,7 +478,12 @@ export default function User() {
 
       {/* BẢNG NGƯỜI DÙNG */}
       <div className="show-users">
-        <div className="show-users_title">DANH SÁCH NGƯỜI DÙNG</div>
+        <div className="show-users_header">
+          <h2>Quản lý User</h2>
+          <button className="btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+            <FaPlus /> Tạo User
+          </button>
+        </div>
         <div className="show-users_content">
           {loading ? (
             <div style={{ textAlign: "center", padding: "40px", color: "#6b7280" }}>
@@ -327,6 +542,21 @@ export default function User() {
                         <td data-label="Ngày Tạo">{formatDate(user.createdAt)}</td>
                         <td data-label="Hành động">
                           <div className="action-buttons">
+                            <button
+                              className="btn-action edit"
+                              onClick={() => {
+                                setEditRoleForm({
+                                  userId: user.id,
+                                  username: user.username,
+                                  currentRole: user.roles[0]?.name || 'ROLE_USER',
+                                  newRole: user.roles[0]?.name || 'ROLE_USER'
+                                });
+                                setIsEditRoleModalOpen(true);
+                              }}
+                              title="Sửa role"
+                            >
+                              <FaEdit />
+                            </button>
                             <button
                               className="btn-toggle-status"
                               onClick={() => triggerToggleStatus(user, getUserStatus(user))}

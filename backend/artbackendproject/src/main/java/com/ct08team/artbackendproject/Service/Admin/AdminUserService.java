@@ -7,6 +7,8 @@ import com.ct08team.artbackendproject.DTO.User.UserFilterRequestDTO;
 import com.ct08team.artbackendproject.DTO.User.UserUpdateDTO;
 import com.ct08team.artbackendproject.Entity.auth.Role;
 import com.ct08team.artbackendproject.Entity.auth.User;
+import com.ct08team.artbackendproject.Exception.UserAlreadyExistsException;
+import com.ct08team.artbackendproject.Exception.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.ct08team.artbackendproject.DTO.User.UserCreateDTO;
 
 @Service
 public class AdminUserService {
@@ -27,6 +31,62 @@ public class AdminUserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UserDTO createUser(UserCreateDTO createDTO) {
+
+
+        if (createDTO.getUsername() == null || createDTO.getUsername().isEmpty()) {
+            throw new ValidationException("Username không được để trống");
+        }
+        if (createDTO.getPassword() == null || createDTO.getPassword().isEmpty()) {
+            throw new ValidationException("Password không được để trống");
+        }
+        if (createDTO.getEmail() == null || createDTO.getEmail().isEmpty()) {
+            throw new ValidationException("Email không được để trống");
+        }
+        
+
+        if (userRepository.existsByUsername(createDTO.getUsername())) {
+            throw new UserAlreadyExistsException("Username đã tồn tại");
+        }
+        if (userRepository.existsByEmail(createDTO.getEmail())) {
+            throw new UserAlreadyExistsException("Email đã tồn tại");
+        }
+        
+        User user = new User();
+        user.setUsername(createDTO.getUsername());
+        user.setEmail(createDTO.getEmail());
+        user.setFullName(createDTO.getFullName());
+        user.setPhoneNumber(createDTO.getPhoneNumber());
+        // encode password
+        user.setPassword(passwordEncoder.encode(createDTO.getPassword()));
+        // by default enable account
+        user.setEnabled(true);
+        user.setAccountNonLocked(true);
+
+        Set<Role> roles = new HashSet<>();
+        if (createDTO.getRoles() != null && !createDTO.getRoles().isEmpty()) {
+            for (String roleName : createDTO.getRoles()) {
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                roles.add(role);
+            }
+        } else {
+            // fallback to ROLE_USER
+            Role defaultRole = roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new RuntimeException("Default role ROLE_USER not found"));
+            roles.add(defaultRole);
+        }
+
+        user.setRoles(roles);
+
+        User saved = userRepository.save(user);
+        return convertToDTO(saved);
+    }
 
     @Transactional(readOnly = true)
     public Page<UserDTO> getUsers(UserFilterRequestDTO filter, Pageable pageable) {
