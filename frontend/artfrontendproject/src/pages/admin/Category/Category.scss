@@ -1,0 +1,410 @@
+// Variables
+$primary-color: #4a90e2;
+$secondary-color: #f5f6fa;
+$text-color: #2f3542;
+$danger-color: #ff6b6b;
+$success-color: #2ecc71;
+$border-color: #dfe4ea;
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+
+.category-manager {
+    padding: 20px;
+    background-color: #f1f2f6;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+
+        h2 {
+            color: $text-color;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .btn-add-parent {
+            background-color: $primary-color;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: $shadow;
+
+            &:hover {
+                background-color: darken($primary-color, 10%);
+                transform: translateY(-2px);
+            }
+        }
+    }
+
+    .loading {
+        text-align: center;
+        font-size: 18px;
+        color: #7f8c8d;
+        margin-top: 50px;
+    }
+
+    // Grid Layout
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: $shadow;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            position: relative;
+
+            &:hover {
+                transform: translateY(-5px);
+                box-shadow: $hover-shadow;
+                border-color: lighten($primary-color, 20%);
+
+                .card-icon {
+                    color: $primary-color;
+                    background-color: lighten($primary-color, 40%);
+                }
+            }
+
+            .card-icon {
+                font-size: 40px;
+                color: #a4b0be;
+                margin-bottom: 15px;
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background-color: #f1f2f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+
+            .card-info {
+                flex: 1;
+
+                h3 {
+                    margin: 0 0 5px;
+                    font-size: 18px;
+                    color: $text-color;
+                }
+
+                p {
+                    margin: 0;
+                    font-size: 14px;
+                    color: #7f8c8d;
+                }
+            }
+
+            .card-actions {
+                margin-top: 15px;
+                display: flex;
+                gap: 10px;
+                opacity: 0.6;
+                transition: opacity 0.3s;
+
+                .btn-icon {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 16px;
+                    padding: 8px;
+                    border-radius: 50%;
+                    transition: background 0.2s;
+
+                    &.edit {
+                        color: $primary-color;
+
+                        &:hover {
+                            background: lighten($primary-color, 45%);
+                        }
+                    }
+
+                    &.delete {
+                        color: $danger-color;
+
+                        &:hover {
+                            background: lighten($danger-color, 40%);
+                        }
+                    }
+                }
+            }
+
+            &:hover .card-actions {
+                opacity: 1;
+            }
+        }
+    }
+
+    // Modal Styles
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease-out;
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+
+            &.small {
+                width: 400px;
+            }
+
+            &.large {
+                width: 800px;
+                max-height: 85vh;
+            }
+
+            .modal-header {
+                padding: 20px;
+                border-bottom: 1px solid $border-color;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #f8f9fa;
+
+                h3 {
+                    margin: 0;
+                    font-size: 20px;
+                    color: $text-color;
+
+                    .highlight {
+                        color: $primary-color;
+                    }
+                }
+
+                .close-btn {
+                    background: none;
+                    border: none;
+                    font-size: 20px;
+                    cursor: pointer;
+                    color: #a4b0be;
+
+                    &:hover {
+                        color: $danger-color;
+                    }
+                }
+            }
+
+            .modal-body {
+                padding: 20px;
+                overflow-y: auto;
+
+                // Input styles for Parent Modal
+                input[type="text"] {
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid $border-color;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    outline: none;
+                    transition: border-color 0.2s;
+
+                    &:focus {
+                        border-color: $primary-color;
+                        box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+                    }
+                }
+
+                // Child Form
+                .child-form {
+                    display: flex;
+                    gap: 10px;
+                    margin-bottom: 20px;
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid $border-color;
+
+                    input {
+                        flex: 1;
+                    }
+
+                    .btn-save-child {
+                        background-color: $success-color;
+                        color: white;
+                        border: none;
+                        padding: 0 20px;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+
+                        &:hover {
+                            background-color: darken($success-color, 10%);
+                        }
+                    }
+
+                    .btn-cancel-edit {
+                        background-color: #95a5a6;
+                        color: white;
+                        border: none;
+                        padding: 0 15px;
+                        border-radius: 8px;
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: darken(#95a5a6, 10%);
+                        }
+                    }
+                }
+
+                // Child Table
+                .child-list-container {
+                    .child-table {
+                        width: 100%;
+                        border-collapse: collapse;
+
+                        th,
+                        td {
+                            padding: 12px 15px;
+                            text-align: left;
+                            border-bottom: 1px solid $border-color;
+                        }
+
+                        th {
+                            background-color: #f8f9fa;
+                            color: #7f8c8d;
+                            font-weight: 600;
+                            font-size: 14px;
+                        }
+
+                        td {
+                            color: $text-color;
+                        }
+
+                        tr:last-child td {
+                            border-bottom: none;
+                        }
+
+                        tr.editing {
+                            background-color: #fff9c4;
+                        }
+
+                        .text-right {
+                            text-align: right;
+                        }
+
+                        .empty-text {
+                            text-align: center;
+                            color: #a4b0be;
+                            padding: 30px;
+                        }
+
+                        .btn-action {
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            margin-left: 10px;
+                            font-size: 16px;
+                            transition: transform 0.2s;
+
+                            &.edit {
+                                color: $primary-color;
+                            }
+
+                            &.delete {
+                                color: $danger-color;
+                            }
+
+                            &:hover {
+                                transform: scale(1.2);
+                            }
+                        }
+                    }
+                }
+            }
+
+            .modal-footer {
+                padding: 15px 20px;
+                border-top: 1px solid $border-color;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                background-color: #f8f9fa;
+
+                button {
+                    padding: 10px 20px;
+                    border-radius: 6px;
+                    border: none;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+
+                .btn-cancel {
+                    background-color: #dfe4ea;
+                    color: $text-color;
+
+                    &:hover {
+                        background-color: darken(#dfe4ea, 5%);
+                    }
+                }
+
+                .btn-save {
+                    background-color: $primary-color;
+                    color: white;
+
+                    &:hover {
+                        background-color: darken($primary-color, 10%);
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

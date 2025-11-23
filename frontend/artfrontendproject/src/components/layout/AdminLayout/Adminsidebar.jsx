@@ -1,6 +1,6 @@
 import React from "react";
 import "./Adminsidebar.scss";
-import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt } from "react-icons/fa";
+import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt, FaTags } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
 
 export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar }) {
@@ -10,6 +10,7 @@ export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar 
     { path: "suppliers", name: "Suppliers", icon: <FaTruck /> },
     { path: "goods-receipts", name: "Goods Receipts", icon: <FaReceipt /> },
     { path: "user", name: "Users", icon: <FaUsers /> },
+    { path: "category", name: "Category", icon: <FaTags /> },
   ];
 
   return (
@@ -18,9 +19,8 @@ export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar 
       {showSidebar && <div className="sidebar-overlay" onClick={() => setShowSidebar(false)}></div>}
 
       <div
-        className={`sidebar-container ${!openSidebar ? "close" : ""} ${
-          showSidebar ? "show-mobile" : ""
-        }`}
+        className={`sidebar-container ${!openSidebar ? "close" : ""} ${showSidebar ? "show-mobile" : ""
+          }`}
       >
         <div className="sidebar-header">
           <div className="logo">

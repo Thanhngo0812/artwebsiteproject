@@ -12,12 +12,11 @@ class AuthService {
       })
       .then(response => {
         if (response.data.token) {
-          localStorage.setItem('user', JSON.stringify(response.data));
+          // Store just the token string to be consistent with VerifyOTP
+          localStorage.setItem('user', response.data.token);
         }
         return response.data;
-      })
-      // .catch(error=>{return error});
-
+      });
   }
 
   logout() {
@@ -37,57 +36,46 @@ class AuthService {
 
   getAuthHeader() {
     const user = this.getCurrentUser();
-    if (user && user.token) {
+    if (user) {
       return { Authorization: 'Bearer ' + user };
     } else {
       return {};
     }
   }
 
-  // SỬA LỖI Ở ĐÂY: Dùng arrow function để `this` luôn đúng
   isLoggedIn = () => {
-    return (!!this.getCurrentUser&&!this.isTokenExpired());
+    return (!!this.getCurrentUser() && !this.isTokenExpired());
   }
 
-  // SỬA LỖI Ở ĐÂY: Dùng arrow function
   getUserRole() {
-    const user = this.getCurrentUser(); // getCurrentUser lấy từ localStorage
+    const user = this.getCurrentUser();
     if (user) {
       try {
         const decodedToken = jwtDecode(user);
-        // Backend Spring Security thường trả về roles trong một mảng
-        return decodedToken.roles[0] || null;
+        // Return the full array of roles
+        return decodedToken.roles || [];
       } catch (error) {
-        return null;
+        return [];
       }
     }
-    return null;
+    return [];
   }
 
   isTokenExpired() {
     const user = this.getCurrentUser();
-    if (!user ) {
-      return true; // Coi như hết hạn nếu không có token
+    if (!user) {
+      return true;
     }
 
     try {
       const decodedToken = jwtDecode(user);
-   
-      // Lấy thời gian hết hạn (exp) từ token (đơn vị là giây)
-      const expirationTime = decodedToken.exp; 
-     
-      // Lấy thời gian hiện tại (đơn vị là giây)
+      const expirationTime = decodedToken.exp;
       const currentTime = Date.now() / 1000;
-     
-      // So sánh: nếu thời gian hết hạn nhỏ hơn thời gian hiện tại, token đã hết hạn
       return expirationTime < currentTime;
-
     } catch (error) {
-      // Token không hợp lệ cũng coi như đã hết hạn
       return true;
     }
   }
-
 }
 
 export default new AuthService();

@@ -1,19 +1,23 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../../hooks/useCart';
+import { useAuth } from '../../../context/AuthContext';
+import { toast } from 'react-toastify';
 import './Cart.css';
 
 export default function Cart() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
-  const { 
-    cartItems, 
-    updateQuantity, 
-    updateSize, 
-    removeItem, 
-    getTotal 
+  const {
+    cartItems,
+    updateQuantity,
+    updateSize,
+    removeItem,
+    getTotal
   } = useCart();
-  
+
   const [availableVariants, setAvailableVariants] = useState({});
   const [productStatuses, setProductStatuses] = useState({});
   const [productPromotions, setProductPromotions] = useState({});
@@ -31,13 +35,13 @@ export default function Cart() {
     try {
       setLoading(true);
       const response = await fetch(`http://localhost:8888/api/products/${productId}`);
-      
+
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
+
       const data = await response.json();
 
       const variants = data.variants || [];
-      
+
       setAvailableVariants(prev => ({
         ...prev,
         [productId]: variants
@@ -84,16 +88,16 @@ export default function Cart() {
   const handleDimensionChange = (index, newVariantId) => {
     const productId = cartItems[index].productId;
     const variants = availableVariants[productId];
-    
+
     if (!variants) return;
-    
+
     const selectedVariant = variants.find(v => v.id === parseInt(newVariantId));
-    
+
     if (selectedVariant) {
       const currentQuantity = cartItems[index].quantity;
-      
+
       const priceData = calculateVariantPromotion(productId, selectedVariant.price);
-      
+
       if (currentQuantity > selectedVariant.stockQuantity) {
         updateSize(
           index,
@@ -104,7 +108,7 @@ export default function Cart() {
           priceData.originalPrice,
           priceData.promotionalPrice
         );
-        
+
         const quantityDelta = selectedVariant.stockQuantity - currentQuantity;
         updateQuantity(index, quantityDelta);
       } else {
@@ -128,7 +132,7 @@ export default function Cart() {
 
   const handleQuantityInputBlur = (index) => {
     const inputValue = editingQuantity[index];
-    
+
     if (!inputValue || inputValue === '') {
       setEditingQuantity(prev => {
         const newState = { ...prev };
@@ -137,30 +141,30 @@ export default function Cart() {
       });
       return;
     }
-    
+
     let newQuantity = parseInt(inputValue, 10);
-    
+
     if (isNaN(newQuantity) || newQuantity < 1) {
       newQuantity = 1;
     }
-    
+
     const item = cartItems[index];
     const variants = availableVariants[item.productId];
-    
+
     if (variants) {
       const currentVariant = variants.find(v => v.dimensions === item.dimensions);
-      
+
       if (currentVariant && newQuantity > currentVariant.stockQuantity) {
         alert(`Chỉ còn ${currentVariant.stockQuantity} sản phẩm!`);
         newQuantity = currentVariant.stockQuantity;
       }
     }
-    
+
     const delta = newQuantity - item.quantity;
     if (delta !== 0) {
       updateQuantity(index, delta);
     }
-    
+
     setEditingQuantity(prev => {
       const newState = { ...prev };
       delete newState[index];
@@ -175,20 +179,20 @@ export default function Cart() {
   const handleQuantityButton = (index, delta) => {
     const item = cartItems[index];
     const newQuantity = item.quantity + delta;
-    
+
     if (newQuantity < 1) return;
-    
+
     const variants = availableVariants[item.productId];
     if (variants) {
       const currentVariant = variants.find(v => v.dimensions === item.dimensions);
-      
+
       if (currentVariant && newQuantity > currentVariant.stockQuantity) return;
     }
-    
+
     updateQuantity(index, delta);
   };
 
-  const validCartItems = cartItems.filter(item => 
+  const validCartItems = cartItems.filter(item =>
     productStatuses[item.productId] === 1
   );
 
@@ -242,20 +246,20 @@ export default function Cart() {
 
         {validCartItems.map((item, index) => {
           const originalIndex = cartItems.findIndex(
-            ci => ci.productId === item.productId && 
-                  ci.categoryId === item.categoryId && 
-                  ci.dimensions === item.dimensions
+            ci => ci.productId === item.productId &&
+              ci.categoryId === item.categoryId &&
+              ci.dimensions === item.dimensions
           );
           const variants = availableVariants[item.productId] || [];
           const currentVariant = variants.find(v => v.dimensions === item.dimensions);
           const maxStock = currentVariant ? currentVariant.stockQuantity : 999;
-          
+
           const hasPromotion = item.promotionalPrice && item.promotionalPrice < item.originalPrice;
           const discountPercent = hasPromotion ? calculateDiscount(item.originalPrice, item.promotionalPrice) : 0;
-          
+
           return (
             <div key={`${item.productId}-${item.categoryId}-${item.dimensions}-${index}`} className="cart-item">
-              <div 
+              <div
                 className="item-info"
                 onClick={() => handleProductClick(item.productId)}
                 style={{ cursor: 'pointer' }}
@@ -263,7 +267,7 @@ export default function Cart() {
                 <img src={item.thumbnail} alt={item.productname} />
                 <div className="item-details">
                   <h3>{item.productname}</h3>
-                  
+
                   {hasPromotion ? (
                     <div className="item-price-container">
                       <p className="item-price item-price-promo">
@@ -284,15 +288,15 @@ export default function Cart() {
                 <div className="controls-row">
                   <div className="size-selector">
                     <label>Size:</label>
-                    <select 
+                    <select
                       value={currentVariant ? currentVariant.id : ''}
                       onChange={(e) => handleDimensionChange(originalIndex, e.target.value)}
                       className="size-dropdown"
                       disabled={loading || variants.length === 0}
                     >
                       {variants.map(variant => (
-                        <option 
-                          key={variant.id} 
+                        <option
+                          key={variant.id}
                           value={variant.id}
                           disabled={variant.stockQuantity === 0}
                         >
@@ -305,14 +309,14 @@ export default function Cart() {
                   <div className="quantity-selector">
                     <label>Số lượng:</label>
                     <div className="quantity-controls">
-                      <button 
+                      <button
                         onClick={() => handleQuantityButton(originalIndex, -1)}
                         disabled={item.quantity <= 1}
                         className="qty-btn"
                       >
                         −
                       </button>
-                      
+
                       <input
                         type="text"
                         inputMode="numeric"
@@ -322,8 +326,8 @@ export default function Cart() {
                         onBlur={() => handleQuantityInputBlur(originalIndex)}
                         onKeyPress={(e) => handleQuantityKeyPress(e, originalIndex)}
                       />
-                      
-                      <button 
+
+                      <button
                         onClick={() => handleQuantityButton(originalIndex, 1)}
                         disabled={item.quantity >= maxStock}
                         className="qty-btn"
@@ -333,17 +337,17 @@ export default function Cart() {
                     </div>
                   </div>
                 </div>
-                
+
                 {currentVariant && (
                   <span className="stock-info">
-                    {currentVariant.stockQuantity < 10 
-                      ? `Chỉ còn ${currentVariant.stockQuantity}` 
+                    {currentVariant.stockQuantity < 10
+                      ? `Chỉ còn ${currentVariant.stockQuantity}`
                       : `Còn ${currentVariant.stockQuantity}`}
                   </span>
                 )}
 
-                <button 
-                  className="remove-btn" 
+                <button
+                  className="remove-btn"
                   onClick={() => removeItem(originalIndex)}
                 >
                   🗑️
@@ -363,7 +367,7 @@ export default function Cart() {
           <span className="shipping-icon">🚚</span>
           <span>MIỄN PHÍ SHIP cho đơn hàng từ 800K. Hỗ trợ lắp đặt tại TPHCM và một số tỉnh lân cận.</span>
         </div>
-        
+
         <div className="cart-summary">
           <div className="summary-row">
             <span>Tạm tính:</span>
@@ -380,8 +384,18 @@ export default function Cart() {
             </span>
           </div>
         </div>
-        
-        <button className="checkout-btn">
+
+        <button
+          className="checkout-btn"
+          onClick={() => {
+            if (!currentUser) {
+              toast.error('Vui lòng đăng nhập để thanh toán!');
+              navigate('/login');
+              return;
+            }
+            navigate('/checkout');
+          }}
+        >
           Tiến hành đặt hàng
         </button>
       </div>

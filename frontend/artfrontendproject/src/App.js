@@ -32,10 +32,11 @@ import ResetPasswordPage from "./pages/auth/ResetPassword/ResetPassword";
 import ProductAdmin_Add from "./pages/admin/ProductManagement/ProductAdmin_Add";
 import Suppliers from "./pages/admin/Suppliers/Suppliers";
 import GoodsReceipts from "./pages/admin/Suppliers/GoodsReceipts";
+import Category from "./pages/admin/Category/Category";
 
 function App() {
   return (
-    <AuthProvider> 
+    <AuthProvider>
       <BrowserRouter>
         <div className="App">
           <Routes>
@@ -46,7 +47,7 @@ function App() {
               <Route path="products" element={<ProductUser />} />
               <Route path="products/:id" element={<ProductDetail />} />
               <Route path="products/search" element={<ProductListPage />} />
-               <Route path="checkout" element={<CheckoutPage />} />
+              <Route path="checkout" element={<CheckoutPage />} />
 
             </Route>
 
@@ -70,24 +71,28 @@ function App() {
 
 
             {/* ← ← ← ROUTE ADMIN (CẦN LOGIN + ROLE_ADMIN) */}
-            {/* <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
+            <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="product" element={<Product />} />
                 <Route path="user" element={<User />} />
+                <Route path="suppliers" element={<Suppliers />} />
+                <Route path="goods-receipts" element={<GoodsReceipts />} />
                 <Route path="product/new" element={<ProductAdmin_Add />} />
+                <Route path="category" element={<Category />} />
               </Route>
-            </Route> */}
-            <Route path="/admin" element={<AdminLayout />}>
+            </Route>
+            {/* <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="product" element={<Product />} />
               <Route path="user" element={<User />} />
               <Route path="suppliers" element={<Suppliers />} />
               <Route path="goods-receipts" element={<GoodsReceipts />} />
-              <Route path="product/new" element={<ProductAdmin_Add/>}/>
+              <Route path="product/new" element={<ProductAdmin_Add />} />
+              <Route path="category" element={<Category />} />
             </Route>
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} /> */}
           </Routes>
 
           <ToastContainer
