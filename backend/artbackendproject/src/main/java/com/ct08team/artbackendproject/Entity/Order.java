@@ -95,10 +95,11 @@ public class Order {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
     // --- MỚI THÊM: Quan hệ với OrderPromotion ---
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // --- SỬA: Đổi từ OneToMany sang OneToOne ---
+    // Vì 1 Order chỉ có tối đa 1 Promotion
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<OrderPromotion> orderPromotions = new ArrayList<>();
-
+    private OrderPromotion orderPromotion;
     // --- Mối quan hệ ---
 
     // Liên kết với OrderItems
@@ -117,14 +118,13 @@ public class Order {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Promotion> promotions = new HashSet<>();
-    public List<OrderPromotion> getOrderPromotions() { return orderPromotions; }
-    public void setOrderPromotions(List<OrderPromotion> orderPromotions) { this.orderPromotions = orderPromotions; }
-
-    // Helper để thêm promotion dễ dàng
-    public void addOrderPromotion(OrderPromotion op) {
-        if (this.orderPromotions == null) this.orderPromotions = new ArrayList<>();
-        this.orderPromotions.add(op);
-        op.setOrder(this);
+    // Getter Setter mới cho orderPromotion
+    public OrderPromotion getOrderPromotion() { return orderPromotion; }
+    public void setOrderPromotion(OrderPromotion orderPromotion) {
+        this.orderPromotion = orderPromotion;
+        if(orderPromotion != null) {
+            orderPromotion.setOrder(this);
+        }
     }
     // --- Helper Methods ---
     // (Giúp 'OrderService' (file 'com/ct08team/artbackendproject/Service/Order/OrderService.java') dễ dàng hơn)

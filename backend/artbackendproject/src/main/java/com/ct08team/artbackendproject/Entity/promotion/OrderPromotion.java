@@ -1,5 +1,6 @@
 package com.ct08team.artbackendproject.Entity.promotion;
 
+
 import com.ct08team.artbackendproject.Entity.Order;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -9,36 +10,35 @@ import java.math.BigDecimal;
 @Table(name = "order_promotions")
 public class OrderPromotion {
 
-    @EmbeddedId
-    private OrderPromotionKey id = new OrderPromotionKey();
+    // Lấy order_id làm khóa chính luôn
+    @Id
+    @Column(name = "order_id")
+    private Long orderId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("orderId") // Map với field orderId trong Key
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId // Hibernate sẽ copy ID từ Order bỏ vào biến orderId ở trên
     @JoinColumn(name = "order_id")
     @JsonBackReference
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("promotionId") // Map với field promotionId trong Key
-    @JoinColumn(name = "promotion_id")
+    @JoinColumn(name = "promotion_id", nullable = false)
     private Promotion promotion;
 
     @Column(name = "discount_applied_for_this_order", nullable = false)
     private BigDecimal discountApplied;
 
-    // Constructors
     public OrderPromotion() {}
 
     public OrderPromotion(Order order, Promotion promotion, BigDecimal discountApplied) {
         this.order = order;
         this.promotion = promotion;
         this.discountApplied = discountApplied;
-        this.id = new OrderPromotionKey(order.getId(), promotion.getId());
     }
 
     // Getters and Setters
-    public OrderPromotionKey getId() { return id; }
-    public void setId(OrderPromotionKey id) { this.id = id; }
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
 
     public Order getOrder() { return order; }
     public void setOrder(Order order) { this.order = order; }

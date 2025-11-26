@@ -109,7 +109,7 @@ public class OrderService {
             orderPromotion.setDiscountApplied(orderDTO.getDiscountAmount());
 
             // Thêm vào list của Order để Cascade lưu xuống DB
-            order.addOrderPromotion(orderPromotion);
+            order.setOrderPromotion(orderPromotion);
 
             // d. Tăng số lượt sử dụng của mã
             promotion.setUsageCount(promotion.getUsageCount() + 1);
