@@ -14,6 +14,8 @@ import com.ct08team.artbackendproject.Entity.auth.User;
 
 import com.ct08team.artbackendproject.Entity.product.ProductVariant;
 
+import com.ct08team.artbackendproject.Entity.promotion.OrderPromotion;
+import com.ct08team.artbackendproject.Entity.promotion.Promotion;
 import com.ct08team.artbackendproject.Service.VnpayService; // <-- QUAY LẠI VNPAY
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -80,9 +84,38 @@ public class OrderService {
         order.setPaymentStatus("UNPAID");
         order.setOrderStatus("PENDING");
 
-        if (orderDTO.getPromotionCode() != null) {
-            // Logic coupon...
+        // 3. XỬ LÝ LOGIC COUPON (Lưu vào bảng order_promotions)
+        if (orderDTO.getPromotionCode() != null && !orderDTO.getPromotionCode().isEmpty()) {
+            // a. Tìm khuyến mãi trong DB
+            Promotion promotion = promotionRepository.findByCode(orderDTO.getPromotionCode())
+                    .orElseThrow(() -> new RuntimeException("Mã khuyến mãi không tồn tại!"));
+
+            // b. Validate lại ở Backend (Quan trọng để bảo mật)
+            LocalDateTime now = LocalDateTime.now();
+
+            if (!promotion.isActive() || now.isBefore(promotion.getStartDate()) || now.isAfter(promotion.getEndDate())) {
+                throw new RuntimeException("Mã khuyến mãi đã hết hạn hoặc chưa kích hoạt.");
+            }
+            if (promotion.getUsageLimit() != null && promotion.getUsageCount() >= promotion.getUsageLimit()) {
+                throw new RuntimeException("Mã khuyến mãi đã hết lượt sử dụng.");
+            }
+            // (Có thể check thêm minOrderValue nếu cần)
+
+            // c. Tạo liên kết Order - Promotion
+            // Dù Frontend đã tính tiền, ta lấy số tiền đó lưu vào để đối soát
+            OrderPromotion orderPromotion = new OrderPromotion();
+            orderPromotion.setOrder(order); // Liên kết với đơn hàng hiện tại
+            orderPromotion.setPromotion(promotion);
+            orderPromotion.setDiscountApplied(orderDTO.getDiscountAmount());
+
+            // Thêm vào list của Order để Cascade lưu xuống DB
+            order.addOrderPromotion(orderPromotion);
+
+            // d. Tăng số lượt sử dụng của mã
+            promotion.setUsageCount(promotion.getUsageCount() + 1);
+            promotionRepository.save(promotion);
         }
+
 
         List<OrderItem> orderItems = new ArrayList<>();
         for (OrderDTO.ItemDTO itemDTO : orderDTO.getItems()) {

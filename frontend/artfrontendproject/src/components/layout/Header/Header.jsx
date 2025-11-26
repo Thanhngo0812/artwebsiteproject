@@ -384,7 +384,7 @@ export default function Header() {
             {/* Tooltip hiện khi hover (chỉ hiện khi menu không mở) */}
             {!isUserMenuOpen && (
               <div className="user-hover-tooltip">
-                {isLoggedIn ? `Xin chào, ${username}` : "Đăng nhập/Đăng kí ngay"}
+                {isLoggedIn ? `Xin chào, ${username}` : 'Trở thành thành viên TRANH XỊN ngay' }
               </div>
             )}
 
