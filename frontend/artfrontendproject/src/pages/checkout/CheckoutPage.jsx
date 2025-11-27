@@ -425,7 +425,11 @@ export default function CheckoutPage() {
       markerRef.current = marker;
     }
   };
-
+// Hàm cắt chuỗi nếu dài quá số ký tự cho phép (ví dụ 65 ký tự)
+const truncateText = (text, maxLength = 80) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
   // =======================================================
   // SỬA: XỬ LÝ ÁP DỤNG MÃ COUPON (Gửi cả Tạm tính)
   // =======================================================
@@ -865,6 +869,7 @@ export default function CheckoutPage() {
     .btn-place-order:disabled {
       background-color: #aaa;
     }
+ 
   `;
   // ==================================
   // KẾT THÚC CSS
@@ -955,21 +960,30 @@ export default function CheckoutPage() {
               {savedAddresses.length > 0 && (
                 <div className="form-group">
                   <label htmlFor="savedAddress">Chọn địa chỉ đã lưu:</label>
-                  <select
-                    id="savedAddress"
-                    value={selectedAddressId || ''}
-                    onChange={(e) => {
-                      const id = e.target.value ? Number(e.target.value) : null;
-                      handleSelectSavedAddress(savedAddresses.find(a => a.id === id) || null);
-                    }}
-                  >
-                    <option value="">-- Nhập địa chỉ mới bên dưới --</option>
-                    {savedAddresses.map(addr => (
-                      <option key={addr.id} value={addr.id}>
-                        {addr.addressName} ({addr.address})
-                      </option>
-                    ))}
-                  </select>
+               <select
+  id="savedAddress"
+  // Thêm style này để đảm bảo khung select khi đóng không bị tràn
+  style={{ width: "100%", maxWidth: "100%", textOverflow: "ellipsis" }} 
+  value={selectedAddressId || ''}
+  onChange={(e) => {
+    const id = e.target.value ? Number(e.target.value) : null;
+    handleSelectSavedAddress(savedAddresses.find(a => a.id === id) || null);
+  }}
+>
+  <option value="">-- Nhập địa chỉ mới bên dưới --</option>
+  
+  {savedAddresses.map(addr => {
+    // 1. Tạo chuỗi đầy đủ trước
+    const fullLabel = `${addr.isDefault ? '(MẶC ĐỊNH) ' : ''}${addr.addressName}: (${addr.address})`;
+    
+    return (
+      <option key={addr.id} value={addr.id}>
+        {/* 2. Gọi hàm cắt chuỗi để hiển thị */}
+        {truncateText(fullLabel)}
+      </option>
+    );
+  })}
+</select>
                 </div>
               )}
 
