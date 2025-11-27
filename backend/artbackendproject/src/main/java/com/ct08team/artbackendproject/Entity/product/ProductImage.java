@@ -1,5 +1,6 @@
 package com.ct08team.artbackendproject.Entity.product;
 import com.ct08team.artbackendproject.Entity.product.ProductVariant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -13,6 +14,7 @@ public class ProductImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", nullable = false)
+    @JsonIgnore
     private ProductVariant variant;
 
     @Column(name = "image_url", length = 512, nullable = false)

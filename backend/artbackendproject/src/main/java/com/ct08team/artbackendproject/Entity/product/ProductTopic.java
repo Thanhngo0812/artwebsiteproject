@@ -1,6 +1,7 @@
 package com.ct08team.artbackendproject.Entity.product;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -12,6 +13,8 @@ public class ProductTopic {
     private ProductTopicId id;
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId") // Ánh xạ tới trường 'productId' trong ProductTopicId
+    @JsonIgnore // <-- NGẮT VÒNG LẶP (Con trỏ ngược lên Cha)
+
     @JoinColumn(name = "product_id")
     private Product product;
 

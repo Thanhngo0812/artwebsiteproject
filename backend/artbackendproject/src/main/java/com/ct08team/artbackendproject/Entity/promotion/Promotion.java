@@ -48,6 +48,7 @@ public class Promotion {
     private BigDecimal value;
 
     @Column(name = "start_date", nullable = false)
+
     private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = false)

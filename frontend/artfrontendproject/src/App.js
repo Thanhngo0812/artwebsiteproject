@@ -18,6 +18,7 @@ import RegisterPage from "./pages/auth/Register/RegisterPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPassword/ForgotPassword";
 // import ProfilePage from "./pages/profile/ProfilePage";
 import UserProfilePage from "./pages/user/UserProfilePage";
+import OrderHistoryPage from "./pages/order/OrderHistoryPage";
 import ProductDetail from "./pages/product/ProductDetail/ProductDetail";
 import ProductListPage from "./pages/product/ProductList/ProductListPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
@@ -33,6 +34,10 @@ import ProductAdmin_Add from "./pages/admin/ProductManagement/ProductAdmin_Add";
 import Suppliers from "./pages/admin/Suppliers/Suppliers";
 import GoodsReceipts from "./pages/admin/Suppliers/GoodsReceipts";
 import Category from "./pages/admin/Category/Category";
+import ProductAdmin_Edit from "./pages/admin/ProductManagement/ProductAdmin_Edit";
+import OrderManagement from "./pages/admin/OrderManagement/OrderManagement";
+import PromotionManagement from "./pages/admin/Promotion/PromotionManagement";
+import ProductPromotionManagement from "./pages/admin/Promotion/ProductPromotionManagement";
 
 function App() {
   return (
@@ -67,6 +72,9 @@ function App() {
             <Route element={<ProtectedRoute requiredRole="ROLE_USER" />}>
               <Route path="/user/profile" element={<UserProfilePage />} />
               <Route path="/user/paymentcallback" element={<PaymentCallback />} />
+               <Route path="/user/orders" element={<OrderHistoryPage />} />
+
+              
             </Route>
 
 
@@ -80,6 +88,10 @@ function App() {
                 <Route path="suppliers" element={<Suppliers />} />
                 <Route path="goods-receipts" element={<GoodsReceipts />} />
                 <Route path="product/new" element={<ProductAdmin_Add />} />
+                 <Route path="/admin/product/edit/:id" element={<ProductAdmin_Edit />} />
+                  <Route path="order" element={<OrderManagement />} />
+                  <Route path="promotion" element={<PromotionManagement/>} />
+                  <Route path="promotionapply" element={<ProductPromotionManagement/>} />
                 <Route path="category" element={<Category />} />
               </Route>
             </Route>

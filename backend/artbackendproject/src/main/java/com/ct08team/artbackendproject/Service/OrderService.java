@@ -7,6 +7,7 @@ import com.ct08team.artbackendproject.DAO.OrderRepository;
 import com.ct08team.artbackendproject.DAO.ProductVariantRepository;
 import com.ct08team.artbackendproject.DAO.PromotionRepository;
 import com.ct08team.artbackendproject.DTO.OrderDTO;
+import com.ct08team.artbackendproject.DTO.OrderHistoryDTO;
 import com.ct08team.artbackendproject.DTO.PaymentResponseDTO; // Dùng DTO cũ (chỉ có paymentUrl)
 import com.ct08team.artbackendproject.Entity.Order;
 import com.ct08team.artbackendproject.Entity.OrderItem;
@@ -19,13 +20,18 @@ import com.ct08team.artbackendproject.Entity.promotion.Promotion;
 import com.ct08team.artbackendproject.Service.VnpayService; // <-- QUAY LẠI VNPAY
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -152,5 +158,95 @@ public class OrderService {
         } else {
             return new PaymentResponseDTO("OK", "Đặt hàng COD thành công", null);
         }
+    }
+    // API: Lấy danh sách đơn cho Admin
+    @Transactional(readOnly = true)
+    public Page<OrderHistoryDTO> getOrdersForAdmin(String status, String keyword, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+        Instant start = (fromDate != null) ? fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant() : null;
+        Instant end = (toDate != null) ? toDate.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant() : null;
+
+        Page<Order> orders = orderRepository.searchOrdersAdmin(status, keyword, start, end, pageable);
+        return orders.map(OrderHistoryDTO::new);
+    }
+
+    // API: Cập nhật trạng thái đơn hàng
+    @Transactional
+    public void updateOrderStatus(Long orderId, String newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng ID: " + orderId));
+
+        // Logic chuyển trạng thái
+        if ("CANCELLED".equals(newStatus)) {
+            // Nếu Admin hủy -> Hoàn kho
+            if (!"CANCELLED".equals(order.getOrderStatus())) {
+                for (OrderItem item : order.getOrderItems()) {
+                    ProductVariant variant = item.getVariant();
+                    if (variant != null) {
+                        variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+                        variantRepository.save(variant);
+                    }
+                }
+            }
+            order.setPaymentStatus("FAILED");
+        } else if ("PAID".equals(newStatus)) {
+            order.setPaymentStatus("SUCCESSFUL");
+        } else if ("DELIVERED".equals(newStatus)) {
+            if ("COD".equals(order.getPaymentMethod())) {
+                order.setPaymentStatus("SUCCESSFUL");
+            }
+        }
+
+        order.setOrderStatus(newStatus);
+        orderRepository.save(order);
+    }
+    @Transactional(readOnly = true)
+    public Page<OrderHistoryDTO> getUserOrders(String username, LocalDate fromDate, LocalDate toDate, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Instant start = (fromDate != null) ? fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant() : null;
+        Instant end = (toDate != null) ? toDate.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toInstant() : null;
+
+        // 1. Lấy Page<Order> từ Repository
+        Page<Order> orderPage = orderRepository.findByUserAndDateRange(user, start, end, pageable);
+
+        // 2. Chuyển đổi sang Page<OrderHistoryDTO>
+        return orderPage.map(OrderHistoryDTO::new);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrderByUser(Long orderId, String username) {
+        // 1. Tìm đơn hàng
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + orderId));
+
+        // 2. Kiểm tra quyền sở hữu (Bảo mật)
+        // Chỉ cho phép hủy nếu đơn hàng thuộc về user đang đăng nhập
+        if (!order.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Bạn không có quyền hủy đơn hàng này.");
+        }
+
+        // 3. Kiểm tra trạng thái
+        // Chỉ được hủy khi còn PENDING
+        if (!"PENDING".equals(order.getOrderStatus())) {
+            // Thông báo lỗi tùy chỉnh như bạn yêu cầu
+            throw new RuntimeException("Đơn hàng đã được thanh toán hoặc đang xử lý, không thể hủy. Vui lòng liên hệ 0909246319 để được hỗ trợ.");
+        }
+
+        // 4. Hoàn trả tồn kho (Rất quan trọng!)
+        // Khi hủy đơn, phải cộng lại số lượng vào kho
+        for (OrderItem item : order.getOrderItems()) {
+            ProductVariant variant = item.getVariant();
+            variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+            variantRepository.save(variant);
+        }
+
+        // 5. Cập nhật trạng thái
+        order.setOrderStatus("CANCELLED");
+        order.setPaymentStatus("FAILED"); // Hoặc "CANCELLED" tùy logic của bạn
+
+        // (Nếu có coupon, có thể cân nhắc hoàn lại lượt sử dụng, nhưng thường thì không cần)
+
+        orderRepository.save(order);
     }
 }

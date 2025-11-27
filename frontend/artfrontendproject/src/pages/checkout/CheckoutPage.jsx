@@ -559,7 +559,7 @@ export default function CheckoutPage() {
         // Nếu là COD
         toast.success("Đặt hàng thành công!");
         localStorage.removeItem('cart'); // Xóa giỏ hàng
-        navigate('/order-success'); // Chuyển đến trang Cảm ơn
+        navigate('/'); // Chuyển đến trang Cảm ơn
       }
 
     } catch (error) {

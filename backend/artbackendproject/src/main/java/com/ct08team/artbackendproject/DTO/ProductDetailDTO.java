@@ -33,10 +33,12 @@ public class ProductDetailDTO {
         public Long id;
         public String dimensions;
         public Double price;
+        public BigDecimal promotionalPrice;
+
         public Long stockQuantity;
         public VariantDTO() {}
-        public VariantDTO(Long id, String dimensions, Double price, Long stockQuantity) {
-            this.id = id; this.dimensions = dimensions; this.price = price; this.stockQuantity = stockQuantity;
+        public VariantDTO(Long id, String dimensions, Double price, Long stockQuantity, BigDecimal promotionalPrice) {
+            this.id = id; this.dimensions = dimensions; this.price = price; this.stockQuantity = stockQuantity;this.promotionalPrice = promotionalPrice;
         }
     }
 

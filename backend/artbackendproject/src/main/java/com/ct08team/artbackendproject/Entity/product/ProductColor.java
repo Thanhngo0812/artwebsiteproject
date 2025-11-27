@@ -1,5 +1,6 @@
 package com.ct08team.artbackendproject.Entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -9,6 +10,8 @@ import java.util.Objects;
 public class ProductColor {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore // <-- NGẮT VÒNG LẶP (Con trỏ ngược lên Cha)
+
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
     
