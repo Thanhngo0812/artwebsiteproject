@@ -1,9 +1,16 @@
 package com.ct08team.artbackendproject.Service.Promotion;
 
+import com.ct08team.artbackendproject.DAO.CategoryRepository;
+import com.ct08team.artbackendproject.DAO.ProductRepository;
 import com.ct08team.artbackendproject.DAO.PromotionRepository;
+import com.ct08team.artbackendproject.DTO.ProductSimpleDTO;
 import com.ct08team.artbackendproject.DTO.Promotion.PromotionDTO;
+import com.ct08team.artbackendproject.Entity.product.Category;
+import com.ct08team.artbackendproject.Entity.product.Product;
 import com.ct08team.artbackendproject.Entity.promotion.Promotion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,12 +20,18 @@ import java.time.ZoneId;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PromotionService {
 
     @Autowired
     private PromotionRepository promotionRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     /**
      * Xử lý logic áp dụng mã coupon
@@ -89,6 +102,63 @@ public class PromotionService {
                 message);
     }
 
+    public Page<Promotion> findAll(String keyword, Pageable pageable) {
+        // (Nếu có keyword thì search, không thì findAll)
+        if (keyword != null && !keyword.isEmpty()) {
+            // Bạn cần viết thêm query trong PromotionRepository:
+            // findByNameContainingOrCodeContaining
+            return promotionRepository.findAll(pageable); // Tạm thời trả về tất cả
+        }
+        return promotionRepository.findAll(pageable);
+    }
+
+    public Promotion findById(Long id) {
+        return promotionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi ID: " + id));
+    }
+
+    @Transactional
+    public Promotion create(Promotion p) {
+        // Validate
+        if (p.getStartDate() != null && p.getEndDate() != null && p.getStartDate().isAfter(p.getEndDate())) {
+            throw new RuntimeException("Ngày bắt đầu phải trước ngày kết thúc.");
+        }
+        // (Nếu là coupon, kiểm tra code trùng)
+        if (p.getCode() != null && !p.getCode().isEmpty()) {
+            if (promotionRepository.findByCode(p.getCode()).isPresent()) {
+                throw new RuntimeException("Mã code đã tồn tại.");
+            }
+            p.setCode(p.getCode().toUpperCase());
+        }
+
+        return promotionRepository.save(p);
+    }
+
+    @Transactional
+    public Promotion update(Long id, Promotion p) {
+        Promotion existing = findById(id);
+
+        existing.setName(p.getName());
+        existing.setDescription(p.getDescription());
+        existing.setImageUrl(p.getImageUrl()); // Cập nhật ảnh
+        existing.setCode(p.getCode() != null ? p.getCode().toUpperCase() : null);
+        existing.setType(p.getType());
+        existing.setValue(p.getValue());
+        existing.setStartDate(p.getStartDate());
+        existing.setEndDate(p.getEndDate());
+        existing.setActive(p.isActive());
+        existing.setMinOrderValue(p.getMinOrderValue());
+        existing.setMaxDiscountValue(p.getMaxDiscountValue());
+        existing.setUsageLimit(p.getUsageLimit());
+
+        return promotionRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        promotionRepository.deleteById(id);
+    }
+
     // (Hàm format tiền tệ giả lập)
     private String formatCurrency(BigDecimal value) {
         // (Bạn nên có một hàm helper chung cho việc này)
@@ -108,5 +178,64 @@ public class PromotionService {
     public Promotion getPromotionById(Long id) {
         return promotionRepository.findByIdWithProducts(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    // SỬA: Trả về List<ProductSimpleDTO> thay vì Set<Product>
+    public List<ProductSimpleDTO> getProductsByPromotion(Long promoId) {
+        Promotion p = findById(promoId);
+        // Convert Entity -> DTO để tránh lỗi JSON Loop / Hibernate Proxy
+        return p.getProducts().stream()
+                .map(ProductSimpleDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void addProductToPromotion(Long promoId, Long productId) {
+        Promotion p = findById(promoId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+        p.getProducts().add(product);
+        promotionRepository.save(p);
+    }
+
+    @Transactional
+    public void removeProductFromPromotion(Long promoId, Long productId) {
+        Promotion p = findById(promoId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+        p.getProducts().remove(product);
+        promotionRepository.save(p);
+    }
+
+    // --- QUẢN LÝ DANH MỤC ÁP DỤNG ---
+    // (Danh mục thường ít bị lỗi Proxy hơn vì nó đơn giản, nhưng nếu bị thì làm
+    // tương tự)
+
+    @Transactional(readOnly = true)
+    public Set<Category> getCategoriesByPromotion(Long promoId) {
+        Promotion p = findById(promoId);
+        // Ép tải dữ liệu (nếu cần thiết để tránh LazyInitializationException bên
+        // Controller)
+        p.getCategories().size();
+        return p.getCategories();
+    }
+
+    @Transactional
+    public void addCategoryToPromotion(Long promoId, Long categoryId) {
+        Promotion p = findById(promoId);
+        Category c = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
+        p.getCategories().add(c);
+        promotionRepository.save(p);
+    }
+
+    @Transactional
+    public void removeCategoryFromPromotion(Long promoId, Long categoryId) {
+        Promotion p = findById(promoId);
+        Category c = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
+        p.getCategories().remove(c);
+        promotionRepository.save(p);
     }
 }

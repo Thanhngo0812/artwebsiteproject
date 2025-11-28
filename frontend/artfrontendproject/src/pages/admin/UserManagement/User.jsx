@@ -541,35 +541,43 @@ export default function User() {
                         <td data-label="Ngày Tạo">{formatDate(user.createdAt)}</td>
                         <td data-label="Hành động">
                           <div className="action-buttons">
-                            <button
-                              className="btn-action edit"
-                              onClick={() => {
-                                setEditRoleForm({
-                                  userId: user.id,
-                                  username: user.username,
-                                  currentRole: user.roles[0] || 'ROLE_USER',
-                                  newRole: user.roles[0] || 'ROLE_USER'
-                                });
-                                setIsEditRoleModalOpen(true);
-                              }}
-                              title="Sửa role"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              className="btn-toggle-status"
-                              onClick={() => triggerToggleStatus(user, getUserStatus(user))}
-                              title={getUserStatus(user) === "ACTIVE" ? "Khóa" : "Mở khóa"}
-                            >
-                              {getUserStatus(user) === "ACTIVE" ? <FaLock /> : <FaUnlock />}
-                            </button>
-                            <button
-                              className="btn-delete"
-                              onClick={() => triggerDeleteUser(user)}
-                              title="Xóa"
-                            >
-                              <FaTrash />
-                            </button>
+                            {user.id === 1 && user.roles.includes("ROLE_ADMIN") ? (
+                              <span style={{ color: '#999', fontSize: '12px', fontStyle: 'italic' }}>
+                                Super Admin
+                              </span>
+                            ) : (
+                              <>
+                                <button
+                                  className="btn-action edit"
+                                  onClick={() => {
+                                    setEditRoleForm({
+                                      userId: user.id,
+                                      username: user.username,
+                                      currentRole: user.roles[0] || 'ROLE_USER',
+                                      newRole: user.roles[0] || 'ROLE_USER'
+                                    });
+                                    setIsEditRoleModalOpen(true);
+                                  }}
+                                  title="Sửa role"
+                                >
+                                  <FaEdit />
+                                </button>
+                                <button
+                                  className="btn-toggle-status"
+                                  onClick={() => triggerToggleStatus(user, getUserStatus(user))}
+                                  title={getUserStatus(user) === "ACTIVE" ? "Khóa" : "Mở khóa"}
+                                >
+                                  {getUserStatus(user) === "ACTIVE" ? <FaLock /> : <FaUnlock />}
+                                </button>
+                                <button
+                                  className="btn-delete"
+                                  onClick={() => triggerDeleteUser(user)}
+                                  title="Xóa"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>

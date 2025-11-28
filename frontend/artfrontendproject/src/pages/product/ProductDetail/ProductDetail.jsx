@@ -155,9 +155,8 @@ export default function ProductDetail() {
 
   const inStock = selectedVariant && selectedVariant.stockQuantity > 0;
 
-  const displayPrice = selectedVariant 
-    ? (calculateVariantPromoPrice(selectedVariant.price) || selectedVariant.price)
-    : (product.promotionalPrice || product.minPrice);
+  const displayPrice = selectedVariant.promotionalPrice? selectedVariant.promotionalPrice:selectedVariant.price;
+
 
   const originalPrice = selectedVariant 
     ? selectedVariant.price 
@@ -237,7 +236,8 @@ export default function ProductDetail() {
               <label>Chọn kích thước:</label>
               <div className="pd-variant-options">
                 {product.variants.map((variant) => {
-                  const variantPromoPrice = calculateVariantPromoPrice(variant.price);
+                  const variantPromoPrice = variant.promotionalPrice
+                  console.log(variant)
                   const variantHasPromo = variantPromoPrice && variantPromoPrice < variant.price;
                   const variantDiscount = variantHasPromo 
                     ? calculateDiscount(variant.price, variantPromoPrice)

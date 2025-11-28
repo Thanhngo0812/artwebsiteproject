@@ -1,9 +1,17 @@
 import React from "react";
 import "./Adminsidebar.scss";
-import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt, FaTags } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt, FaTags, FaShoppingCart, FaGift, FaPercentage, FaSignOutAlt } from "react-icons/fa";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar }) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   const menuItem = [
     { path: "", name: "Dashboard", icon: <FaChartLine /> },
     { path: "product", name: "Products", icon: <FaBoxOpen /> },
@@ -11,6 +19,12 @@ export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar 
     { path: "goods-receipts", name: "Goods Receipts", icon: <FaReceipt /> },
     { path: "user", name: "Users", icon: <FaUsers /> },
     { path: "category", name: "Category", icon: <FaTags /> },
+    { path: "order", name: "Orders", icon: <FaShoppingCart /> },
+    { path: "promotion", name: "Promotions", icon: <FaGift /> },
+    { path: "promotionapply", name: "Promotion Products", icon: <FaPercentage /> },
+
+
+
   ];
 
   return (
@@ -56,6 +70,20 @@ export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar 
               </div>
             </NavLink>
           ))}
+
+          <div
+            className="nav-items logout"
+            onClick={handleLogout}
+            style={{ cursor: "pointer", marginTop: "20px", borderTop: "1px solid rgba(255,255,255,0.1)" }}
+          >
+            <div className="icon"><FaSignOutAlt /></div>
+            <div
+              className="name"
+              style={{ display: openSidebar ? "block" : "none" }}
+            >
+              Đăng xuất
+            </div>
+          </div>
         </div>
       </div>
     </>

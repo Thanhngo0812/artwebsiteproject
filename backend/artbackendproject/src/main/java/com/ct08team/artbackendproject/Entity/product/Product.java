@@ -1,5 +1,6 @@
 package com.ct08team.artbackendproject.Entity.product;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -49,6 +50,7 @@ public class Product {
     private Set<Category> categories = new HashSet<>();
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<ProductVariant> variants = new ArrayList<>();
 
     @Column(name = "min_price")

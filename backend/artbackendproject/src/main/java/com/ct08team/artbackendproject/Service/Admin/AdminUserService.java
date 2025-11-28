@@ -38,7 +38,6 @@ public class AdminUserService {
     @Transactional
     public UserDTO createUser(UserCreateDTO createDTO) {
 
-
         if (createDTO.getUsername() == null || createDTO.getUsername().isEmpty()) {
             throw new ValidationException("Username không được để trống");
         }
@@ -48,7 +47,6 @@ public class AdminUserService {
         if (createDTO.getEmail() == null || createDTO.getEmail().isEmpty()) {
             throw new ValidationException("Email không được để trống");
         }
-        
 
         if (userRepository.existsByUsername(createDTO.getUsername())) {
             throw new UserAlreadyExistsException("Username đã tồn tại");
@@ -56,7 +54,7 @@ public class AdminUserService {
         if (userRepository.existsByEmail(createDTO.getEmail())) {
             throw new UserAlreadyExistsException("Email đã tồn tại");
         }
-        
+
         User user = new User();
         user.setUsername(createDTO.getUsername());
         user.setEmail(createDTO.getEmail());
@@ -93,46 +91,50 @@ public class AdminUserService {
         List<User> users = userRepository.findAll();
 
         List<User> filteredUsers = users.stream()
-            .filter(user -> {
-                if (filter.getId() != null && !user.getId().equals(filter.getId())) {
-                    return false;
-                }
-
-                if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
-                    if (!user.getUsername().toLowerCase().contains(filter.getUsername().toLowerCase())) {
+                .filter(user -> {
+                    if (filter.getId() != null && !user.getId().equals(filter.getId())) {
                         return false;
                     }
-                }
 
-                if (filter.getEmail() != null && !filter.getEmail().isEmpty()) {
-                    if (!user.getEmail().toLowerCase().contains(filter.getEmail().toLowerCase())) {
-                        return false;
+                    if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
+                        if (!user.getUsername().toLowerCase().contains(filter.getUsername().toLowerCase())) {
+                            return false;
+                        }
                     }
-                }
 
-                if (filter.getFullName() != null && !filter.getFullName().isEmpty()) {
-                    if (user.getFullName() == null || 
-                        !user.getFullName().toLowerCase().contains(filter.getFullName().toLowerCase())) {
-                        return false;
+                    if (filter.getEmail() != null && !filter.getEmail().isEmpty()) {
+                        if (!user.getEmail().toLowerCase().contains(filter.getEmail().toLowerCase())) {
+                            return false;
+                        }
                     }
-                }
 
-                if (filter.getRole() != null && !filter.getRole().isEmpty()) {
-                    boolean hasRole = user.getRoles().stream()
-                        .anyMatch(role -> role.getName().equals(filter.getRole()));
-                    if (!hasRole) return false;
-                }
+                    if (filter.getFullName() != null && !filter.getFullName().isEmpty()) {
+                        if (user.getFullName() == null ||
+                                !user.getFullName().toLowerCase().contains(filter.getFullName().toLowerCase())) {
+                            return false;
+                        }
+                    }
 
-                if (filter.getStatus() != null && !filter.getStatus().isEmpty()) {
-                    String status = filter.getStatus();
-                    if (status.equals("ACTIVE") && !user.isEnabled()) return false;
-                    if (status.equals("INACTIVE") && (user.isEnabled() || !user.isAccountNonLocked())) return false;
-                    if (status.equals("BANNED") && user.isAccountNonLocked()) return false;
-                }
+                    if (filter.getRole() != null && !filter.getRole().isEmpty()) {
+                        boolean hasRole = user.getRoles().stream()
+                                .anyMatch(role -> role.getName().equals(filter.getRole()));
+                        if (!hasRole)
+                            return false;
+                    }
 
-                return true;
-            })
-            .collect(Collectors.toList());
+                    if (filter.getStatus() != null && !filter.getStatus().isEmpty()) {
+                        String status = filter.getStatus();
+                        if (status.equals("ACTIVE") && !user.isEnabled())
+                            return false;
+                        if (status.equals("INACTIVE") && (user.isEnabled() || !user.isAccountNonLocked()))
+                            return false;
+                        if (status.equals("BANNED") && user.isAccountNonLocked())
+                            return false;
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), filteredUsers.size());
@@ -143,8 +145,8 @@ public class AdminUserService {
 
         List<User> pageContent = filteredUsers.subList(start, end);
         List<UserDTO> dtoList = pageContent.stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(dtoList, pageable, filteredUsers.size());
     }
@@ -152,14 +154,15 @@ public class AdminUserService {
     @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return convertToDTO(user);
     }
 
     @Transactional
     public UserDTO updateUser(Long id, UserUpdateDTO updateDTO) {
+        checkSuperAdmin(id);
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (updateDTO.getFullName() != null) {
             user.setFullName(updateDTO.getFullName());
@@ -185,7 +188,7 @@ public class AdminUserService {
             Set<Role> roles = new HashSet<>();
             for (String roleName : updateDTO.getRoles()) {
                 Role role = roleRepository.findByName(roleName)
-                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
                 roles.add(role);
             }
             user.setRoles(roles);
@@ -197,8 +200,9 @@ public class AdminUserService {
 
     @Transactional
     public UserDTO toggleUserStatus(Long id) {
+        checkSuperAdmin(id);
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.isEnabled()) {
             user.setEnabled(false);
@@ -213,8 +217,9 @@ public class AdminUserService {
 
     @Transactional
     public UserDTO banUser(Long id) {
+        checkSuperAdmin(id);
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setEnabled(false);
         user.setAccountNonLocked(false);
@@ -225,6 +230,7 @@ public class AdminUserService {
 
     @Transactional
     public void deleteUser(Long id) {
+        checkSuperAdmin(id);
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found");
         }
@@ -233,20 +239,25 @@ public class AdminUserService {
 
     private UserDTO convertToDTO(User user) {
         Set<String> roleNames = user.getRoles().stream()
-            .map(Role::getName)
-            .collect(Collectors.toSet());
+                .map(Role::getName)
+                .collect(Collectors.toSet());
 
         return new UserDTO(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getFullName(),
-            user.getPhoneNumber(),
-            user.isEnabled(),
-            user.isAccountNonLocked(),
-            roleNames,
-            user.getCreatedAt(),
-            user.getUpdatedAt()
-        );
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getPhoneNumber(),
+                user.isEnabled(),
+                user.isAccountNonLocked(),
+                roleNames,
+                user.getCreatedAt(),
+                user.getUpdatedAt());
+    }
+
+    private void checkSuperAdmin(Long userId) {
+        if (userId == 1L) {
+            throw new RuntimeException("Không thể chỉnh sửa, khóa hoặc xóa tài khoản Super Admin");
+        }
     }
 }

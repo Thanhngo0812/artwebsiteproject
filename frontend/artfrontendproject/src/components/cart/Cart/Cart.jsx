@@ -68,20 +68,20 @@ export default function Cart() {
     }
   };
 
-  const calculateVariantPromotion = (productId, variantPrice) => {
-    const promo = productPromotions[productId];
-    if (!promo || !promo.promotionalPrice || !promo.minPrice) {
-      return { price: variantPrice, originalPrice: variantPrice, promotionalPrice: null };
-    }
+  const calculateVariantPromotion = (variant) => {
+    // const promo = productPromotions[productId];
+    // if (!promo || !promo.promotionalPrice || !promo.minPrice) {
+    //   return { price: variantPrice, originalPrice: variantPrice, promotionalPrice: null };
+    // }
 
-    const discountPercent = (promo.minPrice - promo.promotionalPrice) / promo.minPrice;
-    const discount = variantPrice * discountPercent;
-    const promoPrice = variantPrice - discount;
+    // const discountPercent = (promo.minPrice - promo.promotionalPrice) / promo.minPrice;
+    // const discount = variantPrice * discountPercent;
+    // const promoPrice = variantPrice - discount;
 
     return {
-      price: promoPrice,
-      originalPrice: variantPrice,
-      promotionalPrice: promoPrice
+      price: variant.promotionalPrice?variant.promotionalPrice:variant.price,
+      originalPrice: variant.price,
+      promotionalPrice: variant.promotionalPrice
     };
   };
 
@@ -96,7 +96,7 @@ export default function Cart() {
     if (selectedVariant) {
       const currentQuantity = cartItems[index].quantity;
 
-      const priceData = calculateVariantPromotion(productId, selectedVariant.price);
+      const priceData = calculateVariantPromotion(selectedVariant);
 
       if (currentQuantity > selectedVariant.stockQuantity) {
         updateSize(

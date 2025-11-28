@@ -1,5 +1,6 @@
 package com.ct08team.artbackendproject.Entity.product;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ public class ProductVariant {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonBackReference
+
     private Product product;
 
     @Column(name = "dimensions", length = 20, nullable = false)

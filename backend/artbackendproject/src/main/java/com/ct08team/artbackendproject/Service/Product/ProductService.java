@@ -3,12 +3,10 @@ package com.ct08team.artbackendproject.Service.Product;
 import com.ct08team.artbackendproject.DAO.CategoryRepository;
 import com.ct08team.artbackendproject.DAO.MaterialRepository;
 import com.ct08team.artbackendproject.DAO.ProductRepository;
-import com.ct08team.artbackendproject.DTO.ProductAdminDTO;
-import com.ct08team.artbackendproject.DTO.ProductCreateDTO;
-import com.ct08team.artbackendproject.DTO.ProductDetailDTO;
-import com.ct08team.artbackendproject.DTO.ProductListDTO;
+import com.ct08team.artbackendproject.DTO.*;
 import com.ct08team.artbackendproject.DTO.Filter.ProductFilterRequestDTO;
 import com.ct08team.artbackendproject.Entity.product.*;
+import com.ct08team.artbackendproject.Entity.promotion.Promotion;
 import com.ct08team.artbackendproject.Service.Filter.FilterService;
 import com.ct08team.artbackendproject.Service.Promotion.PromotionCalculationService;
 import com.ct08team.artbackendproject.Service.Storage.StorageService;
@@ -97,6 +95,8 @@ public class ProductService {
 
             dto.originalPrice = p.getMinPrice();
             Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(p);
+            Promotion promotion = promotionCalculationService.calculateBestPromotion(p);
+
             dto.promotionalPrice = promoPriceOpt.orElse(null);
 
             // Categories
@@ -106,6 +106,7 @@ public class ProductService {
                     .collect(Collectors.toList());
 
             // Variants
+
             dto.variants = p.getVariants() == null ? List.of() :
                 p.getVariants().stream()
                     .filter(v -> v.getVariantStatus() == 1)
@@ -113,8 +114,8 @@ public class ProductService {
                         v.getId(),
                         v.getDimensions(),
                         v.getPrice() == null ? 0.0 : v.getPrice().doubleValue(),
-                        v.getStockQuantity()
-                    ))
+                        v.getStockQuantity(),
+                            (promotion!=null)?(promotionCalculationService.calculateDiscountedPrice(v.getPrice(),promotion)):null ))
                     .collect(Collectors.toList());
 
             List<ProductDetailDTO.ImageDTO> imgs = new ArrayList<>();
@@ -342,7 +343,132 @@ public class ProductService {
         product.setProductStatus(newStatus);
         productRepository.save(product);
     }
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProduct(Long id, ProductUpdateDTO dto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm ID: " + id));
 
+        // 1. Cập nhật thông tin cơ bản
+        product.setProductName(dto.getProductName());
+        product.setDescription(dto.getDescription());
+        product.setThumbnail(dto.getThumbnail());
+        product.setProductStatus(dto.getProductStatus());
+
+        // 2. Cập nhật Material
+        if (dto.getMaterialId() != null) {
+            Material m = materialRepository.findById(dto.getMaterialId())
+                    .orElseThrow(() -> new RuntimeException("Material not found"));
+            product.setMaterial(m);
+        }
+
+        // 3. Cập nhật Categories (Many-to-Many)
+        // Với Many-to-Many, clear() và addAll() thường an toàn hơn One-to-Many
+        product.getCategories().clear();
+        if (dto.getCategories() != null) {
+            System.out.println(1);
+
+            for (var catRef : dto.getCategories()) {
+                categoryRepository.findById(catRef.getId())
+                        .ifPresent(c -> product.getCategories().add(c));
+            }
+        }
+
+        // 4. Cập nhật Topics (One-to-Many với Composite Key) -> Nơi gây lỗi
+        // GIẢI PHÁP: Thay vì clear() toàn bộ, hãy đồng bộ hóa danh sách
+        if (dto.getTopics() != null) {
+            // A. Xóa những topic không còn trong danh sách mới
+            List<String> newTopicNames = dto.getTopics().stream()
+                    .map(ProductUpdateDTO.TopicRef::getTopicName).toList();
+
+            product.getTopics().removeIf(t -> !newTopicNames.contains(t.getTopicName()));
+
+            // B. Thêm những topic mới chưa có
+            for (String name : newTopicNames) {
+                boolean exists = product.getTopics().stream()
+                        .anyMatch(t -> t.getTopicName().equals(name));
+
+                if (!exists) {
+                    ProductTopic newTopic = new ProductTopic();
+                    newTopic.setTopicName(name);
+                    product.addTopic(newTopic); // Helper method setProduct(this)
+                }
+            }
+        } else {
+            // Nếu list gửi lên null/rỗng -> Xóa hết
+            product.getTopics().clear();
+        }
+
+        // 5. Cập nhật Colors (Tương tự Topics)
+        if (dto.getColors() != null) {
+            List<String> newHexCodes = dto.getColors().stream()
+                    .map(ProductUpdateDTO.ColorRef::getHexCode).toList();
+
+            // Xóa cũ
+            product.getColors().removeIf(c -> !newHexCodes.contains(c.getHexCode()));
+
+            // Thêm mới
+            for (String hex : newHexCodes) {
+                boolean exists = product.getColors().stream()
+                        .anyMatch(c -> c.getHexCode().equals(hex));
+
+                if (!exists) {
+                    ProductColor newColor = new ProductColor();
+                    newColor.setHexCode(hex);
+                    product.addColor(newColor);
+                }
+            }
+        } else {
+            product.getColors().clear();
+        }
+
+        // 6. Cập nhật Variants (Giữ nguyên logic cũ, nó ổn vì dùng ID)
+        if (dto.getVariants() != null) {
+            // A. Xóa các variant không còn trong danh sách gửi lên (nếu muốn cho phép xóa)
+            // (Nhưng yêu cầu của bạn là KHÔNG XÓA variant cũ, nên ta bỏ qua bước remove)
+
+            for (var vDto : dto.getVariants()) {
+                if (vDto.getId() != null) {
+                    // --- UPDATE VARIANT CŨ ---
+                    product.getVariants().stream()
+                            .filter(v -> v.getId().equals(vDto.getId()))
+                            .findFirst()
+                            .ifPresent(v -> {
+                                v.setPrice(vDto.getPrice()); // Chỉ sửa giá bán
+                                // v.setDimensions(vDto.getDimensions()); // (Có thể cho sửa kích thước nếu muốn)
+
+                                // Cập nhật ảnh: Xóa hết cũ, thêm mới từ URL
+                                v.getImages().clear();
+                                if (vDto.getImages() != null) {
+                                    for (var imgRef : vDto.getImages()) {
+                                        ProductImage img = new ProductImage();
+                                        img.setImageUrl(imgRef.getImageUrl());
+                                        v.addImage(img);
+                                    }
+                                }
+                            });
+                } else {
+                    // --- INSERT VARIANT MỚI ---
+                    ProductVariant v = new ProductVariant();
+                    v.setDimensions(vDto.getDimensions());
+                    v.setPrice(vDto.getPrice());
+                    v.setCostPrice(BigDecimal.ZERO);
+                    v.setStockQuantity(0L);
+                    v.setVariantStatus(1);
+
+                    if (vDto.getImages() != null) {
+                        for (var imgRef : vDto.getImages()) {
+                            ProductImage img = new ProductImage();
+                            img.setImageUrl(imgRef.getImageUrl());
+                            v.addImage(img);
+                        }
+                    }
+                    product.addVariant(v);
+                }
+            }
+        }
+
+        productRepository.save(product);
+    }
     /**
      * API: DELETE /api/v1/admin/products/{id}
      * Xóa sản phẩm
@@ -723,5 +849,14 @@ public class ProductService {
         }
         
         return paginateProducts(filteredProducts, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductAdminDetailDTO getProductDetailAdmin(Long id) {
+        // Dùng findById (mặc định của JPA) là đủ, Hibernate sẽ lazy load các relation khi getter được gọi trong DTO
+        // Hoặc dùng query fetch join nếu muốn tối ưu performance
+        return productRepository.findById(id)
+                .map(ProductAdminDetailDTO::new) // Map sang DTO Admin
+                .orElse(null);
     }
 }

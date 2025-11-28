@@ -1,7 +1,9 @@
 package com.ct08team.artbackendproject.Controller;
 
 import com.ct08team.artbackendproject.DTO.ProductAdminDTO;
+import com.ct08team.artbackendproject.DTO.ProductAdminDetailDTO;
 import com.ct08team.artbackendproject.DTO.ProductCreateDTO;
+import com.ct08team.artbackendproject.DTO.ProductUpdateDTO;
 import com.ct08team.artbackendproject.Service.Product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +30,12 @@ public class ProductAdminController {
 
     @Autowired
     private ProductService productService;
-
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductAdminDetailDTO> getProductDetailAdmin(@PathVariable Long id) {
+        ProductAdminDetailDTO detail = productService.getProductDetailAdmin(id);
+        if (detail == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(detail);
+    }
     /**
      * API 1: Tìm kiếm sản phẩm (cho Admin)
      */
@@ -106,6 +113,16 @@ public class ProductAdminController {
         }
     }
     // TODO:
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO updateDTO) {
+        try {
+            productService.updateProduct(id, updateDTO);
+            return ResponseEntity.ok(java.util.Map.of("message", "Cập nhật thành công"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     // API 4: GET /api/v1/admin/products/{id} (Cho trang Edit)
     // API 5: POST /api/v1/admin/products (Cho trang Add New)
     // API 6: PUT /api/v1/admin/products/{id} (Cho trang Edit)

@@ -356,21 +356,41 @@ export default function Header() {
             })}
           </ul>
 
-          <div className="footer-sidebar">
-            <div className="footer-sidebar-login" onClick={handleUserIconClick}>
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
-                alt="User"
-                className="nav-sidebar-icon"
-              />
-              <span>{isLoggedIn ? `Chào, ${username}` : "Đăng nhập"}</span>
+          <div className="nav-right">
+            <button className="icon-button" onClick={openSearch}>
+              <img src="/search.png" alt="Search" className="nav-icon" />
+            </button>
+
+            {/* --- KHU VỰC USER CẬP NHẬT --- */}
+            <div className="user-menu-container" ref={userDropdownRef} style={{ position: 'relative' }}>
+              <button className="icon-button" onClick={handleUserIconClick}>
+                <img src="/user.png" alt="User" className="nav-icon" />
+              </button>
+
+              {/* Tooltip hiện khi hover (chỉ hiện khi menu không mở) */}
+              {!isUserMenuOpen && (
+                <div className="user-hover-tooltip">
+                  {isLoggedIn ? `Xin chào, ${username}` : 'Trở thành thành viên TRANH XỊN ngay'}
+                </div>
+              )}
+
+              {/* Menu Dropdown */}
+              {isLoggedIn && isUserMenuOpen && (
+                <div className="user-dropdown-menu">
+                  <div className="user-dropdown-arrow"></div>
+                  <Link to="/user/profile" className="user-dropdown-item" onClick={() => setIsUserMenuOpen(false)}>
+                    <FaUser className="dropdown-icon" /> Thông tin cá nhân
+                  </Link>
+                  <Link to="/user/orders" className="user-dropdown-item" onClick={() => setIsUserMenuOpen(false)}>
+                    <FaHistory className="dropdown-icon" /> Lịch sử đơn hàng
+                  </Link>
+                  <div className="user-dropdown-divider"></div>
+                  <button className="user-dropdown-item logout-btn" onClick={handleLogout}>
+                    <FaSignOutAlt className="dropdown-icon" /> Đăng xuất
+                  </button>
+                </div>
+              )}
             </div>
-            {isLoggedIn && (
-              <div className="footer-sidebar-login" onClick={handleLogout} style={{ marginTop: '10px' }}>
-                <FaSignOutAlt className="nav-sidebar-icon" style={{ color: '#d32f2f', filter: 'none' }} />
-                <span style={{ color: '#d32f2f' }}>Đăng xuất</span>
-              </div>
-            )}
           </div>
         </div>
 

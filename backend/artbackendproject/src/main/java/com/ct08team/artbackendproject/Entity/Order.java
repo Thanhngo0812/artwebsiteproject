@@ -2,9 +2,11 @@ package com.ct08team.artbackendproject.Entity;
 
 
 import com.ct08team.artbackendproject.Entity.auth.User;
+import com.ct08team.artbackendproject.Entity.promotion.OrderPromotion;
 import com.ct08team.artbackendproject.Entity.promotion.Promotion;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -92,7 +94,12 @@ public class Order {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
+    // --- MỚI THÊM: Quan hệ với OrderPromotion ---
+    // --- SỬA: Đổi từ OneToMany sang OneToOne ---
+    // Vì 1 Order chỉ có tối đa 1 Promotion
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private OrderPromotion orderPromotion;
     // --- Mối quan hệ ---
 
     // Liên kết với OrderItems
@@ -111,7 +118,14 @@ public class Order {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Promotion> promotions = new HashSet<>();
-
+    // Getter Setter mới cho orderPromotion
+    public OrderPromotion getOrderPromotion() { return orderPromotion; }
+    public void setOrderPromotion(OrderPromotion orderPromotion) {
+        this.orderPromotion = orderPromotion;
+        if(orderPromotion != null) {
+            orderPromotion.setOrder(this);
+        }
+    }
     // --- Helper Methods ---
     // (Giúp 'OrderService' (file 'com/ct08team/artbackendproject/Service/Order/OrderService.java') dễ dàng hơn)
     public void addOrderItem(OrderItem item) {

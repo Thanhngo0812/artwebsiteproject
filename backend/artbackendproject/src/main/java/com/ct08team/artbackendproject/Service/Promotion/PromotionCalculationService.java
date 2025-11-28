@@ -84,10 +84,63 @@ public class PromotionCalculationService {
         return Optional.of(bestPrice);
     }
 
+    @Transactional(readOnly = true)
+    public Promotion calculateBestPromotion(Product product) {
+        BigDecimal originalPrice = product.getMinPrice();
+        // Không tính nếu sản phẩm không có giá
+        if (originalPrice == null || originalPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            return null;
+        }
+
+        // 1. Lấy tất cả khuyến mãi tự động đang chạy
+        List<Promotion> activePromotions = promotionRepository.findAllActiveAutomaticPromotions(LocalDateTime.now());
+        // 2. Lấy ID danh mục của sản phẩm này
+        Set<Long> categoryIds = product.getCategories().stream()
+                .map(Category::getId)
+                .collect(Collectors.toSet());
+
+        List<BigDecimal> possiblePrices = new ArrayList<>();
+        Promotion promotional=null;
+        // 3. Duyệt qua từng khuyến mãi
+        for (Promotion promo : activePromotions) {
+            promotional=promo;
+            // Kiểm tra xem khuyến mãi này có áp dụng cho sản phẩm không
+            boolean appliesToProduct = promo.getProducts().stream()
+                    .anyMatch(p -> p.getId().equals(product.getId()));
+            boolean appliesToCategory = promo.getCategories().stream()
+                    .anyMatch(c -> categoryIds.contains(c.getId()));
+
+            // Khuyến mãi toàn cửa hàng (không set sản phẩm, không set danh mục)
+            boolean appliesToAll = promo.getProducts().isEmpty() && promo.getCategories().isEmpty();
+
+            if (appliesToProduct || appliesToCategory || appliesToAll) {
+                // Nếu có, tính giá mới
+                BigDecimal newPrice = calculateDiscountedPrice(originalPrice, promo);
+                possiblePrices.add(newPrice);
+            }
+        }
+
+        // 4. Nếu không có giá nào, trả về empty
+        if (possiblePrices.isEmpty()) {
+            return null;
+        }
+
+        // 5. Tìm giá thấp nhất trong các khuyến mãi
+        BigDecimal bestPrice = Collections.min(possiblePrices);
+        // Đảm bảo giá khuyến mãi không vô lý (ví dụ: cao hơn giá gốc)
+        if (bestPrice.compareTo(originalPrice) >= 0) {
+            return null;
+        }
+
+        // Làm tròn tiền (ví dụ: làm tròn đến 1000đ)
+        bestPrice = bestPrice.setScale(-3, RoundingMode.HALF_UP); // Làm tròn đến hàng nghìn
+        return promotional;
+    }
+
     /**
      * Helper tính toán giá dựa trên loại khuyến mãi
      */
-    private BigDecimal calculateDiscountedPrice(BigDecimal original, Promotion promo) {
+    public BigDecimal calculateDiscountedPrice(BigDecimal original, Promotion promo) {
         if (PromotionType.PERCENTAGE==promo.getType()) {
             BigDecimal discountPercent = promo.getValue().divide(new BigDecimal("100"));
             BigDecimal discountAmount = original.multiply(discountPercent);
@@ -97,7 +150,7 @@ public class PromotionCalculationService {
             }
             return original.subtract(discountAmount);
 
-        } else if ("FIXED_AMOUNT".equals(promo.getType())) {
+        } else if (PromotionType.FIXED_AMOUNT==promo.getType()) {
             BigDecimal newPrice = original.subtract(promo.getValue());
             // Đảm bảo giá không bị âm
             return newPrice.compareTo(BigDecimal.ZERO) > 0 ? newPrice : BigDecimal.ZERO;
