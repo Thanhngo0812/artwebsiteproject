@@ -332,6 +332,29 @@ CREATE TABLE `goods_receipt_items` (
 -- Trigger: sau khi chèn một mục nhập (goods_receipt_items), cập nhật tồn kho và giá trên product_variants
 DELIMITER //
 
+CREATE TRIGGER trg_update_sales_count_after_insert
+AFTER INSERT ON order_items
+FOR EACH ROW
+BEGIN
+    -- Tìm product_id từ variant_id vừa được thêm vào đơn hàng
+    DECLARE p_id BIGINT;
+    
+    SELECT product_id INTO p_id
+    FROM product_variants
+    WHERE variant_id = NEW.variant_id;
+
+    -- Cập nhật sales_count cho sản phẩm đó
+    IF p_id IS NOT NULL THEN
+        UPDATE product
+        SET sales_count = sales_count + NEW.quantity
+        WHERE id = p_id;
+    END IF;
+END;
+//
+
+DELIMITER ;
+DELIMITER //
+
 CREATE TRIGGER trg_update_variant_after_goods_receipt_item_insert
 AFTER INSERT ON goods_receipt_items
 FOR EACH ROW
