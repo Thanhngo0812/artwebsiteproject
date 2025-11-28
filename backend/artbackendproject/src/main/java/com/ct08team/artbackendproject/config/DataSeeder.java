@@ -36,7 +36,7 @@ public class DataSeeder implements CommandLineRunner {
         String username = "ngocongthanhsg0812";
         String email = "ngocongthanhsg0812@gmail.com";
         String plainPassword = "password123";
-        String roleName = "ROLE_USER"; // Đảm bảo role này tồn tại
+        String roleName = "ROLE_ADMIN"; // Đảm bảo role này tồn tại
 
         // 1. Tìm hoặc tạo Role (ví dụ: ROLE_USER)
         Role userRole = roleRepository.findByName(roleName)

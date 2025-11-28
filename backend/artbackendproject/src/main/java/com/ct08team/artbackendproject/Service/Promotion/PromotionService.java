@@ -1,7 +1,5 @@
 package com.ct08team.artbackendproject.Service.Promotion;
 
-
-
 import com.ct08team.artbackendproject.DAO.PromotionRepository;
 import com.ct08team.artbackendproject.DTO.Promotion.PromotionDTO;
 import com.ct08team.artbackendproject.Entity.promotion.Promotion;
@@ -12,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,7 +59,8 @@ public class PromotionService {
         }
         // SỬA: Kiểm tra min_order_value (dùng Tạm tính)
         if (promo.getMinOrderValue() != null && subtotal.compareTo(promo.getMinOrderValue()) < 0) {
-            throw new RuntimeException("Đơn hàng chưa đủ điều kiện (tối thiểu " + formatCurrency(promo.getMinOrderValue()) + ")");
+            throw new RuntimeException(
+                    "Đơn hàng chưa đủ điều kiện (tối thiểu " + formatCurrency(promo.getMinOrderValue()) + ")");
         }
 
         // 3. Tính toán số tiền giảm
@@ -85,13 +86,27 @@ public class PromotionService {
         return new PromotionDTO.ApplyResponse(
                 promo.getCode(),
                 discountAmount,
-                message
-        );
+                message);
     }
 
     // (Hàm format tiền tệ giả lập)
     private String formatCurrency(BigDecimal value) {
         // (Bạn nên có một hàm helper chung cho việc này)
         return value.toString() + " ₫";
+    }
+
+    /**
+     * Lấy danh sách các chương trình Sale tự động đang chạy
+     */
+    public List<Promotion> getAllActiveSales() {
+        return promotionRepository.findAllActiveAutomaticPromotions(LocalDateTime.now());
+    }
+
+    /**
+     * Lấy chi tiết khuyến mãi theo ID
+     */
+    public Promotion getPromotionById(Long id) {
+        return promotionRepository.findByIdWithProducts(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + id));
     }
 }

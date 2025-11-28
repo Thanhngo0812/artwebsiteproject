@@ -1,6 +1,5 @@
 package com.ct08team.artbackendproject.Entity.product;
 
-
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,6 +17,7 @@ public class ProductVariant {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Product product;
 
     @Column(name = "dimensions", length = 20, nullable = false)
@@ -44,7 +44,7 @@ public class ProductVariant {
     }
 
     public ProductVariant(Long id, Product product, String dimensions,
-                          BigDecimal price, BigDecimal costPrice,Long stockQuantity, Integer variantStatus) {
+            BigDecimal price, BigDecimal costPrice, Long stockQuantity, Integer variantStatus) {
         this.id = id;
         this.product = product;
         this.dimensions = dimensions;
@@ -95,7 +95,6 @@ public class ProductVariant {
         this.costPrice = costPrice;
     }
 
-
     public Long getStockQuantity() {
         return stockQuantity;
     }
@@ -133,8 +132,10 @@ public class ProductVariant {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProductVariant that = (ProductVariant) o;
         return Objects.equals(id, that.id);
     }

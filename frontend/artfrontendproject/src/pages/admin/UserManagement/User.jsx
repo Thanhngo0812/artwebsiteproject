@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:8888';
 
 export default function User() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [availableRoles, setAvailableRoles] = useState(['ROLE_USER', 'ROLE_ADMIN']); 
+  const [availableRoles, setAvailableRoles] = useState(['ROLE_USER', 'ROLE_ADMIN']);
   const [openFilter, setOpenFilter] = useState(true);
   const [filters, setFilters] = useState({
     id: "",
@@ -57,11 +57,11 @@ export default function User() {
     try {
       setLoading(true);
       const token = localStorage.getItem('user');
-      
+
       await axios.post(`${API_BASE_URL}/api/admin/users`, createForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       showToast('Tạo user thành công!', 'success');
       setIsCreateModalOpen(false);
       setCreateForm({
@@ -85,13 +85,13 @@ export default function User() {
     try {
       setLoading(true);
       const token = localStorage.getItem('user');
-      
+
       await axios.put(
         `${API_BASE_URL}/api/admin/users/${editRoleForm.userId}`,
         { roles: [editRoleForm.newRole] },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       showToast('Cập nhật role thành công!', 'success');
       setIsEditRoleModalOpen(false);
       fetchUsers();
@@ -246,14 +246,14 @@ export default function User() {
             <div className="confirm-modal-header">
               <FaPlus /> Tạo User Mới
             </div>
-            
+
             <div className="confirm-modal-body">
               <div className="form-row">
                 <label>Username <span className="required">*</span></label>
                 <input
                   type="text"
                   value={createForm.username}
-                  onChange={(e) => setCreateForm({...createForm, username: e.target.value})}
+                  onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })}
                   placeholder="Nhập username..."
                 />
               </div>
@@ -263,7 +263,7 @@ export default function User() {
                 <input
                   type="email"
                   value={createForm.email}
-                  onChange={(e) => setCreateForm({...createForm, email: e.target.value})}
+                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
                   placeholder="email@example.com"
                 />
               </div>
@@ -273,7 +273,7 @@ export default function User() {
                 <input
                   type="password"
                   value={createForm.password}
-                  onChange={(e) => setCreateForm({...createForm, password: e.target.value})}
+                  onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
                   placeholder="Nhập password..."
                 />
               </div>
@@ -283,7 +283,7 @@ export default function User() {
                 <input
                   type="text"
                   value={createForm.fullName}
-                  onChange={(e) => setCreateForm({...createForm, fullName: e.target.value})}
+                  onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })}
                   placeholder="Nguyễn Văn A"
                 />
               </div>
@@ -293,7 +293,7 @@ export default function User() {
                 <input
                   type="text"
                   value={createForm.phoneNumber}
-                  onChange={(e) => setCreateForm({...createForm, phoneNumber: e.target.value})}
+                  onChange={(e) => setCreateForm({ ...createForm, phoneNumber: e.target.value })}
                   placeholder="0901234567"
                 />
               </div>
@@ -307,7 +307,7 @@ export default function User() {
                         type="radio"
                         name="role"
                         checked={createForm.roles[0] === role}
-                        onChange={() => setCreateForm({...createForm, roles: [role]})}
+                        onChange={() => setCreateForm({ ...createForm, roles: [role] })}
                       />
                       <span className="radio-custom"></span>
                       <span className="role-label">{role.replace('ROLE_', '')}</span>
@@ -335,12 +335,12 @@ export default function User() {
             <div className="confirm-modal-header">
               <FaEdit /> Sửa Role User
             </div>
-            
+
             <div className="confirm-modal-body">
               <div className="user-info-box">
                 <strong>Username:</strong> {editRoleForm.username}
                 <br />
-                <strong>Role hiện tại:</strong> 
+                <strong>Role hiện tại:</strong>
                 <span className={`role-badge ${editRoleForm.currentRole.toLowerCase()}`}>
                   {editRoleForm.currentRole.replace('ROLE_', '')}
                 </span>
@@ -355,7 +355,7 @@ export default function User() {
                         type="radio"
                         name="newRole"
                         checked={editRoleForm.newRole === role}
-                        onChange={() => setEditRoleForm({...editRoleForm, newRole: role})}
+                        onChange={() => setEditRoleForm({ ...editRoleForm, newRole: role })}
                       />
                       <span className="radio-custom"></span>
                       <span className="role-label">{role.replace('ROLE_', '')}</span>
@@ -369,8 +369,8 @@ export default function User() {
               <button className="btn-secondary" onClick={() => setIsEditRoleModalOpen(false)}>
                 Hủy
               </button>
-              <button 
-                className="btn-primary" 
+              <button
+                className="btn-primary"
                 onClick={handleEditRole}
                 disabled={editRoleForm.newRole === editRoleForm.currentRole}
               >
@@ -499,15 +499,15 @@ export default function User() {
                     <th>Email</th>
                     <th>Họ Tên</th>
                     <th>Vai Trò</th>
-                    <th style={{textAlign: 'center'}}>Trạng Thái</th>
+                    <th style={{ textAlign: 'center' }}>Trạng Thái</th>
                     <th>Ngày Tạo</th>
-                    <th style={{textAlign: 'center'}}>Hành động</th>
+                    <th style={{ textAlign: 'center' }}>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan="8" style={{textAlign: "center", padding: "40px", color: "#888"}}>
+                      <td colSpan="8" style={{ textAlign: "center", padding: "40px", color: "#888" }}>
                         Không có dữ liệu
                       </td>
                     </tr>
@@ -522,21 +522,20 @@ export default function User() {
                           {user.roles.map((role) => (
                             <span
                               key={role}
-                              className={`role-badge ${
-                                role === "ROLE_ADMIN" ? "admin" : "user"
-                              }`}
+                              className={`role-badge ${role === "ROLE_ADMIN" ? "admin" : "user"
+                                }`}
                             >
                               {role === "ROLE_ADMIN" ? "Admin" : "User"}
                             </span>
                           ))}
                         </td>
-                        <td data-label="Trạng Thái" style={{textAlign: 'center'}}>
+                        <td data-label="Trạng Thái" style={{ textAlign: 'center' }}>
                           <span className={`status-badge ${getUserStatus(user).toLowerCase()}`}>
                             {getUserStatus(user) === "ACTIVE"
                               ? "Hoạt động"
                               : getUserStatus(user) === "INACTIVE"
-                              ? "Tạm khóa"
-                              : "Bị cấm"}
+                                ? "Tạm khóa"
+                                : "Bị cấm"}
                           </span>
                         </td>
                         <td data-label="Ngày Tạo">{formatDate(user.createdAt)}</td>
@@ -548,8 +547,8 @@ export default function User() {
                                 setEditRoleForm({
                                   userId: user.id,
                                   username: user.username,
-                                  currentRole: user.roles[0]?.name || 'ROLE_USER',
-                                  newRole: user.roles[0]?.name || 'ROLE_USER'
+                                  currentRole: user.roles[0] || 'ROLE_USER',
+                                  newRole: user.roles[0] || 'ROLE_USER'
                                 });
                                 setIsEditRoleModalOpen(true);
                               }}

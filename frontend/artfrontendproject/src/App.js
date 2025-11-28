@@ -33,6 +33,7 @@ import ProductAdmin_Add from "./pages/admin/ProductManagement/ProductAdmin_Add";
 import Suppliers from "./pages/admin/Suppliers/Suppliers";
 import GoodsReceipts from "./pages/admin/Suppliers/GoodsReceipts";
 import Category from "./pages/admin/Category/Category";
+import SaleDetail from "./pages/SaleDetail/SaleDetail";
 
 function App() {
   return (
@@ -47,8 +48,8 @@ function App() {
               <Route path="products" element={<ProductUser />} />
               <Route path="products/:id" element={<ProductDetail />} />
               <Route path="products/search" element={<ProductListPage />} />
+              <Route path="sale/:id" element={<SaleDetail />} />
               <Route path="checkout" element={<CheckoutPage />} />
-
             </Route>
 
             {/*trang đăng nhập/ đăng kí*/}
@@ -83,16 +84,6 @@ function App() {
                 <Route path="category" element={<Category />} />
               </Route>
             </Route>
-            {/* <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="product" element={<Product />} />
-              <Route path="user" element={<User />} />
-              <Route path="suppliers" element={<Suppliers />} />
-              <Route path="goods-receipts" element={<GoodsReceipts />} />
-              <Route path="product/new" element={<ProductAdmin_Add />} />
-              <Route path="category" element={<Category />} />
-            </Route>
-            <Route path="*" element={<Navigate to="/" replace />} /> */}
           </Routes>
 
           <ToastContainer

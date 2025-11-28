@@ -1,4 +1,5 @@
 package com.ct08team.artbackendproject.Entity.product;
+
 import com.ct08team.artbackendproject.Entity.product.ProductVariant;
 import jakarta.persistence.*;
 import java.util.Objects;
@@ -13,6 +14,7 @@ public class ProductImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private ProductVariant variant;
 
     @Column(name = "image_url", length = 512, nullable = false)
@@ -55,8 +57,10 @@ public class ProductImage {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProductImage that = (ProductImage) o;
         return Objects.equals(id, that.id);
     }

@@ -1,8 +1,7 @@
 package com.ct08team.artbackendproject.Controller;
 
-
-
 import com.ct08team.artbackendproject.DTO.Promotion.PromotionDTO;
+import com.ct08team.artbackendproject.Entity.promotion.Promotion;
 import com.ct08team.artbackendproject.Service.Promotion.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,4 +35,27 @@ public class PromotionController {
     }
 
     // (Bạn có thể thêm các API Admin CRUD (Tạo/Sửa/Xóa) cho khuyến mãi ở đây)
+
+    /**
+     * API 2: Lấy danh sách các chương trình Sale tự động đang chạy
+     * (Dùng cho Header "Sale")
+     */
+    @GetMapping("/sales")
+    public ResponseEntity<?> getAllActiveSales() {
+        return ResponseEntity.ok(promotionService.getAllActiveSales());
+    }
+
+    /**
+     * API 3: Lấy chi tiết khuyến mãi theo ID
+     * (Dùng cho trang chi tiết Sale)
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPromotionById(@PathVariable Long id) {
+        try {
+            Promotion promotion = promotionService.getPromotionById(id);
+            return ResponseEntity.ok(promotion);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

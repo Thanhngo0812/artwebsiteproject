@@ -770,3 +770,251 @@ COMMIT;
 -- -- KẾT THÚC TRANSACTION
 -- -- ============================================
 -- COMMIT;
+INSERT INTO `promotions` (`name`, `description`, `image_url`, `code`, `type`, `value`, `start_date`, `end_date`, `is_active`, `min_order_value`, `max_discount_value`, `usage_limit`, `usage_count`) VALUES
+
+-- ===== SALE & OFFERS =====
+('Shop All Sale',
+ 'Giảm giá toàn bộ sản phẩm - Khám phá hàng ngàn tác phẩm nghệ thuật đang sale',
+ 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&h=600&fit=crop',
+ NULL,
+ 'PERCENTAGE',
+ 25.00,
+ '2025-11-20 00:00:00',
+ '2025-12-31 23:59:59',
+ TRUE,
+ 0.00,
+ 1000000.00,
+ NULL,
+ 456),
+
+('Bestsellers',
+ 'Giảm giá các tác phẩm bán chạy nhất - Top sản phẩm được yêu thích',
+ 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=1200&h=600&fit=crop',
+ NULL,
+ 'PERCENTAGE',
+ 20.00,
+ '2025-11-15 00:00:00',
+ '2025-12-31 23:59:59',
+ TRUE,
+ 0.00,
+ 500000.00,
+ NULL,
+ 234),
+
+('Last Chance',
+ 'Cơ hội cuối cùng - Sale tới 50% sắp kết thúc',
+ 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200&h=600&fit=crop',
+ NULL,
+ 'PERCENTAGE',
+ 50.00,
+ '2025-11-26 00:00:00',
+ '2025-11-30 23:59:59',
+ TRUE,
+ 0.00,
+ 800000.00,
+ 500,
+ 389),
+
+-- ===== TRANH TRỪU TƯỢNG =====
+('Abstract Art Sale',
+ 'Sale đặc biệt cho tranh trừu tượng - Giảm 35%',
+ NULL,
+ NULL,
+ 'PERCENTAGE',
+ 35.00,
+ '2025-11-20 00:00:00',
+ '2025-12-15 23:59:59',
+ TRUE,
+ 300000.00,
+ 600000.00,
+ NULL,
+ 123),
+
+-- ===== TRANH PHONG CẢNH =====
+('Landscape Sale',
+ 'Giảm giá tranh phong cảnh - Mang thiên nhiên về nhà',
+ 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop',
+ NULL,
+ 'PERCENTAGE',
+ 30.00,
+ '2025-11-25 00:00:00',
+ '2025-12-20 23:59:59',
+ TRUE,
+ 500000.00,
+ 700000.00,
+ NULL,
+ 178),
+
+('Seascape Sale',
+ 'Sale tranh biển - Không gian biển xanh trong lành',
+ NULL,
+ NULL,
+ 'PERCENTAGE',
+ 25.00,
+ '2025-11-20 00:00:00',
+ '2025-12-31 23:59:59',
+ TRUE,
+ 0.00,
+ 400000.00,
+ NULL,
+ 89),
+
+('Mountain & Forest',
+ 'Giảm giá tranh núi rừng - Phong cảnh hùng vĩ',
+ NULL,
+ NULL,
+ 'PERCENTAGE',
+ 30.00,
+ '2025-11-20 00:00:00',
+ '2025-12-25 23:59:59',
+ TRUE,
+ 0.00,
+ 500000.00,
+ NULL,
+ 67),
+
+-- ===== TRANH SƠN DẦU =====
+('Oil Painting Sale',
+ 'Sale tranh sơn dầu chính hãng - Giảm tới 40%',
+ 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&h=600&fit=crop',
+ NULL,
+ 'PERCENTAGE',
+ 40.00,
+ '2025-11-22 00:00:00',
+ '2025-12-10 23:59:59',
+ TRUE,
+ 800000.00,
+ 1000000.00,
+ NULL,
+ 156),
+
+('Portrait Sale',
+ 'Giảm giá tranh chân dung sơn dầu - Tác phẩm độc đáo',
+ NULL,
+ NULL,
+ 'PERCENTAGE',
+ 35.00,
+ '2025-11-20 00:00:00',
+ '2025-12-31 23:59:59',
+ TRUE,
+ 0.00,
+ 600000.00,
+ NULL,
+ 45),
+
+-- ===== KHUNG TRANH =====
+('Frame Sale',
+ 'Sale khung tranh - Đóng khung chuyên nghiệp giá tốt',
+ NULL,
+ NULL,
+ 'FIXED_AMOUNT',
+ 150000.00,
+ '2025-11-15 00:00:00',
+ '2025-12-31 23:59:59',
+ TRUE,
+ 200000.00,
+ NULL,
+ 200,
+ 78),
+
+-- ===== THEO PHONG CÁCH NGHỆ THUẬT =====
+('Impressionism Sale',
+ 'Sale tranh ấn tượng - Phong cách nghệ thuật Pháp',
+ NULL,
+ NULL,
+ 'PERCENTAGE',
+ 30.00,
+ '2025-11-20 00:00:00',
+ '2025-12-20 23:59:59',
+ TRUE,
+ 0.00,
+ 500000.00,
+ NULL,
+ 56),
+
+('Modern Art Sale',
+ 'Sale nghệ thuật hiện đại - Phong cách đương đại',
+ 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200&h=600&fit=crop',
+ NULL,
+ 'PERCENTAGE',
+ 35.00,
+ '2025-11-25 00:00:00',
+ '2025-12-15 23:59:59',
+ TRUE,
+ 400000.00,
+ 800000.00,
+ NULL,
+ 134);
+
+-- ============================================
+-- INSERT PROMOTION_PRODUCTS (SẢN PHẨM 1-17)
+-- ============================================
+
+INSERT INTO `promotion_products` (`promotion_id`, `product_id`) VALUES
+-- Shop All Sale (promotion_id=1)
+(1, 1), (1, 2), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12),
+
+-- Bestsellers (promotion_id=2)
+(2, 1), (2, 2), (2, 4), (2, 8), (2, 16),
+
+-- Last Chance (promotion_id=3)
+(3, 7), (3, 9), (3, 10), (3, 13),
+
+-- Abstract Art Sale (promotion_id=4)
+(4, 1), (4, 11), (4, 12), (4, 13), (4, 14), (4, 15),
+
+-- Seascape Sale (promotion_id=6)
+(6, 2), (6, 9),
+
+-- Portrait Sale (promotion_id=9)
+(9, 4), (9, 16), (9, 17),
+
+-- Frame Sale (promotion_id=10)
+(10, 3);
+
+-- ============================================
+-- INSERT PROMOTION_CATEGORIES
+-- ============================================
+
+INSERT INTO `promotion_categories` (`promotion_id`, `categories_id`) VALUES
+-- Shop All Sale (promotion_id=1)
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5),
+
+-- Bestsellers (promotion_id=2)
+(2, 1), (2, 2), (2, 3), (2, 4),
+
+-- Last Chance (promotion_id=3)
+(3, 1), (3, 2),
+
+-- Abstract Art Sale (promotion_id=4)
+(4, 1), (4, 6), (4, 7), (4, 8), (4, 9),
+
+-- Landscape Sale (promotion_id=5)
+(5, 2), (5, 10), (5, 11), (5, 12), (5, 13),
+
+-- Seascape Sale (promotion_id=6)
+(6, 10),
+
+-- Mountain & Forest (promotion_id=7)
+(7, 11),
+
+-- Oil Painting Sale (promotion_id=8)
+(8, 3), (8, 14), (8, 15), (8, 16),
+
+-- Portrait Sale (promotion_id=9)
+(9, 14),
+
+-- Frame Sale (promotion_id=10)
+(10, 5), (10, 21),
+
+-- Impressionism Sale (promotion_id=11)
+(11, 17),
+
+-- Modern Art Sale (promotion_id=12)
+(12, 16), (12, 18), (12, 19);
+
+-- ============================================
+-- HOÀN TẤT
+-- ============================================
+
+SELECT 'Promotions data inserted successfully!' AS Status;

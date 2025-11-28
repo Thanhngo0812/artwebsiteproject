@@ -3,16 +3,16 @@ import axios from "axios";
 // import productService from "../../service/productService";
 import "./GoodsReceipts.scss";
 import ProductVariantSelector from '../../../components/layout/AdminLayout/ProductVariantSelector';
-import { 
-  FaPlus, 
-  FaTrash, 
-  FaCheckCircle, 
-  FaTimesCircle, 
-  FaChevronDown, 
+import {
+  FaPlus,
+  FaTrash,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaChevronDown,
   FaChevronUp,
   FaSearch,
   FaFileInvoice,
-  FaBoxOpen 
+  FaBoxOpen
 } from "react-icons/fa";
 
 const API_BASE_URL = 'http://localhost:8888';
@@ -28,15 +28,17 @@ export default function GoodsReceipts() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isVariantSelectorOpen, setIsVariantSelectorOpen] = useState(false);
   const [currentRowIndex, setCurrentRowIndex] = useState(null);
-  
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUsername, setCurrentUsername] = useState('');
+
   const [form, setForm] = useState({
     supplierId: '',
     note: '',
     receiptItems: [{ variantId: '', quantity: 1, importPrice: '', newSellingPrice: '' }]
   });
-  
+
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
-  
+
   const [filter, setFilter] = useState({
     supplierId: '',
     receiptCode: '',
@@ -55,13 +57,13 @@ export default function GoodsReceipts() {
 
   useEffect(() => {
     let data = receipts || [];
-    if (filter.supplierId) 
+    if (filter.supplierId)
       data = data.filter(r => String(r.supplierId) === String(filter.supplierId));
-    if (filter.receiptCode) 
-      data = data.filter(r => (r.receiptCode||'').toLowerCase().includes(filter.receiptCode.toLowerCase()));
-    if (filter.dateFrom) 
+    if (filter.receiptCode)
+      data = data.filter(r => (r.receiptCode || '').toLowerCase().includes(filter.receiptCode.toLowerCase()));
+    if (filter.dateFrom)
       data = data.filter(r => new Date(r.createdAt) >= new Date(filter.dateFrom));
-    if (filter.dateTo) 
+    if (filter.dateTo)
       data = data.filter(r => new Date(r.createdAt) <= new Date(filter.dateTo));
     setFilteredReceipts(data);
   }, [filter, receipts]);
@@ -70,16 +72,40 @@ export default function GoodsReceipts() {
     try {
       setLoading(true);
       const token = localStorage.getItem('user');
-      const [r1, r2] = await Promise.all([
+      const [r1, r2, r3] = await Promise.all([
         axios.get(`${API_BASE_URL}/admin/goods-receipts`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get(`${API_BASE_URL}/admin/suppliers`, {
           headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API_BASE_URL}/api/v1/users/me`, {
+          headers: { Authorization: `Bearer ${token}` }
         })
       ]);
       setReceipts(r1.data || []);
       setSuppliers(r2.data || []);
+
+      // Logic mới: Lấy username từ r3 -> Gọi API admin để lấy ID
+      if (r3.data && r3.data.username) {
+        const username = r3.data.username;
+        try {
+          const userRes = await axios.get(`${API_BASE_URL}/api/admin/users`, {
+            params: { username: username },
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          // API trả về phân trang: { content: [...], ... }
+          const foundUser = userRes.data.content && userRes.data.content.find(u => u.username === username);
+
+          if (foundUser) {
+            setCurrentUserId(foundUser.id);
+            setCurrentUsername(foundUser.username);
+          }
+        } catch (uErr) {
+          console.error("Error fetching user details from admin API", uErr);
+        }
+      }
     } catch (err) {
       console.error(err);
       showToast('Không thể tải dữ liệu', 'error');
@@ -90,74 +116,111 @@ export default function GoodsReceipts() {
 
   const fetchReceiptDetails = async (receiptId) => {
     try {
-      const token = localStorage.getItem('user');
-      const res = await axios.get(`${API_BASE_URL}/admin/goods-receipts/${receiptId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSelectedReceipt(res.data);
-      setIsDetailModalOpen(true);
+      const found = receipts.find(r => r.id === receiptId);
+      if (found) {
+        let creatorName = found.creatorName;
+
+        // Nếu không có creatorName (do fullName null), tìm cách lấy username
+        if (!creatorName) {
+          if (found.creatorId === currentUserId) {
+            creatorName = currentUsername;
+          } else {
+            // Gọi API để lấy thông tin user theo ID
+            try {
+              const token = localStorage.getItem('user');
+              const uRes = await axios.get(`${API_BASE_URL}/api/admin/users`, {
+                params: { id: found.creatorId },
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              if (uRes.data.content && uRes.data.content.length > 0) {
+                creatorName = uRes.data.content[0].username;
+              }
+            } catch (e) {
+              console.error("Failed to fetch creator info", e);
+            }
+          }
+        }
+
+        // Map receiptItems -> items để khớp với modal
+        const detailData = {
+          ...found,
+          creatorName: creatorName || `ID: ${found.creatorId}`, // Fallback cuối cùng
+          items: found.receiptItems || found.items || []
+        };
+        setSelectedReceipt(detailData);
+        setIsDetailModalOpen(true);
+      } else {
+        showToast('Không tìm thấy thông tin phiếu nhập', 'error');
+      }
     } catch (err) {
       console.error(err);
-      showToast('Không thể tải chi tiết phiếu nhập', 'error');
+      showToast('Lỗi hiển thị chi tiết', 'error');
     }
   };
 
-  const addItemRow = () => 
-    setForm({ 
-      ...form, 
-      receiptItems: [...form.receiptItems, { variantId: '', quantity: 1, importPrice: '', newSellingPrice: '' }] 
+  const addItemRow = () =>
+    setForm({
+      ...form,
+      receiptItems: [...form.receiptItems, { variantId: '', quantity: 1, importPrice: '', newSellingPrice: '' }]
     });
 
-  const removeItemRow = (idx) => 
-    setForm({ 
-      ...form, 
-      receiptItems: form.receiptItems.filter((_, i) => i !== idx) 
+  const removeItemRow = (idx) =>
+    setForm({
+      ...form,
+      receiptItems: form.receiptItems.filter((_, i) => i !== idx)
     });
 
-  
+
   const handleVariantSelect = (variantData) => {
     const arr = [...form.receiptItems];
     arr[currentRowIndex].variantId = variantData.variantId;
     arr[currentRowIndex].variantInfo = variantData;
-    
-    
+
+
 
     if (!arr[currentRowIndex].importPrice) {
-        let autoImportPrice = 0;
-        
-        
-        if (variantData.costPrice && variantData.costPrice > 0) {
-        autoImportPrice = variantData.costPrice;
-        } 
+      let autoImportPrice = 0;
 
-        else if (variantData.price && variantData.price > 0) {
+
+      if (variantData.costPrice && variantData.costPrice > 0) {
+        autoImportPrice = variantData.costPrice;
+      }
+
+      else if (variantData.price && variantData.price > 0) {
         autoImportPrice = Math.floor(variantData.price * 0.7);
-        }
-        
-        arr[currentRowIndex].importPrice = autoImportPrice;
+      }
+
+      arr[currentRowIndex].importPrice = autoImportPrice;
     }
-    
+
 
     if (!arr[currentRowIndex].newSellingPrice) {
-        arr[currentRowIndex].newSellingPrice = variantData.price || '';
+      arr[currentRowIndex].newSellingPrice = variantData.price || '';
     }
-    
+
     setForm({ ...form, receiptItems: arr });
     setIsVariantSelectorOpen(false);
     setCurrentRowIndex(null);
-};
+  };
 
   const handleCreate = async () => {
     try {
       const token = localStorage.getItem('user');
-      
+
       for (const it of form.receiptItems) {
         if (!it.variantId) throw new Error('Mỗi hàng phải có Variant ID');
         if (!it.quantity || Number(it.quantity) <= 0) throw new Error('Số lượng phải > 0');
       }
-      
+
+
+      const totalAmount = form.receiptItems.reduce((sum, item) => {
+        return sum + (Number(item.quantity) * Number(item.importPrice));
+      }, 0);
+
       const payload = {
         supplierId: form.supplierId || null,
+        creatorId: currentUserId,
+        totalAmount: totalAmount,
         note: form.note,
         receiptItems: form.receiptItems.map(it => ({
           variantId: Number(it.variantId),
@@ -166,11 +229,11 @@ export default function GoodsReceipts() {
           newSellingPrice: it.newSellingPrice ? Number(it.newSellingPrice) : null
         }))
       };
-      
+
       await axios.post(`${API_BASE_URL}/admin/goods-receipts`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       showToast('Tạo phiếu nhập thành công', 'success');
       setIsModalOpen(false);
       fetchData();
@@ -199,8 +262,8 @@ export default function GoodsReceipts() {
       {/* Bộ lọc */}
       <div className="filters-content">
         <div className="filters-header">
-          <div 
-            className="filters-title" 
+          <div
+            className="filters-title"
             onClick={() => setIsFilterOpen(!isFilterOpen)}
           >
             <span>
@@ -216,8 +279,8 @@ export default function GoodsReceipts() {
         <div className={`filters-items ${isFilterOpen ? 'open' : 'close'}`}>
           <div className="item">
             <label>Nhà cung cấp</label>
-            <select 
-              value={filter.supplierId} 
+            <select
+              value={filter.supplierId}
               onChange={(e) => setFilter({ ...filter, supplierId: e.target.value })}
             >
               <option value="">Tất cả</option>
@@ -229,9 +292,9 @@ export default function GoodsReceipts() {
 
           <div className="item">
             <label>Mã phiếu nhập</label>
-            <input 
-              type="text" 
-              placeholder="Tìm theo mã..." 
+            <input
+              type="text"
+              placeholder="Tìm theo mã..."
               value={filter.receiptCode}
               onChange={(e) => setFilter({ ...filter, receiptCode: e.target.value })}
             />
@@ -239,8 +302,8 @@ export default function GoodsReceipts() {
 
           <div className="item">
             <label>Từ ngày</label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               value={filter.dateFrom}
               onChange={(e) => setFilter({ ...filter, dateFrom: e.target.value })}
             />
@@ -248,8 +311,8 @@ export default function GoodsReceipts() {
 
           <div className="item">
             <label>Đến ngày</label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               value={filter.dateTo}
               onChange={(e) => setFilter({ ...filter, dateTo: e.target.value })}
             />
@@ -298,14 +361,16 @@ export default function GoodsReceipts() {
                           <span className="receipt-code">{r.receiptCode}</span>
                         </td>
                         <td data-label="Nhà cung cấp">{r.supplierName || '-'}</td>
-                        <td data-label="Người tạo">{r.creatorName || '-'}</td>
+                        <td data-label="Người tạo">
+                          {r.creatorName || (r.creatorId === currentUserId ? currentUsername : `ID: ${r.creatorId}`)}
+                        </td>
                         <td data-label="Tổng tiền">
                           <span className="total-amount">{formatCurrency(r.totalAmount)}</span>
                         </td>
                         <td data-label="Ngày tạo">{formatDate(r.createdAt)}</td>
                         <td data-label="Hành động">
-                          <button 
-                            className="btn-view" 
+                          <button
+                            className="btn-view"
                             onClick={() => fetchReceiptDetails(r.id)}
                           >
                             <FaBoxOpen /> Chi tiết
@@ -332,8 +397,8 @@ export default function GoodsReceipts() {
             <div className="confirm-modal-body">
               <div className="form-row">
                 <label>Nhà cung cấp</label>
-                <select 
-                  value={form.supplierId} 
+                <select
+                  value={form.supplierId}
                   onChange={(e) => setForm({ ...form, supplierId: e.target.value })}
                 >
                   <option value="">Chọn nhà cung cấp</option>
@@ -345,7 +410,7 @@ export default function GoodsReceipts() {
 
               <div className="form-row">
                 <label>Ghi chú</label>
-                <textarea 
+                <textarea
                   value={form.note}
                   onChange={(e) => setForm({ ...form, note: e.target.value })}
                   placeholder="Nhập ghi chú..."
@@ -356,87 +421,87 @@ export default function GoodsReceipts() {
               <div className="form-row">
                 <label>Danh sách sản phẩm</label>
                 <div className="items-list">
-                {form.receiptItems.map((item, idx) => (
+                  {form.receiptItems.map((item, idx) => (
                     <div key={idx} className="item-row">
-                    {/* Hiển thị thông tin đã chọn hoặc nút chọn */}
-                    {item.variantInfo ? (
+                      {/* Hiển thị thông tin đã chọn hoặc nút chọn */}
+                      {item.variantInfo ? (
                         <div className="selected-variant-info">
-                        <img 
-                            src={item.variantInfo.thumbnail || '/placeholder.png'} 
+                          <img
+                            src={item.variantInfo.thumbnail || '/placeholder.png'}
                             alt={item.variantInfo.productName}
                             className="variant-thumbnail"
-                        />
-                        <div className="variant-text">
+                          />
+                          <div className="variant-text">
                             <strong>{item.variantInfo.productName}</strong>
                             <span>{item.variantInfo.dimensions}</span>
-                        </div>
-                        <button
+                          </div>
+                          <button
                             type="button"
                             className="btn-change-variant"
                             onClick={() => {
-                            setCurrentRowIndex(idx);
-                            setIsVariantSelectorOpen(true);
+                              setCurrentRowIndex(idx);
+                              setIsVariantSelectorOpen(true);
                             }}
-                        >
+                          >
                             Đổi
-                        </button>
+                          </button>
                         </div>
-                    ) : (
+                      ) : (
                         <button
-                        type="button"
-                        className="btn-select-product"
-                        onClick={() => {
+                          type="button"
+                          className="btn-select-product"
+                          onClick={() => {
                             setCurrentRowIndex(idx);
                             setIsVariantSelectorOpen(true);
-                        }}
+                          }}
                         >
-                        <FaSearch /> Chọn sản phẩm
+                          <FaSearch /> Chọn sản phẩm
                         </button>
-                    )}
+                      )}
 
-                    <input 
-                        type="number" 
+                      <input
+                        type="number"
                         className="small"
                         placeholder="SL"
                         value={item.quantity}
                         onChange={(e) => {
-                        const arr = [...form.receiptItems];
-                        arr[idx].quantity = e.target.value;
-                        setForm({ ...form, receiptItems: arr });
+                          const arr = [...form.receiptItems];
+                          arr[idx].quantity = e.target.value;
+                          setForm({ ...form, receiptItems: arr });
                         }}
-                    />
-                    
-                    <input 
-                        type="number" 
+                      />
+
+                      <input
+                        type="number"
                         placeholder="Giá nhập"
                         value={item.importPrice}
                         onChange={(e) => {
-                        const arr = [...form.receiptItems];
-                        arr[idx].importPrice = e.target.value;
-                        setForm({ ...form, receiptItems: arr });
+                          const arr = [...form.receiptItems];
+                          arr[idx].importPrice = e.target.value;
+                          setForm({ ...form, receiptItems: arr });
                         }}
-                    />
-                    
-                    <input 
-                        type="number" 
+                      />
+
+                      <input
+                        type="number"
                         placeholder="Giá bán mới"
                         value={item.newSellingPrice}
                         onChange={(e) => {
-                        const arr = [...form.receiptItems];
-                        arr[idx].newSellingPrice = e.target.value;
-                        setForm({ ...form, receiptItems: arr });
+                          const arr = [...form.receiptItems];
+                          arr[idx].newSellingPrice = e.target.value;
+                          setForm({ ...form, receiptItems: arr });
                         }}
-                    />
-                    
-                    <button 
-                        type="button" 
+                      />
+
+                      <button
+                        type="button"
                         className="btn-delete"
                         onClick={() => removeItemRow(idx)}
-                    >
+                      >
                         <FaTrash />
-                    </button>
+                      </button>
                     </div>
-                ))}
+                  ))}
                 </div>
                 <button type="button" className="btn-add-item" onClick={addItemRow}>
                   <FaPlus /> Thêm sản phẩm
@@ -545,8 +610,8 @@ export default function GoodsReceipts() {
       <ProductVariantSelector
         isOpen={isVariantSelectorOpen}
         onClose={() => {
-            setIsVariantSelectorOpen(false);
-            setCurrentRowIndex(null);
+          setIsVariantSelectorOpen(false);
+          setCurrentRowIndex(null);
         }}
         onSelect={handleVariantSelect}
       />

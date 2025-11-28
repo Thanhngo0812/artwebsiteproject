@@ -19,7 +19,7 @@
 .filters-content {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 20px;
   margin-bottom: 24px;
 
@@ -169,7 +169,7 @@
     width: 0;
     height: 0;
 
-    &:checked + .radio-custom {
+    &:checked+.radio-custom {
       background: #007bff;
       border-color: #007bff;
 
@@ -179,7 +179,7 @@
       }
     }
 
-    &:checked ~ .role-label {
+    &:checked~.role-label {
       color: #007bff;
       font-weight: 700;
     }
@@ -232,7 +232,7 @@
 .show-users {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 24px;
 
   .show-users_header {
@@ -472,6 +472,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -573,8 +574,8 @@
   }
 
   &.role_admin {
-    background: #ffe7e7;
-    color: #dc3545;
+    background: #fef3c7;
+    color: #92400e;
   }
 }
 
@@ -625,6 +626,7 @@
     transform: translateX(400px);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -635,6 +637,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }

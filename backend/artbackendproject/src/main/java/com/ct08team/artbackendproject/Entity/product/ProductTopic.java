@@ -1,6 +1,5 @@
 package com.ct08team.artbackendproject.Entity.product;
 
-
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -13,6 +12,7 @@ public class ProductTopic {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("productId") // Ánh xạ tới trường 'productId' trong ProductTopicId
     @JoinColumn(name = "product_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Product product;
 
     // Constructor rỗng
@@ -46,6 +46,7 @@ public class ProductTopic {
     public String getTopicName() {
         return (this.id != null) ? this.id.getTopicName() : null;
     }
+
     public void setTopicName(String topicName) {
         // Khởi tạo nếu id vẫn null (an toàn)
         if (this.id == null) {
@@ -57,8 +58,10 @@ public class ProductTopic {
     // equals() và hashCode()
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ProductTopic that = (ProductTopic) o;
         return Objects.equals(id, that.id);
     }
