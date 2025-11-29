@@ -525,3 +525,26 @@ INSERT INTO categories (name, parent_id) VALUES ('Khung Kim Loại Hiện đại
 INSERT INTO categories (name, parent_id) VALUES ('Khung Composite', 5); -- ID 23
 INSERT INTO categories (name, parent_id) VALUES ('Khung Tranh Đơn Giản', 5); -- ID 24
 
+use artdbproject;
+
+INSERT INTO promotions 
+    (name, description, image_url, code, type, value, start_date, end_date, is_active, max_discount_value)
+VALUES 
+    (
+        'Giảm 20% Tranh Hoàng Hôn', 
+        'Giảm giá đặc biệt 20% cho Tranh Hoàng Hôn Trên Biển. Tối đa 150K.', 
+        'https://placehold.co/1200x300/FF8C00/FFFFFF?text=SALE+20%25+Tranh+Bien', 
+        NULL, -- Quan trọng: NULL để service tự động nhận diện
+        'PERCENTAGE', 
+        20.00, 
+        (NOW() - INTERVAL 1 DAY), -- Bắt đầu từ hôm qua
+        (NOW() + INTERVAL 1 MONTH), -- Kết thúc sau 1 tháng
+        TRUE,
+        150000.00 -- Giảm tối đa 150K
+    );
+
+-- Lấy ID của khuyến mãi vừa tạo
+SET @promo1_id = LAST_INSERT_ID();
+
+-- Liên kết nó với Product ID 1
+INSERT INTO promotion_products (promotion_id, product_id) VALUES (@promo1_id, 1);

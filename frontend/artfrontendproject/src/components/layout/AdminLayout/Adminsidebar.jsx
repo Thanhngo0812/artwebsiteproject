@@ -1,6 +1,6 @@
 import React from "react";
 import "./Adminsidebar.scss";
-import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt, FaTags, FaShoppingCart, FaGift, FaPercentage, FaSignOutAlt } from "react-icons/fa";
+import { FaChartBar, FaChartLine, FaBoxOpen, FaUsers, FaTruck, FaReceipt, FaTags, FaShoppingCart, FaGift,FaPercentage, FaSignOutAlt } from "react-icons/fa";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -9,8 +9,11 @@ export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar 
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    localStorage.removeItem('user');
+    localStorage.removeItem('username');
+        navigate("/login");
+
+  
   };
   const menuItem = [
     { path: "", name: "Dashboard", icon: <FaChartLine /> },
@@ -22,8 +25,7 @@ export default function Adminsidebar({ openSidebar, showSidebar, setShowSidebar 
     { path: "order", name: "Orders", icon: <FaShoppingCart /> },
     { path: "promotion", name: "Promotions", icon: <FaGift /> },
     { path: "promotionapply", name: "Promotion Products", icon: <FaPercentage /> },
-
-
+      { path: "statistics-detail", name: "Statistics Detail", icon: <FaChartBar /> },
 
   ];
 

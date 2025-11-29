@@ -195,6 +195,32 @@ public class PromotionService {
         Promotion p = findById(promoId);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+
+        // ==============================================================
+        // LOGIC MỚI: Kiểm tra sản phẩm đã có trong chương trình khác chưa
+        // ==============================================================
+        // product.getPromotions() trả về danh sách các chương trình mà sản phẩm đang tham gia
+        // Nếu danh sách này không rỗng, nghĩa là nó đã thuộc về một chương trình nào đó
+        if (product.getPromotions() != null && !product.getPromotions().isEmpty()) {
+
+            // Kiểm tra xem có phải là chính chương trình này không (tránh lỗi khi add lại chính nó)
+            boolean alreadyInThisPromo = product.getPromotions().stream()
+                    .anyMatch(promo -> promo.getId().equals(promoId));
+
+            if (alreadyInThisPromo) {
+                throw new RuntimeException("Sản phẩm này đã có trong chương trình khuyến mãi này rồi.");
+            }
+
+            // Lấy tên chương trình đầu tiên nó đang tham gia để báo lỗi
+            String existingPromoName = product.getPromotions().iterator().next().getName();
+
+            // Báo lỗi ngay lập tức, bất kể chương trình kia còn hạn hay không
+            throw new RuntimeException("Sản phẩm '" + product.getProductName() +
+                    "' hiện đang thuộc chương trình khuyến mãi: '" + existingPromoName +
+                    "'. Vui lòng gỡ khỏi chương trình cũ trước.");
+        }
+        // ==============================================================
+
         p.getProducts().add(product);
         promotionRepository.save(p);
     }
