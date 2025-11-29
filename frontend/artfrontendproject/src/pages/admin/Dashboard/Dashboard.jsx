@@ -154,7 +154,7 @@ export default function Dashboard() {
             <div className="stat-card stat-blue">
                 <div className="stat-icon-wrapper"><FaDollarSign /></div>
                 <div className="stat-info">
-                    <h3>Doanh thu tháng này</h3>
+                    <h3>Tổng Doanh thu</h3>
                     <span className="value">{formatCurrency(data.totalRevenue)}</span>
                 </div>
             </div>

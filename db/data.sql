@@ -4,6 +4,39 @@ use artdbproject;
 -- CHÈN DỮ LIỆU MẪU (50 SẢN PHẨM) - CẬP NHẬT MÔ TẢ
 -- ============================================
 START TRANSACTION;
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Trừu Tượng', NULL); -- ID 1
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Phong Cảnh', NULL); -- ID 2
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Sơn Dầu', NULL);    -- ID 3
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Nghệ Thuật', NULL); -- ID 4
+INSERT INTO categories (name, parent_id) VALUES ('Khung Tranh', NULL);      -- ID 5
+
+-- Danh mục con của "Tranh Trừu Tượng" (parent_id = 1)
+INSERT INTO categories (name, parent_id) VALUES ('Trừu Tượng Hành động', 1); -- ID 6
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Trường màu', 1); -- ID 7
+INSERT INTO categories (name, parent_id) VALUES ('Trừu Tượng Hình học', 1); -- ID 8
+INSERT INTO categories (name, parent_id) VALUES ('Trừu Tượng Trữ tình', 1); -- ID 9
+-- Danh mục con của "Tranh Phong Cảnh" (parent_id = 2)
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Biển', 2); -- ID 10
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Núi Rừng', 2); -- ID 11
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Đồng Quê', 2); -- ID 12
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Thành Phố', 2); -- ID 13
+
+-- Danh mục con của "Tranh Sơn Dầu" (parent_id = 3)
+INSERT INTO categories (name, parent_id) VALUES ('Sơn Dầu Chân dung', 3); -- ID 14
+INSERT INTO categories (name, parent_id) VALUES ('Sơn Dầu Tĩnh vật', 3); -- ID 15
+INSERT INTO categories (name, parent_id) VALUES ('Sơn Dầu Hiện đại', 3); -- ID 16
+
+-- Danh mục con của "Tranh Nghệ Thuật" (parent_id = 4)
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Ấn Tượng', 4); -- ID 17
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Lập Thể', 4); -- ID 18
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Siêu Thực', 4); -- ID 19
+INSERT INTO categories (name, parent_id) VALUES ('Tranh Phục Hưng', 4); -- ID 20
+
+-- Danh mục con của "Khung Tranh" (parent_id = 5)
+INSERT INTO categories (name, parent_id) VALUES ('Khung Gỗ Cổ điển', 5); -- ID 21
+INSERT INTO categories (name, parent_id) VALUES ('Khung Kim Loại Hiện đại', 5); -- ID 22
+INSERT INTO categories (name, parent_id) VALUES ('Khung Composite', 5); -- ID 23
+INSERT INTO categories (name, parent_id) VALUES ('Khung Tranh Đơn Giản', 5); -- ID 24
 
 -- ============================================
 -- 1. CHÈN LIỆU (MATERIALS)
@@ -770,251 +803,469 @@ COMMIT;
 -- -- KẾT THÚC TRANSACTION
 -- -- ============================================
 -- COMMIT;
-INSERT INTO `promotions` (`name`, `description`, `image_url`, `code`, `type`, `value`, `start_date`, `end_date`, `is_active`, `min_order_value`, `max_discount_value`, `usage_limit`, `usage_count`) VALUES
+USE artdbproject;
+-- 1. Chèn User vào bảng users
+INSERT INTO `users` (
+    `username`, 
+    `email`, 
+    `password`, 
+    `full_name`, 
+    `phone_number`, 
+    `enabled`, 
+    `account_non_locked`, 
+    `created_at`, 
+    `updated_at`
+) VALUES (
+    'ngocongthanhsg0812', 
+    'ngocongthanhsg0812@gmail.com', 
+    '$2a$10$BeQYx7Wfmu6206PwbJPygu8s/ljPNpPFlkKLAFtUzeVlcYCeSDB7i', 
+    'Ngô Công Thành', -- Mình tự điền tên hiển thị dựa trên username
+    NULL, 
+    TRUE,  -- enabled
+    TRUE,  -- account_non_locked
+    '2025-11-27 18:31:22', 
+    '2025-11-29 09:02:13'
+);
 
--- ===== SALE & OFFERS =====
-('Shop All Sale',
- 'Giảm giá toàn bộ sản phẩm - Khám phá hàng ngàn tác phẩm nghệ thuật đang sale',
- 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&h=600&fit=crop',
- NULL,
- 'PERCENTAGE',
- 25.00,
- '2025-11-20 00:00:00',
- '2025-12-31 23:59:59',
- TRUE,
- 0.00,
- 1000000.00,
- NULL,
- 456),
+-- 2. Lấy ID của user vừa tạo và ID của quyền ADMIN để liên kết
+SET @new_user_id = LAST_INSERT_ID();
+SET @admin_role_id = (SELECT id FROM roles WHERE name = 'ROLE_ADMIN' LIMIT 1);
 
-('Bestsellers',
- 'Giảm giá các tác phẩm bán chạy nhất - Top sản phẩm được yêu thích',
- 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=1200&h=600&fit=crop',
- NULL,
- 'PERCENTAGE',
- 20.00,
- '2025-11-15 00:00:00',
- '2025-12-31 23:59:59',
- TRUE,
- 0.00,
- 500000.00,
- NULL,
- 234),
+-- 3. Cấp quyền ADMIN cho user này
+INSERT INTO `user_roles` (`user_id`, `role_id`) 
+VALUES (@new_user_id, @admin_role_id);
 
-('Last Chance',
- 'Cơ hội cuối cùng - Sale tới 50% sắp kết thúc',
- 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=1200&h=600&fit=crop',
- NULL,
- 'PERCENTAGE',
- 50.00,
- '2025-11-26 00:00:00',
- '2025-11-30 23:59:59',
- TRUE,
- 0.00,
- 800000.00,
- 500,
- 389),
+-- 1. Chèn User vào bảng users
+INSERT INTO `users` (
+    `username`, 
+    `email`, 
+    `password`, 
+    `full_name`, 
+    `phone_number`, 
+    `enabled`, 
+    `account_non_locked`, 
+    `created_at`, 
+    `updated_at`
+) VALUES (
+    'teooclol1',  -- Username tự đặt theo email
+    'teooclol1@gmail.com', 
+    '$2a$10$BeQYx7Wfmu6206PwbJPygu8s/ljPNpPFlkKLAFtUzeVlcYCeSDB7i', -- Hash mật khẩu giống Admin
+    'Teo Oclol',  -- Tên giả định
+    NULL, 
+    TRUE, 
+    TRUE, 
+    '2025-11-27 18:31:22', -- Thời gian giống Admin
+    '2025-11-29 09:02:13'
+);
 
--- ===== TRANH TRỪU TƯỢNG =====
-('Abstract Art Sale',
- 'Sale đặc biệt cho tranh trừu tượng - Giảm 35%',
- NULL,
- NULL,
- 'PERCENTAGE',
- 35.00,
- '2025-11-20 00:00:00',
- '2025-12-15 23:59:59',
- TRUE,
- 300000.00,
- 600000.00,
- NULL,
- 123),
+-- 2. Lấy ID của user vừa tạo và ID của quyền ROLE_USER (Khách hàng)
+SET @new_user_id = LAST_INSERT_ID();
+SET @user_role_id = (SELECT id FROM roles WHERE name = 'ROLE_USER' LIMIT 1);
 
--- ===== TRANH PHONG CẢNH =====
-('Landscape Sale',
- 'Giảm giá tranh phong cảnh - Mang thiên nhiên về nhà',
- 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop',
- NULL,
- 'PERCENTAGE',
- 30.00,
- '2025-11-25 00:00:00',
- '2025-12-20 23:59:59',
- TRUE,
- 500000.00,
- 700000.00,
- NULL,
- 178),
+-- 3. Cấp quyền ROLE_USER cho user này
+INSERT INTO `user_roles` (`user_id`, `role_id`) 
+VALUES (@new_user_id, @user_role_id);
+-- ============================================
+-- 1. SỬA LỖI DEFAULT VALUE TRONG DB (Chạy cái này trước)
+-- ============================================
+-- Đảm bảo cột discount_amount có giá trị mặc định là 0
+ALTER TABLE `orders` MODIFY `discount_amount` DECIMAL(15, 2) NOT NULL DEFAULT 0.00;
 
-('Seascape Sale',
- 'Sale tranh biển - Không gian biển xanh trong lành',
- NULL,
- NULL,
- 'PERCENTAGE',
- 25.00,
- '2025-11-20 00:00:00',
- '2025-12-31 23:59:59',
- TRUE,
- 0.00,
- 400000.00,
- NULL,
- 89),
-
-('Mountain & Forest',
- 'Giảm giá tranh núi rừng - Phong cảnh hùng vĩ',
- NULL,
- NULL,
- 'PERCENTAGE',
- 30.00,
- '2025-11-20 00:00:00',
- '2025-12-25 23:59:59',
- TRUE,
- 0.00,
- 500000.00,
- NULL,
- 67),
-
--- ===== TRANH SƠN DẦU =====
-('Oil Painting Sale',
- 'Sale tranh sơn dầu chính hãng - Giảm tới 40%',
- 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&h=600&fit=crop',
- NULL,
- 'PERCENTAGE',
- 40.00,
- '2025-11-22 00:00:00',
- '2025-12-10 23:59:59',
- TRUE,
- 800000.00,
- 1000000.00,
- NULL,
- 156),
-
-('Portrait Sale',
- 'Giảm giá tranh chân dung sơn dầu - Tác phẩm độc đáo',
- NULL,
- NULL,
- 'PERCENTAGE',
- 35.00,
- '2025-11-20 00:00:00',
- '2025-12-31 23:59:59',
- TRUE,
- 0.00,
- 600000.00,
- NULL,
- 45),
-
--- ===== KHUNG TRANH =====
-('Frame Sale',
- 'Sale khung tranh - Đóng khung chuyên nghiệp giá tốt',
- NULL,
- NULL,
- 'FIXED_AMOUNT',
- 150000.00,
- '2025-11-15 00:00:00',
- '2025-12-31 23:59:59',
- TRUE,
- 200000.00,
- NULL,
- 200,
- 78),
-
--- ===== THEO PHONG CÁCH NGHỆ THUẬT =====
-('Impressionism Sale',
- 'Sale tranh ấn tượng - Phong cách nghệ thuật Pháp',
- NULL,
- NULL,
- 'PERCENTAGE',
- 30.00,
- '2025-11-20 00:00:00',
- '2025-12-20 23:59:59',
- TRUE,
- 0.00,
- 500000.00,
- NULL,
- 56),
-
-('Modern Art Sale',
- 'Sale nghệ thuật hiện đại - Phong cách đương đại',
- 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=1200&h=600&fit=crop',
- NULL,
- 'PERCENTAGE',
- 35.00,
- '2025-11-25 00:00:00',
- '2025-12-15 23:59:59',
- TRUE,
- 400000.00,
- 800000.00,
- NULL,
- 134);
+-- Tiện thể sửa luôn bảng order_items để tránh lỗi tương tự tiếp theo
+ALTER TABLE `order_items` MODIFY `discount_applied` DECIMAL(10, 2) NOT NULL DEFAULT 0.00;
 
 -- ============================================
--- INSERT PROMOTION_PRODUCTS (SẢN PHẨM 1-17)
+-- 2. PROCEDURE ĐÃ FIX LỖI (Chạy lại đoạn này)
 -- ============================================
+DROP PROCEDURE IF EXISTS generate_mock_data;
 
-INSERT INTO `promotion_products` (`promotion_id`, `product_id`) VALUES
--- Shop All Sale (promotion_id=1)
-(1, 1), (1, 2), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12),
+DELIMITER //
 
--- Bestsellers (promotion_id=2)
-(2, 1), (2, 2), (2, 4), (2, 8), (2, 16),
+CREATE PROCEDURE generate_mock_data()
+BEGIN
+    DECLARE i INT DEFAULT 1;
+    DECLARE j INT DEFAULT 1;
+    DECLARE k INT DEFAULT 1;
+    
+    -- Biến cho User
+    DECLARE v_user_id BIGINT;
+    DECLARE v_ho VARCHAR(50);
+    DECLARE v_lot VARCHAR(50);
+    DECLARE v_ten VARCHAR(50);
+    DECLARE v_full_name VARCHAR(150);
+    DECLARE v_username VARCHAR(100);
+    DECLARE v_email VARCHAR(100);
+    DECLARE v_phone VARCHAR(20);
+    DECLARE v_role_user_id BIGINT;
 
--- Last Chance (promotion_id=3)
-(3, 7), (3, 9), (3, 10), (3, 13),
+    -- Biến cho Address
+    DECLARE v_address_detail VARCHAR(255);
+    DECLARE v_street VARCHAR(100);
+    DECLARE v_dist VARCHAR(50);
+    
+    -- Biến cho Order
+    DECLARE v_order_id BIGINT;
+    DECLARE v_rand_user_id BIGINT;
+    DECLARE v_order_date DATETIME;
+    DECLARE v_order_status VARCHAR(50);
+    DECLARE v_payment_status VARCHAR(50);
+    DECLARE v_subtotal DECIMAL(15,2);
+    DECLARE v_shipping_fee DECIMAL(15,2);
+    DECLARE v_total DECIMAL(15,2);
+    
+    -- Biến cho Order Item
+    DECLARE v_variant_id BIGINT;
+    DECLARE v_item_price DECIMAL(10,2);
+    DECLARE v_qty INT;
+    DECLARE v_num_items INT;
 
--- Abstract Art Sale (promotion_id=4)
-(4, 1), (4, 11), (4, 12), (4, 13), (4, 14), (4, 15),
+    -- Lấy ID của ROLE_USER
+    SELECT id INTO v_role_user_id FROM roles WHERE name = 'ROLE_USER' LIMIT 1;
 
--- Seascape Sale (promotion_id=6)
-(6, 2), (6, 9),
+    -- --------------------------------------------------------
+    -- TẠO 30 KHÁCH HÀNG (USERS)
+    -- --------------------------------------------------------
+    SET i = 1;
+    WHILE i <= 30 DO
+        SET v_ho = ELT(FLOOR(1 + RAND() * 8), 'Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ');
+        SET v_lot = ELT(FLOOR(1 + RAND() * 6), 'Văn', 'Thị', 'Minh', 'Ngọc', 'Đức', 'Thanh');
+        SET v_ten = ELT(FLOOR(1 + RAND() * 10), 'Tâm', 'Kiệt', 'Sô', 'Pháp', 'Thành', 'Hương', 'Lan', 'Tuấn', 'Hùng', 'Trang');
+        SET v_full_name = CONCAT(v_ho, ' ', v_lot, ' ', v_ten);
+        
+        SET v_username = CONCAT('user', FLOOR(UNIX_TIMESTAMP() + RAND()*10000), i);
+        SET v_email = CONCAT('user', FLOOR(UNIX_TIMESTAMP() + RAND()*10000), i, '@gmail.com');
+        SET v_phone = CONCAT('09', FLOOR(10000000 + RAND() * 89999999));
 
--- Portrait Sale (promotion_id=9)
-(9, 4), (9, 16), (9, 17),
+        INSERT INTO users (username, email, password, full_name, phone_number, enabled, account_non_locked)
+        VALUES (v_username, v_email, '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOcd.g.w1.E.y', v_full_name, v_phone, TRUE, TRUE);
+        
+        SET v_user_id = LAST_INSERT_ID();
+        INSERT INTO user_roles (user_id, role_id) VALUES (v_user_id, v_role_user_id);
 
--- Frame Sale (promotion_id=10)
-(10, 3);
+        SET v_street = ELT(FLOOR(1 + RAND() * 5), 'Nguyễn Huệ', 'Lê Lợi', 'Cách Mạng Tháng 8', 'Điện Biên Phủ', 'Pasteur');
+        SET v_dist = ELT(FLOOR(1 + RAND() * 5), 'Quận 1', 'Quận 3', 'Quận 7', 'Thủ Đức', 'Bình Thạnh');
+        SET v_address_detail = CONCAT(FLOOR(1 + RAND() * 500), ' ', v_street, ', ', v_dist, ', TP.HCM');
+
+        INSERT INTO addresses (user_id, address_name, address, latitude, longitude, is_default)
+        VALUES (v_user_id, 'Nhà riêng', v_address_detail, 10.762622, 106.660172, TRUE);
+
+        SET i = i + 1;
+    END WHILE;
+
+    -- --------------------------------------------------------
+    -- TẠO 60 ĐƠN HÀNG (ORDERS)
+    -- --------------------------------------------------------
+    SET j = 1;
+    WHILE j <= 60 DO
+        SELECT id, address 
+        INTO v_rand_user_id, v_address_detail 
+        FROM (SELECT u.id, a.address FROM users u JOIN addresses a ON u.id = a.user_id ORDER BY RAND() LIMIT 1) AS tmp;
+        
+        SET v_order_date = FROM_UNIXTIME(UNIX_TIMESTAMP('2022-01-01 00:00:00') + FLOOR(0 + (RAND() * (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP('2022-01-01 00:00:00')))));
+        SET v_order_status = ELT(FLOOR(1 + RAND() * 4), 'DELIVERED', 'DELIVERED', 'SHIPPED', 'CANCELLED');
+        
+        IF v_order_status = 'DELIVERED' THEN SET v_payment_status = 'PAID';
+        ELSEIF v_order_status = 'CANCELLED' THEN SET v_payment_status = 'FAILED';
+        ELSE SET v_payment_status = 'PENDING';
+        END IF;
+
+        -- [FIX] Đã thêm discount_amount = 0 vào câu lệnh INSERT
+        INSERT INTO orders (user_id, address, latitude, longitude, subtotal_price, shipping_fee, discount_amount, total_price, order_status, payment_method, payment_status, created_at, updated_at)
+        VALUES (v_rand_user_id, v_address_detail, 10.762622, 106.660172, 0, 0, 0, 0, v_order_status, 'COD', v_payment_status, v_order_date, v_order_date);
+
+        SET v_order_id = LAST_INSERT_ID();
+
+        -- Tạo chi tiết đơn hàng
+        SET v_subtotal = 0;
+        SET v_num_items = FLOOR(1 + RAND() * 3);
+        SET k = 1;
+        
+        WHILE k <= v_num_items DO
+            SELECT variant_id, price INTO v_variant_id, v_item_price FROM product_variants ORDER BY RAND() LIMIT 1;
+            SET v_qty = FLOOR(1 + RAND() * 2);
+
+            -- [FIX] Đã thêm discount_applied = 0 vào insert order_items
+            INSERT INTO order_items (order_id, variant_id, quantity, price_at_purchase, discount_applied, cost_price_at_purchase)
+            VALUES (v_order_id, v_variant_id, v_qty, v_item_price, 0, (v_item_price * 0.6));
+
+            SET v_subtotal = v_subtotal + (v_item_price * v_qty);
+            SET k = k + 1;
+        END WHILE;
+
+        -- Update lại tổng tiền
+        SET v_shipping_fee = IF(v_subtotal > 2000000, 0, 30000);
+        SET v_total = v_subtotal + v_shipping_fee; -- discount = 0
+
+        UPDATE orders 
+        SET subtotal_price = v_subtotal, 
+            shipping_fee = v_shipping_fee, 
+            total_price = v_total
+        WHERE id = v_order_id;
+
+        SET j = j + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
 
 -- ============================================
--- INSERT PROMOTION_CATEGORIES
+-- CHẠY LẠI
 -- ============================================
+CALL generate_mock_data();
 
-INSERT INTO `promotion_categories` (`promotion_id`, `categories_id`) VALUES
--- Shop All Sale (promotion_id=1)
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5),
 
--- Bestsellers (promotion_id=2)
-(2, 1), (2, 2), (2, 3), (2, 4),
+USE artdbproject;
 
--- Last Chance (promotion_id=3)
-(3, 1), (3, 2),
+DROP PROCEDURE IF EXISTS create_recent_orders;
 
--- Abstract Art Sale (promotion_id=4)
-(4, 1), (4, 6), (4, 7), (4, 8), (4, 9),
+DELIMITER //
 
--- Landscape Sale (promotion_id=5)
-(5, 2), (5, 10), (5, 11), (5, 12), (5, 13),
+CREATE PROCEDURE create_recent_orders()
+BEGIN
+    DECLARE x INT DEFAULT 1;
+    
+    -- Các biến để lưu thông tin đơn hàng
+    DECLARE v_order_id BIGINT;
+    DECLARE v_rand_user_id BIGINT;
+    DECLARE v_address_detail VARCHAR(255);
+    DECLARE v_order_date DATETIME;
+    DECLARE v_order_status VARCHAR(50);
+    DECLARE v_payment_status VARCHAR(50);
+    DECLARE v_subtotal DECIMAL(15,2);
+    DECLARE v_shipping_fee DECIMAL(15,2);
+    DECLARE v_total DECIMAL(15,2);
+    
+    -- Các biến để lưu chi tiết sản phẩm
+    DECLARE k INT;
+    DECLARE v_num_items INT;
+    DECLARE v_variant_id BIGINT;
+    DECLARE v_item_price DECIMAL(10,2);
+    DECLARE v_qty INT;
 
--- Seascape Sale (promotion_id=6)
-(6, 10),
+    -- Lặp 10 lần để tạo 10 đơn
+    WHILE x <= 10 DO
+        -- 1. Lấy ngẫu nhiên 1 User và địa chỉ của họ
+        SELECT id, address INTO v_rand_user_id, v_address_detail 
+        FROM (SELECT u.id, a.address FROM users u JOIN addresses a ON u.id = a.user_id ORDER BY RAND() LIMIT 1) AS tmp;
 
--- Mountain & Forest (promotion_id=7)
-(7, 11),
+        -- 2. Random ngày giờ từ 24/11/2025 00:00:00 đến 01/12/2025 23:59:59
+        SET v_order_date = FROM_UNIXTIME(
+            UNIX_TIMESTAMP('2025-11-24 00:00:00') + 
+            FLOOR(RAND() * (UNIX_TIMESTAMP('2025-12-01 23:59:59') - UNIX_TIMESTAMP('2025-11-24 00:00:00')))
+        );
 
--- Oil Painting Sale (promotion_id=8)
-(8, 3), (8, 14), (8, 15), (8, 16),
+        -- 3. Logic trạng thái đơn hàng (cho hợp lý với thời gian)
+        -- Nếu ngày đặt < ngày hiện tại (29/11) -> Random trạng thái: Đã giao, Đang giao, Đã hủy
+        IF v_order_date < NOW() THEN
+             SET v_order_status = ELT(FLOOR(1 + RAND() * 3), 'DELIVERED', 'SHIPPED', 'PAID');
+        ELSE
+        -- Nếu ngày đặt trong tương lai (30/11, 1/12) -> Trạng thái: Chờ xử lý hoặc Đang xử lý
+             SET v_order_status = ELT(FLOOR(1 + RAND() * 2), 'PENDING', 'CANCELLED');
+        END IF;
+        
+        -- Logic trạng thái thanh toán
+        IF v_order_status = 'DELIVERED' THEN SET v_payment_status = 'PAID';
+        ELSEIF v_order_status = 'CANCELLED' THEN SET v_payment_status = 'FAILED';
+        ELSE SET v_payment_status = 'PENDING';
+        END IF;
 
--- Portrait Sale (promotion_id=9)
-(9, 14),
+        -- 4. Tạo đơn hàng (INSERT orders)
+        INSERT INTO orders (user_id, address, latitude, longitude, subtotal_price, shipping_fee, discount_amount, total_price, order_status, payment_method, payment_status, created_at, updated_at)
+        VALUES (v_rand_user_id, v_address_detail, 10.762622, 106.660172, 0, 0, 0, 0, v_order_status, 'COD', v_payment_status, v_order_date, v_order_date);
+        
+        SET v_order_id = LAST_INSERT_ID();
 
--- Frame Sale (promotion_id=10)
-(10, 5), (10, 21),
+        -- 5. Tạo chi tiết đơn hàng (INSERT order_items)
+        SET v_subtotal = 0;
+        SET v_num_items = FLOOR(1 + RAND() * 3); -- Mỗi đơn mua 1-3 món
+        SET k = 1;
+        
+        WHILE k <= v_num_items DO
+            SELECT variant_id, price INTO v_variant_id, v_item_price FROM product_variants ORDER BY RAND() LIMIT 1;
+            SET v_qty = FLOOR(1 + RAND() * 2);
 
--- Impressionism Sale (promotion_id=11)
-(11, 17),
+            INSERT INTO order_items (order_id, variant_id, quantity, price_at_purchase, discount_applied, cost_price_at_purchase)
+            VALUES (v_order_id, v_variant_id, v_qty, v_item_price, 0, (v_item_price * 0.6));
 
--- Modern Art Sale (promotion_id=12)
-(12, 16), (12, 18), (12, 19);
+            SET v_subtotal = v_subtotal + (v_item_price * v_qty);
+            SET k = k + 1;
+        END WHILE;
 
--- ============================================
--- HOÀN TẤT
--- ============================================
+        -- 6. Cập nhật lại tổng tiền cho đơn hàng
+        SET v_shipping_fee = IF(v_subtotal > 2000000, 0, 30000);
+        SET v_total = v_subtotal + v_shipping_fee;
 
-SELECT 'Promotions data inserted successfully!' AS Status;
+        UPDATE orders 
+        SET subtotal_price = v_subtotal, 
+            shipping_fee = v_shipping_fee, 
+            total_price = v_total
+        WHERE id = v_order_id;
+
+        SET x = x + 1;
+    END WHILE;
+END //
+
+DELIMITER ;
+
+-- Chạy Procedure để tạo dữ liệu
+CALL create_recent_orders();
+
+-- Xóa Procedure sau khi dùng cho gọn DB
+DROP PROCEDURE create_recent_orders;
+
+-- Kiểm tra kết quả
+USE artdbproject;
+
+-- =======================================================
+-- CẬP NHẬT TÊN VÀ SỐ ĐIỆN THOẠI CHO CÁC ĐƠN HÀNG VỪA TẠO
+-- =======================================================
+SET SQL_SAFE_UPDATES = 0;
+UPDATE orders o
+INNER JOIN users u ON o.user_id = u.id
+SET 
+    o.customer_name = u.full_name,
+    o.customer_phone = u.phone_number
+WHERE 
+    -- Chỉ cập nhật các đơn hàng từ ngày 24/11/2025 trở đi (đợt vừa tạo)
+    o.created_at >= '2025-11-24 00:00:00' 
+    -- Hoặc an toàn hơn là cập nhật tất cả đơn nào đang bị NULL
+    or (o.customer_name IS NULL OR o.customer_phone IS NULL);
+SET SQL_SAFE_UPDATES = 1;
+-- =======================================================
+-- KIỂM TRA LẠI KẾT QUẢ
+-- =======================================================
+USE artdbproject;
+
+-- ==================================================================
+-- 1. CHƯƠNG TRÌNH KHÔNG CODE 1: "Lễ Hội Mua Sắm Cuối Năm"
+-- Loại: Giảm 15% trực tiếp
+-- Sản phẩm áp dụng: 1, 2, 3 (Tranh bình minh, hoàng hôn)
+-- ==================================================================
+INSERT INTO promotions (name, description, image_url, code, type, value, start_date, end_date, min_order_value, max_discount_value, usage_limit)
+VALUES (
+    'Lễ Hội Mua Sắm Cuối Năm 2025', 
+    'Săn sale tưng bừng, mừng năm mới tới. Giảm ngay 15% cho các tác phẩm bán chạy nhất năm.', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_yearend_sale.jpg', 
+    NULL, -- Không có code
+    'PERCENTAGE', 
+    15.00, -- Giảm 15%
+    '2025-11-25 00:00:00', 
+    '2025-12-31 23:59:59', 
+    0,      -- Không yêu cầu tối thiểu
+    500000, -- Giảm tối đa 500k
+    NULL    -- Không giới hạn số lượng
+);
+
+SET @promo1_id = LAST_INSERT_ID();
+INSERT INTO promotion_products (promotion_id, product_id) VALUES 
+(@promo1_id, 1), (@promo1_id, 2), (@promo1_id, 3);
+
+
+-- ==================================================================
+-- 2. CHƯƠNG TRÌNH KHÔNG CODE 2: "Tuần Lễ Nghệ Thuật Trừu Tượng"
+-- Loại: Giảm tiền mặt 200k
+-- Sản phẩm áp dụng: 11, 12, 15 (Các tranh trừu tượng)
+-- ==================================================================
+INSERT INTO promotions (name, description, image_url, code, type, value, start_date, end_date, min_order_value, max_discount_value, usage_limit)
+VALUES (
+    'Tuần Lễ Nghệ Thuật Trừu Tượng', 
+    'Mang hơi thở hiện đại vào không gian sống. Giảm trực tiếp 200K cho dòng tranh trừu tượng.', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_abstract_week.jpg', 
+    NULL, -- Không có code
+    'FIXED_AMOUNT', 
+    200000.00, -- Giảm 200k
+    '2025-11-28 00:00:00', 
+    '2025-12-15 23:59:59', 
+    1000000, -- Đơn tối thiểu 1 triệu
+    NULL, 
+    NULL
+);
+
+SET @promo2_id = LAST_INSERT_ID();
+INSERT INTO promotion_products (promotion_id, product_id) VALUES 
+(@promo2_id, 11), (@promo2_id, 12), (@promo2_id, 15);
+
+
+-- ==================================================================
+-- 3. CHƯƠNG TRÌNH KHÔNG CODE 3: "Giáng Sinh An Lành"
+-- Loại: Giảm 10%
+-- Sản phẩm áp dụng: 4, 5, 14 (Tranh cổ điển, chân dung, lập thể)
+-- ==================================================================
+INSERT INTO promotions (name, description, image_url, code, type, value, start_date, end_date, min_order_value, max_discount_value, usage_limit)
+VALUES (
+    'Giáng Sinh An Lành - Rinh Tranh Đẹp', 
+    'Ưu đãi mùa lễ hội. Giảm 10% cho các dòng tranh cổ điển làm quà tặng.', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_xmas_sale.jpg', 
+    NULL, -- Không có code
+    'PERCENTAGE', 
+    10.00, -- Giảm 10%
+    '2025-12-01 00:00:00', 
+    '2025-12-25 23:59:59', 
+    500000, 
+    200000, -- Giảm tối đa 200k
+    NULL
+);
+
+SET @promo3_id = LAST_INSERT_ID();
+INSERT INTO promotion_products (promotion_id, product_id) VALUES 
+(@promo3_id, 4), (@promo3_id, 5), (@promo3_id, 14);
+
+
+-- ==================================================================
+-- 4. CHƯƠNG TRÌNH CÓ CODE 1: "Khách Hàng Thân Thiết"
+-- Code: ARTLOVER
+-- Loại: Giảm 20% (Khá sâu)
+-- Sản phẩm áp dụng: 6, 7, 8 (Tranh phong cảnh rừng, lúa, phố cổ)
+-- ==================================================================
+INSERT INTO promotions (name, description, image_url, code, type, value, start_date, end_date, min_order_value, max_discount_value, usage_limit)
+VALUES (
+    'Đặc Quyền Art Lover', 
+    'Nhập mã ARTLOVER để giảm ngay 20%. Dành riêng cho những tâm hồn yêu thiên nhiên và phong cảnh.', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_artlover_coupon.jpg', 
+    'ARTLOVER', -- CÓ CODE
+    'PERCENTAGE', 
+    20.00, -- Giảm 20%
+    '2025-11-20 00:00:00', 
+    '2026-01-30 23:59:59', 
+    800000, 
+    1000000, -- Giảm tối đa 1 triệu
+    100 -- Chỉ 100 mã
+);
+
+SET @promo4_id = LAST_INSERT_ID();
+INSERT INTO promotion_products (promotion_id, product_id) VALUES 
+(@promo4_id, 6), (@promo4_id, 7), (@promo4_id, 8);
+
+
+-- ==================================================================
+-- 5. CHƯƠNG TRÌNH CÓ CODE 2: "Chào Đông 2025"
+-- Code: HELLO2026
+-- Loại: Giảm tiền mặt 500k (Cho đơn hàng lớn)
+-- Sản phẩm áp dụng: 9, 10, 13 (Tranh Vịnh Hạ Long, Suối, Tranh khổ lớn)
+-- ==================================================================
+INSERT INTO promotions (name, description, image_url, code, type, value, start_date, end_date, min_order_value, max_discount_value, usage_limit)
+VALUES (
+    'Chào Đón Năm Mới 2026', 
+    'Mã giảm giá đặc biệt HELLO2026 giảm ngay 500K cho các tác phẩm phong cảnh hùng vĩ.', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_newyear_coupon.jpg', 
+    'HELLO2026', -- CÓ CODE
+    'FIXED_AMOUNT', 
+    500000.00, -- Giảm 500k
+    '2025-12-15 00:00:00', 
+    '2026-02-15 23:59:59', 
+    2500000, -- Chỉ áp dụng đơn trên 2.5 triệu
+    NULL, 
+    50 -- Chỉ 50 mã
+);
+
+SET @promo5_id = LAST_INSERT_ID();
+INSERT INTO promotion_products (promotion_id, product_id) VALUES 
+(@promo5_id, 9), (@promo5_id, 10), (@promo5_id, 13);
+
+-- ==================================================================
+-- KIỂM TRA KẾT QUẢ
+-- ==================================================================
+SELECT p.id, p.name, p.code, p.type, p.value, COUNT(pp.product_id) as total_products
+FROM promotions p
+JOIN promotion_products pp ON p.id = pp.promotion_id
+GROUP BY p.id;
