@@ -111,7 +111,7 @@ export default function ProductPromotionManagement() {
           await axios.post(`${API_BASE_URL}/api/v1/admin/promotions/${selectedPromo.id}/products/${productId}`, {}, { headers: createAuthHeaders() });
           toast.success("Đã thêm sản phẩm");
           loadAssignedData(); // Reload
-      } catch (e) { toast.error("Lỗi thêm sản phẩm"); }
+      } catch (e) { console.log(e.response.data.message); toast.error(e.response.data.message||"Lỗi thêm sản phẩm"); }
   };
 
   // =======================================================
@@ -136,45 +136,12 @@ export default function ProductPromotionManagement() {
   };
   // =======================================================
 
-  // --- LOGIC DANH MỤC ---
-  const openAddCategoryModal = () => {
-      axios.get(`${API_BASE_URL}/api/v1/categories/all`, { headers: createAuthHeaders() })
-        .then(res => {
-            // Flatten categories nếu cần, hoặc lấy list phẳng
-            const list = Array.isArray(res.data) ? res.data : (res.data.content || []);
-            setAllCategories(list);
-            setIsCategoryModalOpen(true);
-        });
-  };
-
-  const handleAddCategory = async (catId) => {
-      try {
-          await axios.post(`${API_BASE_URL}/api/v1/admin/promotions/${selectedPromo.id}/categories/${catId}`, {}, { headers: createAuthHeaders() });
-          toast.success("Đã thêm danh mục");
-          loadAssignedData();
-      } catch (e) { toast.error("Lỗi thêm danh mục"); }
-  };
-
+ 
   // =======================================================
   // SỬA: Logic Xóa Danh mục (dùng Modal Custom)
-  // =======================================================
-  const initiateRemoveCategory = (catId) => {
-    setConfirmData({
-      isOpen: true,
-      title: "Xóa Danh Mục Khỏi Khuyến Mãi",
-      message: "Bạn có chắc chắn muốn xóa danh mục này khỏi chương trình khuyến mãi không?",
-      onConfirm: () => confirmRemoveCategory(catId)
-    });
-  };
 
-  const confirmRemoveCategory = async (catId) => {
-      setConfirmData({ ...confirmData, isOpen: false }); // Đóng modal
-      try {
-          await axios.delete(`${API_BASE_URL}/api/v1/admin/promotions/${selectedPromo.id}/categories/${catId}`, { headers: createAuthHeaders() });
-          toast.success("Đã xóa danh mục");
-          loadAssignedData();
-      } catch (e) { toast.error("Lỗi xóa danh mục"); }
-  };
+
+
   // =======================================================
 
   // Style
@@ -274,7 +241,6 @@ export default function ProductPromotionManagement() {
 
                     <div className="tabs">
                         <div className={`tab ${activeTab === 'PRODUCTS' ? 'active' : ''}`} onClick={() => setActiveTab('PRODUCTS')}>Sản phẩm áp dụng</div>
-                        <div className={`tab ${activeTab === 'CATEGORIES' ? 'active' : ''}`} onClick={() => setActiveTab('CATEGORIES')}>Danh mục áp dụng</div>
                     </div>
 
                     {activeTab === 'PRODUCTS' && (
@@ -302,29 +268,6 @@ export default function ProductPromotionManagement() {
                         </div>
                     )}
 
-                    {activeTab === 'CATEGORIES' && (
-                        <div>
-                             <button className="btn-add" onClick={openAddCategoryModal}>{faPlus} Thêm Danh mục</button>
-                             <div style={{clear:'both', marginBottom: 10}}></div>
-                             <table className="data-table">
-                                <thead><tr><th>ID</th><th>Tên danh mục</th><th>Hành động</th></tr></thead>
-                                <tbody>
-                                    {assignedCategories.length === 0 ? <tr><td colSpan="3">Chưa có danh mục nào.</td></tr> : 
-                                        assignedCategories.map(c => (
-                                            <tr key={c.id}>
-                                                <td>{c.id}</td>
-                                                <td>{c.name}</td>
-                                                <td>
-                                                    {/* SỬA: Gọi hàm mở modal xác nhận */}
-                                                    <button className="btn-icon" onClick={() => initiateRemoveCategory(c.id)}>{faTrash}</button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                             </table>
-                        </div>
-                    )}
                 </>
             )}
         </div>
@@ -369,29 +312,7 @@ export default function ProductPromotionManagement() {
       )}
 
       {/* MODAL THÊM DANH MỤC */}
-      {isCategoryModalOpen && (
-          <div className="modal-overlay" onClick={() => setIsCategoryModalOpen(false)}>
-              <div className="modal-content" onClick={e => e.stopPropagation()}>
-                  <div>
-                      <button className="modal-close" onClick={() => setIsCategoryModalOpen(false)}>×</button>
-                      <h3>Chọn danh mục để thêm</h3>
-                  </div>
-                  {allCategories.map(c => {
-                      const isAssigned = assignedCategories.some(ac => ac.id === c.id);
-                      return (
-                        <div key={c.id} className="modal-list-item">
-                            <span>{c.name}</span>
-                            {isAssigned ? (
-                                <span style={{color:'green', fontSize:12}}>{faCheck} Đã thêm</span>
-                            ) : (
-                                <button className="modal-btn-add" onClick={() => handleAddCategory(c.id)}>Thêm</button>
-                            )}
-                        </div>
-                      );
-                  })}
-              </div>
-          </div>
-      )}
+    
     </>
   );
 }

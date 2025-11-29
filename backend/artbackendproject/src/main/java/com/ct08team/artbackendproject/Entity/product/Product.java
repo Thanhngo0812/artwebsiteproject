@@ -1,5 +1,7 @@
 package com.ct08team.artbackendproject.Entity.product;
 
+import com.ct08team.artbackendproject.Entity.promotion.Promotion;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -53,6 +55,9 @@ public class Product {
     @JsonManagedReference
     private List<ProductVariant> variants = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
+    @JsonIgnore // Quan trọng: Tránh lỗi vòng lặp vô hạn khi chuyển JSON
+    private Set<Promotion> promotions = new HashSet<>();
     @Column(name = "min_price")
     private BigDecimal minPrice;
 
@@ -196,7 +201,13 @@ public class Product {
         this.createdAt = createdAt;
     }
     // Helper methods
+    public Set<Promotion> getPromotions() {
+        return promotions;
+    }
 
+    public void setPromotions(Set<Promotion> promotions) {
+        this.promotions = promotions;
+    }
     
     public void addCategory(Category category) {
         categories.add(category);

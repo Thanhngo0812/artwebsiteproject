@@ -39,6 +39,7 @@ import ProductAdmin_Edit from "./pages/admin/ProductManagement/ProductAdmin_Edit
 import OrderManagement from "./pages/admin/OrderManagement/OrderManagement";
 import PromotionManagement from "./pages/admin/Promotion/PromotionManagement";
 import ProductPromotionManagement from "./pages/admin/Promotion/ProductPromotionManagement";
+import Statistic from "./pages/admin/Statistic/Statistic";
 
 function App() {
   return (
@@ -94,6 +95,8 @@ function App() {
                 <Route path="promotion" element={<PromotionManagement />} />
                 <Route path="promotionapply" element={<ProductPromotionManagement />} />
                 <Route path="category" element={<Category />} />
+               <Route path="statistics-detail" element={<Statistic />} />
+
               </Route>
             </Route>
           </Routes>

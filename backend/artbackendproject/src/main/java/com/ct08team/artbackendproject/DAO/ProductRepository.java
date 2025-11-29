@@ -61,7 +61,15 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             @Param("status") Integer status,
             Pageable pageable
     );
+    // 5. Đếm số lượng sản phẩm sắp hết hàng (Dùng cho Dashboard)
+    // (Sản phẩm được coi là sắp hết hàng nếu TẤT CẢ các biến thể của nó đều có tồn kho < threshold)
+    @Query("SELECT COUNT(p) FROM Product p " +
+            "WHERE (SELECT SUM(v.stockQuantity) FROM ProductVariant v WHERE v.product = p) < :threshold")
+    long countLowStockProducts(@Param("threshold") int threshold);
+
     // Tìm tất cả theo Status (dùng cho Newest và Featured)
     List<Product> findByProductStatus(Integer status); // Trả về List để tính điểm Featured
     Page<Product> findByProductStatus(Integer status, Pageable pageable); // Trả về Page cho Newest
+
+
 }
