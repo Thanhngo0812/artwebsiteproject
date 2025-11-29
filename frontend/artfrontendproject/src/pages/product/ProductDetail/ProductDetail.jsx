@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate,useSearchParams } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import productService from '../../../services/productService';
 import ProductCard from '../../../components/product/ProductCard/ProductCard';
@@ -9,8 +9,8 @@ import './ProductDetail.css';
 
 export default function ProductDetail() {
   const { id } = useParams();
-    const [searchParams] = useSearchParams();
-    const responseCode = searchParams.get('vnp_ResponseCode');
+  const [searchParams] = useSearchParams();
+  const responseCode = searchParams.get('vnp_ResponseCode');
 
   const navigate = useNavigate();
   const { addToCart, cartItems, showMiniCart, lastAddedItem, closeMiniCart } = useCart();
@@ -46,13 +46,13 @@ export default function ProductDetail() {
     try {
       const data = await productService.getProductById(id);
       setProduct(data);
-      
+
       if (data.images && data.images.length > 0) {
         setMainImage(data.images[0].imageUrl);
       } else {
         setMainImage(data.thumbnail);
       }
-      if (data.topics&&data.topics.length>0){
+      if (data.topics && data.topics.length > 0) {
         let topicsToDisplay = data.topics;
         setDisplayTopics(topicsToDisplay);
       }
@@ -100,7 +100,7 @@ export default function ProductDetail() {
     const categoryName = displayCategories.length > 0 ? displayCategories[0].name : product.categories[0].name;
 
     addToCart(product, categoryId, categoryName, selectedVariant.dimensions, quantity);
-    
+
   };
 
   const handleBuyNow = () => {
@@ -145,32 +145,44 @@ export default function ProductDetail() {
 
   const calculateVariantPromoPrice = (variantPrice) => {
     if (!product.promotionalPrice || !product.minPrice) return null;
-  
-  // Tính % giảm giá từ product
-  const discountPercent = (product.minPrice - product.promotionalPrice) / product.minPrice;
-  
-  const discount = variantPrice * discountPercent;
+
+    // Tính % giảm giá từ product
+    const discountPercent = (product.minPrice - product.promotionalPrice) / product.minPrice;
+
+    const discount = variantPrice * discountPercent;
     return variantPrice - discount;
   };
 
   const inStock = selectedVariant && selectedVariant.stockQuantity > 0;
 
-  const displayPrice = selectedVariant.promotionalPrice? selectedVariant.promotionalPrice:selectedVariant.price;
+  const calculatedPromoPrice = calculateVariantPromoPrice(selectedVariant?.price);
+  const finalPromoPrice = selectedVariant?.promotionalPrice || calculatedPromoPrice;
 
+  const hasPromotion = finalPromoPrice && finalPromoPrice < selectedVariant?.price;
 
-  const originalPrice = selectedVariant 
-    ? selectedVariant.price 
-    : product.minPrice;
+  const displayPrice = hasPromotion ? finalPromoPrice : selectedVariant?.price;
+  const originalPrice = selectedVariant?.price;
 
-  const hasPromotion = product.promotionalPrice && product.promotionalPrice < product.minPrice;
-
-  const discountPercent = hasPromotion 
+  const discountPercent = hasPromotion
     ? calculateDiscount(originalPrice, displayPrice)
     : 0;
 
+  console.log('--- Price Debug ---');
+  console.log('Product:', product);
+  console.log('Selected Variant:', selectedVariant);
+  console.log('Product Min Price:', product.minPrice);
+  console.log('Product Promo Price:', product.promotionalPrice);
+  console.log('Variant Price:', selectedVariant?.price);
+  console.log('Variant Promo Price (Explicit):', selectedVariant?.promotionalPrice);
+  console.log('Calculated Promo Price:', calculatedPromoPrice);
+  console.log('Final Promo Price:', finalPromoPrice);
+  console.log('Display Price:', displayPrice);
+  console.log('Has Promotion:', hasPromotion);
+  console.log('-------------------');
+
   return (
     <div className="product-detail-page">
-      <MiniCart 
+      <MiniCart
         isOpen={showMiniCart}
         onClose={closeMiniCart}
         cartItems={cartItems}
@@ -189,13 +201,13 @@ export default function ProductDetail() {
           <div className="pd-main-image">
             <img src={mainImage} alt={product.productName || product.productname} />
           </div>
-          
+
           {product.images && product.images.length > 1 && (
             <div className="pd-thumbnails">
               {product.images.map((img, idx) => (
-                <img 
+                <img
                   key={idx}
-                  src={img.imageUrl} 
+                  src={img.imageUrl}
                   alt={`${product.productName}-${idx}`}
                   className={activeImageIndex === idx ? 'active' : ''}
                   onClick={() => handleImageClick(img.imageUrl, idx)}
@@ -207,7 +219,7 @@ export default function ProductDetail() {
 
         <div className="pd-right">
           <h1 className="pd-title">{product.productName || product.productname}</h1>
-          
+
           <div className="pd-price-section">
             {hasPromotion ? (
               <>
@@ -236,10 +248,11 @@ export default function ProductDetail() {
               <label>Chọn kích thước:</label>
               <div className="pd-variant-options">
                 {product.variants.map((variant) => {
-                  const variantPromoPrice = variant.promotionalPrice
-                  console.log(variant)
+                  const calculated = calculateVariantPromoPrice(variant.price);
+                  const variantPromoPrice = variant.promotionalPrice || calculated;
+
                   const variantHasPromo = variantPromoPrice && variantPromoPrice < variant.price;
-                  const variantDiscount = variantHasPromo 
+                  const variantDiscount = variantHasPromo
                     ? calculateDiscount(variant.price, variantPromoPrice)
                     : 0;
 
@@ -251,7 +264,7 @@ export default function ProductDetail() {
                       disabled={variant.stockQuantity <= 0}
                     >
                       <span className="variant-size">{variant.dimensions}</span>
-                      
+
                       {variantHasPromo ? (
                         <div className="variant-price-container">
                           <span className="variant-price variant-price-promo">
@@ -267,7 +280,7 @@ export default function ProductDetail() {
                       ) : (
                         <span className="variant-price">{formatPrice(variant.price)}</span>
                       )}
-                      
+
                       {variant.stockQuantity <= 0 && (
                         <span className="variant-soldout">Hết hàng</span>
                       )}
@@ -282,21 +295,21 @@ export default function ProductDetail() {
           <div className="pd-quantity-section">
             <label>Số lượng:</label>
             <div className="pd-quantity-control">
-              <button 
+              <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={!inStock}
               >
                 −
               </button>
-              <input 
-                type="number" 
-                value={quantity} 
+              <input
+                type="number"
+                value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, Math.min(selectedVariant?.stockQuantity || 1, parseInt(e.target.value) || 1)))}
                 min="1"
                 max={selectedVariant?.stockQuantity || 1}
                 disabled={!inStock}
               />
-              <button 
+              <button
                 onClick={() => setQuantity(Math.min(selectedVariant?.stockQuantity || 1, quantity + 1))}
                 disabled={!inStock}
               >
@@ -305,8 +318,8 @@ export default function ProductDetail() {
             </div>
             {selectedVariant && (
               <span className="pd-stock-info">
-                {selectedVariant.stockQuantity > 0 
-                  ? `Còn ${selectedVariant.stockQuantity} sản phẩm` 
+                {selectedVariant.stockQuantity > 0
+                  ? `Còn ${selectedVariant.stockQuantity} sản phẩm`
                   : 'Hết hàng'}
               </span>
             )}
@@ -314,15 +327,15 @@ export default function ProductDetail() {
 
           {/* Actions */}
           <div className="pd-actions">
-            <button 
+            <button
               className={`pd-btn-add ${!inStock ? 'disabled' : ''}`}
               onClick={handleAddToCart}
               disabled={!inStock}
             >
               {inStock ? 'Thêm vào giỏ' : 'Hết hàng'}
             </button>
-            
-            <button 
+
+            <button
               className="pd-btn-buy"
               onClick={handleBuyNow}
               disabled={!inStock}
@@ -336,7 +349,7 @@ export default function ProductDetail() {
             <div className="pd-info-item">
               <span className="pd-info-label">Danh mục:</span>
               <span className="pd-info-value">
-                {displayCategories.length > 0 
+                {displayCategories.length > 0
                   ? displayCategories.map(c => c.name).join(', ')
                   : (product.categories?.map(c => c.name).join(', ') || '—')}
               </span>
@@ -344,7 +357,7 @@ export default function ProductDetail() {
             <div className="pd-info-item">
               <span className="pd-info-label">Chủ đề:</span>
               <span className="pd-info-value">
-                {displayTopics.length > 0 
+                {displayTopics.length > 0
                   ? displayTopics.map(c => c.topicName).join(', ')
                   : 'không có'}
               </span>
@@ -352,7 +365,7 @@ export default function ProductDetail() {
             <div className="pd-info-item">
               <span className="pd-info-label">Chất liệu:</span>
               <span className="pd-info-value">
-                {product.material.name?product.material.name:'Không có'}
+                {product.material.name ? product.material.name : 'Không có'}
               </span>
             </div>
             {product.colors && product.colors.length > 0 && (
@@ -360,7 +373,7 @@ export default function ProductDetail() {
                 <span className="pd-info-label">Màu sắc:</span>
                 <div className="pd-colors">
                   {product.colors.map((color, idx) => (
-                    <span 
+                    <span
                       key={idx}
                       className="pd-color-box"
                       style={{ backgroundColor: color.hexCode }}

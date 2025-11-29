@@ -517,7 +517,7 @@ export default function Header() {
                   <div className="user-dropdown-arrow"></div>
 
                   <button className="user-dropdown-item" onClick={() => {
-                    navigate("/profile");
+                    navigate("/user/profile");
                     setIsUserMenuOpen(false);
                   }}>
                     <FaUser className="dropdown-icon" />
@@ -525,7 +525,7 @@ export default function Header() {
                   </button>
 
                   <button className="user-dropdown-item" onClick={() => {
-                    navigate("/purchase-history");
+                    navigate("/user/orders");
                     setIsUserMenuOpen(false);
                   }}>
                     <FaHistory className="dropdown-icon" />
