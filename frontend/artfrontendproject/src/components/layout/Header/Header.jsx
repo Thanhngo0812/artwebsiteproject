@@ -216,6 +216,15 @@ export default function Header() {
     setMenuOpen(false);
   };
 
+    const handleToAbout = () => {
+    setActiveParentId(null);
+    const unique = Date.now();
+    navigateShop(`/about`);
+    setActiveSidebarParentId(null);
+    navigateShop("/about");
+    setMenuOpen(false);
+  };
+
   const navigateCategoryParent = useNavigate();
   const handleParentClick = (parentId, parentName) => {
     const hasChildren = childrenMap[parentId] && childrenMap[parentId].length > 0;
@@ -354,44 +363,12 @@ export default function Header() {
                 </li>
               );
             })}
+            <li onClick={handleToAbout}>
+              <div className="nav-sidebar-item shop">Về chúng tôi</div>
+            </li>
           </ul>
 
-          <div className="nav-right">
-            <button className="icon-button" onClick={openSearch}>
-              <img src="/search.png" alt="Search" className="nav-icon" />
-            </button>
-
-            {/* --- KHU VỰC USER CẬP NHẬT --- */}
-            <div className="user-menu-container" ref={userDropdownRef} style={{ position: 'relative' }}>
-              <button className="icon-button" onClick={handleUserIconClick}>
-                <img src="/user.png" alt="User" className="nav-icon" />
-              </button>
-
-              {/* Tooltip hiện khi hover (chỉ hiện khi menu không mở) */}
-              {!isUserMenuOpen && (
-                <div className="user-hover-tooltip">
-                  {isLoggedIn ? `Xin chào, ${username}` : 'Trở thành thành viên TRANH XỊN ngay'}
-                </div>
-              )}
-
-              {/* Menu Dropdown */}
-              {isLoggedIn && isUserMenuOpen && (
-                <div className="user-dropdown-menu">
-                  <div className="user-dropdown-arrow"></div>
-                  <Link to="/user/profile" className="user-dropdown-item" onClick={() => setIsUserMenuOpen(false)}>
-                    <FaUser className="dropdown-icon" /> Thông tin cá nhân
-                  </Link>
-                  <Link to="/user/orders" className="user-dropdown-item" onClick={() => setIsUserMenuOpen(false)}>
-                    <FaHistory className="dropdown-icon" /> Lịch sử đơn hàng
-                  </Link>
-                  <div className="user-dropdown-divider"></div>
-                  <button className="user-dropdown-item logout-btn" onClick={handleLogout}>
-                    <FaSignOutAlt className="dropdown-icon" /> Đăng xuất
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+        
         </div>
 
         <nav className="nav">
@@ -483,6 +460,11 @@ export default function Header() {
                   </li>
                 );
               })}
+              <li className="nav-menu-item" onClick={handleToAbout}>
+                <Link to="/about" className="nav-item shop">
+                  Về chúng tôi
+                </Link>
+              </li>
             </ul>
           </div>
 

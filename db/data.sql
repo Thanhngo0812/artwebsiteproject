@@ -368,436 +368,155 @@ INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, '
 INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E5B296'), (@product_id, '#F0F1F2');
 
 COMMIT;
--- SP 18
 
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khỏa thân Hiện đại', 'Tranh sơn dầu hiện đại, đường nét táo bạo.', '/images/product/sp18_thumb.jpg', 1, 1, 150);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 16);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '90x120cm', 6000000, 3, 4200000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp18_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#D4AF37'), (@product_id, '#2C2A2A');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Hiện đại'), (@product_id, 'Khỏa thân');
+ -- SP 18
+ INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+ ('Tĩnh vật Giỏ trái cây', 'Tranh sơn dầu tĩnh vật, ánh sáng cổ điển.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764475544/IMG_20250924_155429_jtcsml.jpg', 1, 1, 170);
+ SET @product_id = LAST_INSERT_ID();
+ INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 15);
+ INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+ (@product_id, '50x70cm', 2000000, 7, 1300000);
+ SET @variant1_id = LAST_INSERT_ID();
+ INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764475544/IMG_20250924_155429_jtcsml.jpg');
+ INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#DB4437'), (@product_id, '#34A853');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Tĩnh vật'), (@product_id, 'Trái cây');
 
 -- -- SP 19
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tĩnh vật Giỏ trái cây', 'Tranh sơn dầu tĩnh vật, ánh sáng cổ điển.', '/images/product/sp19_thumb.jpg', 1, 1, 170);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 15);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x70cm', 2000000, 7, 1300000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp19_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#DB4437'), (@product_id, '#34A853');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Tĩnh vật'), (@product_id, 'Trái cây');
-
--- -- SP 20
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Chân dung Tự họa', 'Tranh sơn dầu hiện đại, phong cách tự họa.', '/images/product/sp20_thumb.jpg', 1, 1, 85);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 14), (@product_id, 16);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '40x40cm', 1500000, 5, 1000000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp20_v1.jpg');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Chân dung'), (@product_id, 'Hiện đại');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Chân dung Tự họa', 'Tranh sơn dầu hiện đại, phong cách tự họa.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764475776/IMG_20231009_124142-2_oiquer.jpg', 1, 1, 85);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 14), (@product_id, 16);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '40x40cm', 1500000, 5, 1000000);
+SET @variant1_id = LAST_INSERT_ID();
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764475776/IMG_20231009_124142-2_oiquer.jpg');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Chân dung'), (@product_id, 'Hiện đại');
 
 -- -- ============================================
 -- -- SẢN PHẨM 21 - 25 (Nhóm Nghệ Thuật)
 -- -- ============================================
 
+-- -- SP 20
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Đêm đầy sao (Van Gogh)', 'Tranh phục dựng theo trường phái Ấn tượng, sơn dầu.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764476043/Van_Gogh_-_Starry_Night_-_Google_Art_Project_kln6ff.jpg', 1, 1, 450);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 17);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '60x90cm', 3800000, 7, 2500000),
+(@product_id, '80x120cm', 5000000, 3, 3500000);
+SET @variant1_id = LAST_INSERT_ID();
+SET @variant2_id = @variant1_id + 1;
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764476051/chuyen-gia-phan-bien-ve-buc-tranh-dem-day-sao-cua-van-gogh-1744167369361667823072-29-0-657-1200-crop-1744167524176737805114_g9zndh.jpg'),(@variant1_id,'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764476049/photo1666855374826-16668553762391887687378_u3fdtr.webp'), (@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764476050/O1CN01oAZTmY1Lt5elbBubF__2775031356.png_540x540_uxakhx.avif');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4285F4'), (@product_id, '#F4B400');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Ấn tượng'), (@product_id, 'Van Gogh');
+ 
 -- -- SP 21
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Đêm đầy sao (Van Gogh)', 'Tranh phục dựng theo trường phái Ấn tượng, sơn dầu.', '/images/product/sp21_thumb.jpg', 1, 1, 450);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 17);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '60x90cm', 3800000, 7, 2500000),
--- (@product_id, '80x120cm', 5000000, 3, 3500000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp21_v1.jpg'), (@variant2_id, '/images/product/sp21_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4285F4'), (@product_id, '#F4B400');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Ấn tượng'), (@product_id, 'Van Gogh');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Sự bền bỉ của Ký ức', 'Tranh phục dựng Siêu thực, chất liệu Acrylic.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764476938/S%E1%BB%B1_dai_d%E1%BA%B3ng_c%E1%BB%A7a_k%C3%BD_%E1%BB%A9c_owengh.jpg', 2, 1, 320);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 19);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '50x70cm', 2300000, 10, 1500000);
+SET @variant1_id = LAST_INSERT_ID();
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764476938/S%E1%BB%B1_dai_d%E1%BA%B3ng_c%E1%BB%A7a_k%C3%BD_%E1%BB%A9c_owengh.jpg');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#A67B5B'), (@product_id, '#5E8B7E');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Siêu thực'), (@product_id, 'Dali');
 
 -- -- SP 22
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Sự bền bỉ của Ký ức (Dali)', 'Tranh phục dựng Siêu thực, chất liệu Acrylic.', '/images/product/sp22_thumb.jpg', 2, 1, 320);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 19);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x70cm', 2300000, 10, 1500000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp22_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#A67B5B'), (@product_id, '#5E8B7E');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Siêu thực'), (@product_id, 'Dali');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Mona Lisa (Da Vinci)', 'Tranh phục dựng Phục Hưng, sơn dầu chất lượng cao.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764477180/960px-Gioconda__copia_del_Museo_del_Prado_restaurada_q6jx30.jpg', 1, 1, 500);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 20);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '53x77cm', 8000000, 2, 6000000);
+SET @variant1_id = LAST_INSERT_ID();
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764477180/960px-Gioconda__copia_del_Museo_del_Prado_restaurada_q6jx30.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764477085/135517-tiet-lo-bi-mat-moi-ve-kiet-tac-mona-lisa_iyn0qb.jpg');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4E4B3C'), (@product_id, '#8B4513');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Phục Hưng'), (@product_id, 'Chân dung');
 
 -- -- SP 23
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Mona Lisa (Da Vinci)', 'Tranh phục dựng Phục Hưng, sơn dầu chất lượng cao.', '/images/product/sp23_thumb.jpg', 1, 1, 500);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 20);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '53x77cm', 8000000, 2, 6000000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp23_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4E4B3C'), (@product_id, '#8B4513');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Phục Hưng'), (@product_id, 'Chân dung');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Những cô gái Avignon (Picasso)', 'Tranh phục dựng Lập thể, sơn dầu.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764477675/Les-Demoiselles-dAvignon-972x1024_c42teg.png', 1, 1, 180);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 18);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '100x100cm', 7500000, 3, 5000000);
+SET @variant1_id = LAST_INSERT_ID();
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764477675/Les-Demoiselles-dAvignon-972x1024_c42teg.png'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764477529/tranh-son-dau-nhung-co-nang-o-avignon-homeazvn3-1142_xw987i.webp');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E6A99C'), (@product_id, '#5E8B7E');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Lập thể'), (@product_id, 'Picasso');
 
 -- -- SP 24
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Những cô gái Avignon (Picasso)', 'Tranh phục dựng Lập thể, sơn dầu.', '/images/product/sp24_thumb.jpg', 1, 1, 180);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 18);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '100x100cm', 7500000, 3, 5000000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp24_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E6A99C'), (@product_id, '#5E8B7E');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Lập thể'), (@product_id, 'Picasso');
-
--- -- SP 25
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Ấn tượng Mặt trời mọc (Monet)', 'Tranh phục dựng Ấn tượng, acrylic.', '/images/product/sp25_thumb.jpg', 2, 1, 290);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 17);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '60x80cm', 2600000, 8, 1700000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp25_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FF5733'), (@product_id, '#AECBFA');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Ấn tượng'), (@product_id, 'Phong cảnh');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Ấn tượng Mặt trời mọc', 'Tranh phục dựng Ấn tượng, acrylic.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480390/999px-Claude_Monet__Impression__soleil_levant__1872_qzsy0k.jpg', 2, 1, 290);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 17);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '60x80cm', 2600000, 8, 1700000);
+SET @variant1_id = LAST_INSERT_ID();
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480390/999px-Claude_Monet__Impression__soleil_levant__1872_qzsy0k.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480378/4-95925_thumb_ine7ni.webp');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FF5733'), (@product_id, '#AECBFA');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Ấn tượng'), (@product_id, 'Phong cảnh');
 
 -- -- ============================================
 -- -- SẢN PHẨM 26 - 30 (Nhóm Khung Tranh)
 -- -- ============================================
 
+-- -- SP 25
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Khung Kim loại Hiện đại', 'Khung kim loại mạ vàng, thiết kế thanh mảnh, hiện đại.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480624/an4-1_j4ivyc.jpg', 5, 1, 140);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 22);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '30x40cm', 350000, 40, 250000),
+(@product_id, '50x70cm', 500000, 30, 350000);
+SET @variant1_id = LAST_INSERT_ID();
+SET @variant2_id = @variant1_id + 1;
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480624/an4-1_j4ivyc.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480612/kt28t2.jpg_fsjlbb.webp'), (@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480614/kt28-4.jpg_jzfiiy.webp');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#D4AF37');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Hiện đại');
+
+
 -- -- SP 26
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Kim loại Hiện đại (Vàng)', 'Khung kim loại mạ vàng, thiết kế thanh mảnh, hiện đại.', '/images/product/sp26_thumb.jpg', 5, 1, 140);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 22);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '30x40cm', 350000, 40, 250000),
--- (@product_id, '50x70cm', 500000, 30, 350000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp26_v1.jpg'), (@variant2_id, '/images/product/sp26_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#D4AF37');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Hiện đại');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Bản in Canvas Trừu tượng Xanh', 'Bản in nghệ thuật (art print) trên canvas, chủ đề trừu tượng.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480826/ranh-tru%CC%9B%CC%80u-tu%CC%9Bo%CC%9B%CC%A3ng-ma%CC%80u-xanh-ve%CC%83-hie%CC%A3%CC%82n-da%CC%A3i-kho%CC%82%CC%89-lo%CC%9B%CC%81n-1-100x100-1.jpg_wlkra6.webp', 6, 1, 95);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 8);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '40x60cm', 350000, 50, 200000),
+(@product_id, '60x90cm', 500000, 40, 300000);
+SET @variant1_id = LAST_INSERT_ID();
+SET @variant2_id = @variant1_id + 1;
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480826/ranh-tru%CC%9B%CC%80u-tu%CC%9Bo%CC%9B%CC%A3ng-ma%CC%80u-xanh-ve%CC%83-hie%CC%A3%CC%82n-da%CC%A3i-kho%CC%82%CC%89-lo%CC%9B%CC%81n-1-100x100-1.jpg_wlkra6.webp'), (@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480826/ranh-tru%CC%9B%CC%80u-tu%CC%9Bo%CC%9B%CC%A3ng-ma%CC%80u-xanh-ve%CC%83-hie%CC%A3%CC%82n-da%CC%A3i-kho%CC%82%CC%89-lo%CC%9B%CC%81n-1-100x100-1.jpg_wlkra6.webp'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480828/tranh-kho-lon-2.jpg_ce4i16.webp'), (@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764480833/tranh-tru%CC%9B%CC%80u-tu%CC%9Bo%CC%9B%CC%A3ng-ma%CC%80u-xanh-ve%CC%83-hie%CC%A3%CC%82n-da%CC%A3i-kho%CC%82%CC%89-lo%CC%9B%CC%81n-1.jpg_i5wfxc.webp');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4285F4'), (@product_id, '#AECBFA');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bản in'), (@product_id, 'Trừu tượng');
 
 -- -- SP 27
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Composite Trắng', 'Khung tranh composite, màu trắng, phong cách tối giản.', '/images/product/sp27_thumb.jpg', 8, 1, 200);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 23);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, 'A4 (21x30cm)', 150000, 100, 90000),
--- (@product_id, 'A3 (30x42cm)', 220000, 80, 140000),
--- (@product_id, 'A2 (42x60cm)', 300000, 50, 200000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- SET @variant3_id = @variant1_id + 2;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES
--- (@variant1_id, '/images/product/sp27_v1.jpg'),
--- (@variant2_id, '/images/product/sp27_v2.jpg'),
--- (@variant3_id, '/images/product/sp27_v3.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FFFFFF');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Tối giản');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Tranh Màu nước Hoa Mẫu đơn', 'Tranh màu nước gốc, vẽ hoa mẫu đơn trên giấy mỹ thuật.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764481089/IMG_3713-e1721661352167_dtufu6.jpg', 3, 1, 175);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '30x40cm', 800000, 1, 500000); -- Hàng gốc (Original)
+SET @variant1_id = LAST_INSERT_ID();
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764481089/IMG_3713-e1721661352167_dtufu6.jpg'),(@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764481092/IMG_3711-1536x1516_c3mfcv.jpg');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E87A90'), (@product_id, '#34A853');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Hoa'), (@product_id, 'Màu nước');
 
--- -- SP 28
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Gỗ Thông Đơn giản', 'Khung gỗ thông tự nhiên, không sơn, mộc mạc.', '/images/product/sp28_thumb.jpg', 4, 1, 160);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 24);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '30x30cm', 180000, 50, 120000),
--- (@product_id, '40x40cm', 240000, 40, 160000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp28_v1.jpg'), (@variant2_id, '/images/product/sp28_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FCE3B1');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Mộc');
-
--- -- SP 29
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Kim loại Đen (Slim)', 'Khung kim loại màu đen, viền mỏng, phong cách Scandinavian.', '/images/product/sp29_thumb.jpg', 5, 1, 190);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 22);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x70cm', 480000, 35, 320000),
--- (@product_id, '60x90cm', 600000, 25, 400000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp29_v1.jpg'), (@variant2_id, '/images/product/sp29_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#000000');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Hiện đại');
-
--- -- SP 30
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Gỗ Walnut Cao cấp', 'Khung gỗ óc chó (Walnut) cổ điển, bản dày.', '/images/product/sp30_thumb.jpg', 4, 1, 110);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 21);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '60x80cm', 1200000, 15, 800000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp30_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#5E4534');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Cao cấp');
-
--- -- ============================================
--- -- SẢN PHẨM 31 - 40 (Nhóm Chất liệu khác)
--- -- ============================================
-
--- -- SP 31
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Canvas Trừu tượng Xanh', 'Bản in nghệ thuật (art print) trên canvas, chủ đề trừu tượng.', '/images/product/sp31_thumb.jpg', 6, 1, 95);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 8);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '40x60cm', 350000, 50, 200000),
--- (@product_id, '60x90cm', 500000, 40, 300000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp31_v1.jpg'), (@variant2_id, '/images/product/sp31_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4285F4'), (@product_id, '#AECBFA');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bản in'), (@product_id, 'Trừu tượng');
-
--- -- SP 32
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Màu nước Hoa Mẫu đơn', 'Tranh màu nước gốc, vẽ hoa mẫu đơn trên giấy mỹ thuật.', '/images/product/sp32_thumb.jpg', 3, 1, 175);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '30x40cm', 800000, 1, 500000); -- Hàng gốc (Original)
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp32_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E87A90'), (@product_id, '#34A853');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Hoa'), (@product_id, 'Màu nước');
-
--- -- SP 33
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Giấy mỹ thuật (Art Print) - Tối giản', 'Bản in trên giấy mỹ thuật, hình học tối giản.', '/images/product/sp33_thumb.jpg', 7, 1, 115);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 8);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, 'A4 (21x30cm)', 120000, 60, 70000),
--- (@product_id, 'A3 (30x42cm)', 180000, 40, 110000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp33_v1.jpg'), (@variant2_id, '/images/product/sp33_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#000000'), (@product_id, '#FFFFFF');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bản in'), (@product_id, 'Tối giản');
-
--- -- SP 34
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Acrylic Mini (Để bàn)', 'Tranh acrylic vẽ trên canvas nhỏ, có kèm giá đỡ.', '/images/product/sp34_thumb.jpg', 2, 1, 90);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '15x15cm', 250000, 30, 150000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp34_v1.jpg');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Mini'), (@product_id, 'Để bàn');
-
--- -- SP 35
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Canvas Phong cảnh Núi', 'Bản in canvas cảnh núi tuyết hùng vĩ.', '/images/product/sp35_thumb.jpg', 6, 1, 140);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 11);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x70cm', 450000, 30, 280000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp35_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FFFFFF'), (@product_id, '#6F8FAF');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bản in'), (@product_id, 'Núi');
-
--- -- SP 36
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Lụa (Bản in)', 'Bản in trên chất liệu lụa, tranh đông hồ.', '/images/product/sp36_thumb.jpg', 7, 1, 165); -- Giả định giấy mỹ thuật = lụa
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '40x60cm', 600000, 20, 400000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp36_v1.jpg');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Truyền thống'), (@product_id, 'Đông hồ');
-
--- -- SP 37
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Sơn dầu Biển (Cỡ nhỏ)', 'Tranh sơn dầu gốc, cảnh biển.', '/images/product/sp37_thumb.jpg', 1, 1, 130);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 10);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '30x40cm', 900000, 5, 600000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp37_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#0077B6'), (@product_id, '#E0E1DD');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Biển'), (@product_id, 'Sơn dầu');
-
--- -- SP 38
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Art Print - Chân dung Sư tử', 'Bản in giấy mỹ thuật, hình sư tử.', '/images/product/sp38_thumb.jpg', 7, 1, 210);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, 'A3 (30x42cm)', 200000, 50, 120000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp38_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#000000'), (@product_id, '#D4AF37');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Động vật'), (@product_id, 'Bản in');
-
--- -- SP 39
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Acrylic Hoa Sen', 'Tranh acrylic vẽ hoa sen trên canvas.', '/images/product/sp39_thumb.jpg', 2, 1, 180);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x50cm', 1200000, 10, 750000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp39_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E87A90'), (@product_id, '#34A853');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Hoa sen'), (@product_id, 'Tĩnh vật');
 
 -- -- SP 40
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Canvas - Bản đồ Thế giới Cổ', 'Bản in canvas, thiết kế bản đồ cổ.', '/images/product/sp40_thumb.jpg', 6, 1, 230);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '60x90cm', 550000, 25, 350000),
--- (@product_id, '80x120cm', 750000, 15, 500000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp40_v1.jpg'), (@variant2_id, '/images/product/sp40_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#A67B5B'), (@product_id, '#FCE3B1');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bản đồ'), (@product_id, 'Vintage');
-
--- -- ============================================
--- -- SẢN PHẨM 41 - 50 (Nhóm Tổng hợp)
--- -- ============================================
-
--- -- SP 41
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Trừu tượng Hình học (Bản in)', 'Bản in giấy mỹ thuật, thiết kế hình học.', '/images/product/sp41_thumb.jpg', 7, 1, 88);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 8);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, 'A3 (30x42cm)', 190000, 40, 110000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp41_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#DB4437'), (@product_id, '#000000');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Hình học'), (@product_id, 'Bản in');
-
--- -- SP 42
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Sơn dầu Phong cảnh Đồng quê (Mini)', 'Tranh sơn dầu gốc, cỡ nhỏ.', '/images/product/sp42_thumb.jpg', 1, 1, 122);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 12);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '20x30cm', 700000, 8, 450000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp42_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#34A853'), (@product_id, '#AECBFA');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Đồng quê'), (@product_id, 'Mini');
-
--- -- SP 43
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Composite Đen (A4, A3)', 'Khung composite đen, bản mỏng, hiện đại.', '/images/product/sp43_thumb.jpg', 8, 1, 215);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 23);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, 'A4 (21x30cm)', 150000, 100, 90000),
--- (@product_id, 'A3 (30x42cm)', 220000, 80, 140000);
--- SET @variant1_id = LAST_INSERT_ID();
--- SET @variant2_id = @variant1_id + 1;
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp43_v1.jpg'), (@variant2_id, '/images/product/sp43_v2.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#000000');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Tối giản');
-
--- -- SP 44
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Màu nước Chân dung (Gốc)', 'Tranh màu nước gốc vẽ chân dung cô gái.', '/images/product/sp44_thumb.jpg', 3, 1, 155);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '40x50cm', 1500000, 1, 900000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp44_v1.jpg');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Chân dung'), (@product_id, 'Màu nước');
-
--- -- SP 45
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Siêu thực (Bản in Canvas)', 'Bản in canvas một tác phẩm siêu thực.', '/images/product/sp45_thumb.jpg', 6, 1, 100);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4), (@product_id, 19);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x70cm', 480000, 20, 300000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp45_v1.jpg');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Siêu thực'), (@product_id, 'Bản in');
-
--- -- SP 46
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Sơn dầu Hiện đại (Trừu tượng)', 'Tranh sơn dầu gốc, trừu tượng hiện đại.', '/images/product/sp46_thumb.jpg', 1, 1, 135);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 1), (@product_id, 3), (@product_id, 16);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '80x80cm', 3500000, 3, 2500000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp46_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#C70039'), (@product_id, '#2C2A2A');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Sơn dầu'), (@product_id, 'Trừu tượng');
-
--- -- SP 47
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Khung Gỗ Thông (Set 3 cái)', 'Set 3 khung gỗ thông tự nhiên, cỡ nhỏ.', '/images/product/sp47_thumb.jpg', 4, 1, 105);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 5), (@product_id, 24);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '13x18cm (Set 3)', 250000, 40, 180000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp47_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#FCE3B1');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Khung tranh'), (@product_id, 'Set');
-
--- -- SP 48
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Art Print - Cặp đôi', 'Bản in giấy mỹ thuật, hình vẽ đường nét (line art) cặp đôi.', '/images/product/sp48_thumb.jpg', 7, 1, 195);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, 'A4 (21x30cm)', 130000, 70, 80000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp48_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#000000'), (@product_id, '#FFFFFF');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Line art'), (@product_id, 'Tình yêu');
-
--- -- SP 49
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Tranh Acrylic Phong cảnh Thành phố đêm', 'Tranh acrylic gốc, thành phố về đêm.', '/images/product/sp49_thumb.jpg', 2, 1, 145);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 2), (@product_id, 13);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '60x90cm', 2400000, 5, 1600000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp49_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#4285F4'), (@product_id, '#F4B400');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Thành phố'), (@product_id, 'Ban đêm');
-
--- -- SP 50
--- INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
--- ('Bản in Canvas - Tĩnh vật Hiện đại', 'Bản in canvas tĩnh vật hoa, phong cách hiện đại.', '/images/product/sp50_thumb.jpg', 6, 1, 110);
--- SET @product_id = LAST_INSERT_ID();
--- INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 3), (@product_id, 15);
--- INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
--- (@product_id, '50x50cm', 400000, 30, 250000);
--- SET @variant1_id = LAST_INSERT_ID();
--- INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, '/images/product/sp50_v1.jpg');
--- INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#E0E1DD'), (@product_id, '#8B4513');
--- INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Tĩnh vật'), (@product_id, 'Hiện đại');
+INSERT INTO `product` (`productname`, `description`, `thumbnail`, `material_id`, `product_status`, `view_count`) VALUES
+('Bản in Canvas - Bản đồ Thế giới Cổ', 'Bản in canvas, thiết kế bản đồ cổ.', 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764481282/tranh_cac_quoc_gia_tren_the_gioi_1100x_hjhicu.webp', 6, 1, 230);
+SET @product_id = LAST_INSERT_ID();
+INSERT INTO `product_categories` (`product_id`, `categories_id`) VALUES (@product_id, 4);
+INSERT INTO `product_variants` (`product_id`, `dimensions`, `price`, `stock_quantity`, `cost_price`) VALUES
+(@product_id, '60x90cm', 550000, 25, 350000),
+(@product_id, '80x120cm', 750000, 15, 500000);
+SET @variant1_id = LAST_INSERT_ID();
+SET @variant2_id = @variant1_id + 1;
+INSERT INTO `product_images` (`variant_id`, `image_url`) VALUES (@variant1_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764481282/tranh_cac_quoc_gia_tren_the_gioi_1100x_hjhicu.webp'), (@variant2_id, 'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764481329/tranh-ban-do-va-dong-vat-10147771VT741_1100x_dmuyun.webp');
+INSERT INTO `product_colors` (`product_id`, `hex_code`) VALUES (@product_id, '#A67B5B'), (@product_id, '#FCE3B1');
+INSERT INTO `product_topics` (`product_id`, `topic_name`) VALUES (@product_id, 'Bản đồ'), (@product_id, 'Vintage');
 
 -- -- ============================================
 -- -- KẾT THÚC TRANSACTION
@@ -1145,7 +864,7 @@ INSERT INTO promotions (name, description, image_url, code, type, value, start_d
 VALUES (
     'Lễ Hội Mua Sắm Cuối Năm 2025', 
     'Săn sale tưng bừng, mừng năm mới tới. Giảm ngay 15% cho các tác phẩm bán chạy nhất năm.', 
-    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_yearend_sale.jpg', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764474757/Gemini_Generated_Image_l3gu35l3gu35l3gu_iup5cn.png', 
     NULL, -- Không có code
     'PERCENTAGE', 
     15.00, -- Giảm 15%
@@ -1168,9 +887,9 @@ INSERT INTO promotion_products (promotion_id, product_id) VALUES
 -- ==================================================================
 INSERT INTO promotions (name, description, image_url, code, type, value, start_date, end_date, min_order_value, max_discount_value, usage_limit)
 VALUES (
-    'Tuần Lễ Nghệ Thuật Trừu Tượng', 
-    'Mang hơi thở hiện đại vào không gian sống. Giảm trực tiếp 200K cho dòng tranh trừu tượng.', 
-    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_abstract_week.jpg', 
+    'Tuần Lễ Black Friday', 
+    'Tuần lễ sale to, Không lo về giá. Giảm ngay 200k các sản phẩm trên.', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764475207/Gemini_Generated_Image_uae94duae94duae9_feihvm.png', 
     NULL, -- Không có code
     'FIXED_AMOUNT', 
     200000.00, -- Giảm 200k
@@ -1195,7 +914,7 @@ INSERT INTO promotions (name, description, image_url, code, type, value, start_d
 VALUES (
     'Giáng Sinh An Lành - Rinh Tranh Đẹp', 
     'Ưu đãi mùa lễ hội. Giảm 10% cho các dòng tranh cổ điển làm quà tặng.', 
-    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_xmas_sale.jpg', 
+    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1764475306/Gemini_Generated_Image_v0ma8hv0ma8hv0ma_tyrtxi.png', 
     NULL, -- Không có code
     'PERCENTAGE', 
     10.00, -- Giảm 10%
@@ -1221,7 +940,7 @@ INSERT INTO promotions (name, description, image_url, code, type, value, start_d
 VALUES (
     'Đặc Quyền Art Lover', 
     'Nhập mã ARTLOVER để giảm ngay 20%. Dành riêng cho những tâm hồn yêu thiên nhiên và phong cảnh.', 
-    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_artlover_coupon.jpg', 
+    '', 
     'ARTLOVER', -- CÓ CODE
     'PERCENTAGE', 
     20.00, -- Giảm 20%
@@ -1247,7 +966,7 @@ INSERT INTO promotions (name, description, image_url, code, type, value, start_d
 VALUES (
     'Chào Đón Năm Mới 2026', 
     'Mã giảm giá đặc biệt HELLO2026 giảm ngay 500K cho các tác phẩm phong cảnh hùng vĩ.', 
-    'https://res.cloudinary.com/dfcb3zzw9/image/upload/v1762777545/promo_newyear_coupon.jpg', 
+    '', 
     'HELLO2026', -- CÓ CODE
     'FIXED_AMOUNT', 
     500000.00, -- Giảm 500k
@@ -1262,20 +981,8 @@ SET @promo5_id = LAST_INSERT_ID();
 INSERT INTO promotion_products (promotion_id, product_id) VALUES 
 (@promo5_id, 9), (@promo5_id, 10), (@promo5_id, 13);
 
--- ==================================================================
--- KIỂM TRA KẾT QUẢ
--- ==================================================================
-SELECT p.id, p.name, p.code, p.type, p.value, COUNT(pp.product_id) as total_products
-FROM promotions p
-JOIN promotion_products pp ON p.id = pp.promotion_id
-GROUP BY p.id;
 
-SET SQL_SAFE_UPDATES = 0;
-
--- ===================================
--- DỮ LIỆU NHÀ CUNG CẤP (6 nhà cung cấp)
--- ===================================
-
+USE artdbproject;
 INSERT INTO suppliers (name, contact_person, email, phone_number, address)
 VALUES ('Công ty TNHH Nghệ Thuật Việt', 'Nguyễn Văn An', 'nguyenvanan@nghethuatviet.com', '0901234567', '123 Đường Lê Lợi, Quận 1, TP.HCM');
 INSERT INTO suppliers (name, contact_person, email, phone_number, address)
@@ -1292,6 +999,8 @@ VALUES ('Công ty TNHH Canvas & More', 'Võ Văn Phúc', 'vophuc@canvasmore.com'
 -- ===================================
 -- DỮ LIỆU PHIẾU NHẬP (10 phiếu)
 -- ===================================
+
+
 
 INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
 VALUES (1, 'PN20251109001', 'Nhập hàng định kỳ tháng 11', 1, 0.00, '2025-11-09 00:00:00');
@@ -1345,35 +1054,35 @@ VALUES (@receipt1_id, 4, 14, 2000000, 4469515);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
 VALUES (@receipt1_id, 13, 13, 2000000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt1_id, 44, 10, 300000, 724972);
+VALUES (@receipt1_id, 14, 10, 300000, 724972);
 
 -- Chi tiết phiếu nhập PN20251121002
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt2_id, 41, 13, 1200000, NULL);
+VALUES (@receipt2_id, 14, 13, 1200000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt2_id, 42, 28, 1500000, NULL);
+VALUES (@receipt2_id, 24, 28, 1500000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt2_id, 36, 9, 3000000, NULL);
+VALUES (@receipt2_id, 3, 9, 3000000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt2_id, 41, 18, 3000000, NULL);
+VALUES (@receipt2_id, 6, 18, 3000000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt2_id, 48, 9, 2000000, NULL);
+VALUES (@receipt2_id, 8, 9, 2000000, NULL);
 
 -- Chi tiết phiếu nhập PN20251125003
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt3_id, 37, 7, 300000, 515547);
+VALUES (@receipt3_id, 1, 7, 300000, 515547);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt3_id, 15, 13, 3000000, NULL);
+VALUES (@receipt3_id, 13, 13, 3000000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt3_id, 38, 8, 800000, NULL);
+VALUES (@receipt3_id, 25, 8, 800000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt3_id, 50, 12, 1500000, NULL);
+VALUES (@receipt3_id, 5, 12, 1500000, NULL);
 
 -- Chi tiết phiếu nhập PN20251129004
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
 VALUES (@receipt4_id, 30, 25, 1500000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt4_id, 49, 5, 800000, 1259716);
+VALUES (@receipt4_id, 36, 5, 800000, 1259716);
 
 -- Chi tiết phiếu nhập PN20251130005
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
@@ -1397,7 +1106,7 @@ VALUES (@receipt6_id, 26, 10, 1200000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
 VALUES (@receipt6_id, 35, 18, 800000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt6_id, 46, 18, 3000000, 5814431);
+VALUES (@receipt6_id, 37, 18, 3000000, 5814431);
 
 -- Chi tiết phiếu nhập PN20251115007
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
@@ -1407,7 +1116,7 @@ VALUES (@receipt7_id, 24, 17, 2000000, 3127987);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
 VALUES (@receipt7_id, 26, 28, 800000, NULL);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
-VALUES (@receipt7_id, 50, 12, 1200000, 2728300);
+VALUES (@receipt7_id, 5, 12, 1200000, 2728300);
 INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
 VALUES (@receipt7_id, 16, 13, 300000, 547270);
 

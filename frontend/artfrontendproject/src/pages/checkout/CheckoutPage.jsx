@@ -952,7 +952,7 @@ const truncateText = (text, maxLength = 80) => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleFormChange}
-                  placeholder="0909..."
+                  placeholder="0"
                 />
               </div>
 
@@ -1043,8 +1043,11 @@ const truncateText = (text, maxLength = 80) => {
                     onChange={() => setPaymentMethod('COD')}
                   />
                   <label htmlFor="cod">
-                    <FontAwesomeIcon icon={faMoneyBillWave} style={{ color: '#28a745' }} />
-                    Thanh toán khi nhận hàng (COD)
+                   <img 
+                    src="/codd.jpg" 
+                    alt="cod" 
+                    style={{ width: 24, height: 24,marginRight:5 }}
+                  />                    Thanh toán khi nhận hàng (COD)
                   </label>
                 </div>
 
@@ -1062,8 +1065,12 @@ const truncateText = (text, maxLength = 80) => {
                     onChange={() => setPaymentMethod('ONLINE')}
                   />
                   <label htmlFor="online">
-                    <FontAwesomeIcon icon={faCreditCard} style={{ color: '#007bff' }} />
-                    Chuyển khoản (VNPAY/Momo/Sepay)
+                                      <img 
+                    src="/vnpay.jpg" 
+                    alt="VNPAY" 
+                    style={{ width: 24, height: 24,marginRight:5 }}
+                  />
+                    Chuyển khoản qua VNPay
                   </label>
                 </div>
               </div>

@@ -8,6 +8,7 @@ import MainLayout from "./components/layout/MainLayout/MainLayout";
 import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/Login/LoginPage";
 import VerifyOTP from "./pages/auth/VerifyOTP/VerifyOTP";
+import AboutUs from "./pages/aboutus/AboutUs";
 // trang admin
 import AdminLayout from "./components/layout/AdminLayout/AdminLayout";
 import Product from "./pages/admin/ProductManagement/Product";
@@ -56,6 +57,7 @@ function App() {
               <Route path="products/search" element={<ProductListPage />} />
               <Route path="sale/:id" element={<SaleDetail />} />
               <Route path="checkout" element={<CheckoutPage />} />
+                  <Route path="/about" element={<AboutUs />} />
             </Route>
 
             {/*trang đăng nhập/ đăng kí*/}
@@ -65,6 +67,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/verify-password-otp" element={<VerifyPasswordOTP />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              
             </Route>
 
             {/* ← ← ← ROUTE OTP (KHÔNG PROTECTED) */}
