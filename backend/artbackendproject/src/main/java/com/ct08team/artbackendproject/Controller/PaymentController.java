@@ -1,7 +1,10 @@
 package com.ct08team.artbackendproject.Controller;
 
 import com.ct08team.artbackendproject.DAO.OrderRepository;
+import com.ct08team.artbackendproject.DAO.ProductVariantRepository;
 import com.ct08team.artbackendproject.Entity.Order;
+import com.ct08team.artbackendproject.Entity.OrderItem;
+import com.ct08team.artbackendproject.Entity.product.ProductVariant;
 import com.ct08team.artbackendproject.Service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PaymentController {
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private ProductVariantRepository productVariantRepository;
     @PutMapping("/orders/{orderId}/cancel")
     public ResponseEntity<?> cancelOrder(@PathVariable String orderId) {
         Order order = orderService.getOrderById(Long.valueOf(orderId));
@@ -29,6 +34,13 @@ public class PaymentController {
 
         order.setOrderStatus("CANCELLED");
         order.setPaymentStatus("FAILED");
+        for (OrderItem item : order.getOrderItems()) {
+            ProductVariant variant = item.getVariant();
+            if (variant != null) {
+                variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+                productVariantRepository.save(variant);
+            }
+        }
         orderService.save(order);
 
         return ResponseEntity.ok(Map.of("message", "Đã hủy đơn hàng", "order", order));
