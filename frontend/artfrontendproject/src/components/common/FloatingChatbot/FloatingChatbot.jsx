@@ -15,7 +15,7 @@ function FloatingChatbot() {
                     width: '60px',
                     height: '60px',
                     borderRadius: '50%',
-                    backgroundColor: '#0084ff',
+                    backgroundColor: '#222222',
                     border: 'none',
                     cursor: 'pointer',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
@@ -38,7 +38,7 @@ function FloatingChatbot() {
                     width: '400px',
                     height: '600px',
                     zIndex: 1000,
-                    backgroundColor: 'white',
+                    backgroundColor: '#FFFFFFD9',
                     borderRadius: '10px',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
                     overflow: 'hidden'

@@ -1,6 +1,5 @@
 package com.ct08team.artbackendproject.config;
 
-
 import com.ct08team.artbackendproject.DAO.Auth.UserRepository;
 import com.ct08team.artbackendproject.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/verify-otp").permitAll()
                         // (Bạn cũng nên cho phép /api/auth/register)
                         .anyRequest().permitAll()
-                      //  .authenticated() // Tất cả các request khác đều cần token
+                // .authenticated() // Tất cả các request khác đều cần token
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Không dùng session
@@ -83,8 +82,10 @@ public class SecurityConfig {
         // Tham số đầu vào có thể là username hoặc email
         return usernameOrEmail -> {
             // Thay đổi logic tìm kiếm
-            com.ct08team.artbackendproject.Entity.auth.User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                    .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy user với username hoặc email: " + usernameOrEmail));
+            com.ct08team.artbackendproject.Entity.auth.User user = userRepository
+                    .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                            "Không tìm thấy user với username hoặc email: " + usernameOrEmail));
 
             // Sửa TODO: Chuyển Set<Role> thành List<GrantedAuthority>
             List<GrantedAuthority> authorities = user.getRoles().stream()
@@ -98,8 +99,7 @@ public class SecurityConfig {
                     true, // accountNonExpired (mặc định là true)
                     true, // credentialsNonExpired (mặc định là true)
                     user.isAccountNonLocked(), // <-- Lấy trạng thái 'locked' từ CSDL
-                    authorities
-            );
+                    authorities);
         };
     }
 

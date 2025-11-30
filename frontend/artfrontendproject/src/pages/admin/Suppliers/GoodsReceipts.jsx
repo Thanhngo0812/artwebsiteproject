@@ -12,8 +12,10 @@ import {
   FaChevronUp,
   FaSearch,
   FaFileInvoice,
-  FaBoxOpen
+  FaBoxOpen,
+  FaFileExcel
 } from "react-icons/fa";
+import * as XLSX from 'xlsx';
 
 const API_BASE_URL = 'http://localhost:8888';
 
@@ -86,7 +88,6 @@ export default function GoodsReceipts() {
       setReceipts(r1.data || []);
       setSuppliers(r2.data || []);
 
-      // Logic mới: Lấy username từ r3 -> Gọi API admin để lấy ID
       if (r3.data && r3.data.username) {
         const username = r3.data.username;
         try {
@@ -141,10 +142,10 @@ export default function GoodsReceipts() {
           }
         }
 
-        // Map receiptItems -> items để khớp với modal
+
         const detailData = {
           ...found,
-          creatorName: creatorName || `ID: ${found.creatorId}`, // Fallback cuối cùng
+          creatorName: creatorName || `ID: ${found.creatorId}`,
           items: found.receiptItems || found.items || []
         };
         setSelectedReceipt(detailData);
@@ -257,6 +258,82 @@ export default function GoodsReceipts() {
     return new Date(dateStr).toLocaleDateString('vi-VN');
   };
 
+  const handleExport = () => {
+    try {
+      // Chuẩn bị dữ liệu export
+      // Flatten data: mỗi dòng là một phiếu nhập
+      const dataToExport = filteredReceipts.map(r => ({
+        "ID": r.id,
+        "Mã Phiếu Nhập": r.receiptCode,
+        "Nhà Cung Cấp": r.supplierName || '-',
+        "Người Tạo": r.creatorName || (r.creatorId === currentUserId ? currentUsername : `ID: ${r.creatorId}`),
+        "Tổng Tiền": r.totalAmount,
+        "Ngày Tạo": formatDate(r.createdAt),
+        "Ghi Chú": r.note || ''
+      }));
+
+      // Tạo worksheet
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+
+      // Tạo workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Danh sách phiếu nhập");
+
+      // Xuất file
+      XLSX.writeFile(wb, `Danh_sach_phieu_nhap_${new Date().getTime()}.xlsx`);
+      showToast('Xuất file thành công', 'success');
+    } catch (error) {
+      console.error("Export error", error);
+      showToast('Lỗi khi xuất file', 'error');
+    }
+  };
+
+  const handleExportDetail = (receipt) => {
+    try {
+      if (!receipt) return;
+
+      // 1. Thông tin chung (Header)
+      const headerInfo = [
+        ["CHI TIẾT PHIẾU NHẬP"],
+        ["Mã phiếu:", receipt.receiptCode],
+        ["Nhà cung cấp:", receipt.supplierName || '-'],
+        ["Người tạo:", receipt.creatorName || '-'],
+        ["Ngày tạo:", formatDate(receipt.createdAt)],
+        ["Ghi chú:", receipt.note || 'Không có'],
+        ["Tổng tiền:", formatCurrency(receipt.totalAmount)],
+        [] // Dòng trống
+      ];
+
+      // 2. Danh sách sản phẩm (Table)
+      const tableHeader = ["Kích thước", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán mới", "Thành tiền"];
+      const tableData = (receipt.items || []).map(item => [
+        item.variantDimensions || '-',
+        item.productName || '-',
+        item.quantity,
+        item.importPrice,
+        item.newSellingPrice,
+        item.quantity * item.importPrice
+      ]);
+
+      // 3. Kết hợp dữ liệu
+      const wsData = [...headerInfo, tableHeader, ...tableData];
+
+      // 4. Tạo worksheet
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+      // 5. Tạo workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Chi tiết phiếu nhập");
+
+      // 6. Xuất file
+      XLSX.writeFile(wb, `Chi_tiet_phieu_nhap_${receipt.receiptCode || 'unknown'}.xlsx`);
+      showToast('Xuất file chi tiết thành công', 'success');
+    } catch (error) {
+      console.error("Export detail error", error);
+      showToast('Lỗi khi xuất file chi tiết', 'error');
+    }
+  };
+
   return (
     <div className="user-container">
       {/* Bộ lọc */}
@@ -328,6 +405,9 @@ export default function GoodsReceipts() {
           </h2>
           <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
             <FaPlus /> Tạo phiếu nhập
+          </button>
+          <button className="btn-success" onClick={handleExport} style={{ marginLeft: '10px', backgroundColor: '#28a745', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <FaFileExcel /> Xuất Excel
           </button>
         </div>
 
@@ -559,7 +639,7 @@ export default function GoodsReceipts() {
                 <table className="detail-items-table">
                   <thead>
                     <tr>
-                      <th>Variant ID</th>
+                      <th>Kích thước</th>
                       <th>Tên sản phẩm</th>
                       <th>Số lượng</th>
                       <th>Giá nhập</th>
@@ -570,7 +650,7 @@ export default function GoodsReceipts() {
                   <tbody>
                     {selectedReceipt.items?.map((item, idx) => (
                       <tr key={idx}>
-                        <td data-label="Variant ID">#{item.variantId}</td>
+                        <td data-label="Kích thước">{item.variantDimensions || '-'}</td>
                         <td data-label="Tên">{item.variantName || item.productName || '-'}</td>
                         <td data-label="SL">{item.quantity}</td>
                         <td data-label="Giá nhập">{formatCurrency(item.importPrice)}</td>
@@ -592,6 +672,9 @@ export default function GoodsReceipts() {
             </div>
 
             <div className="confirm-modal-actions">
+              <button className="btn-success" onClick={() => handleExportDetail(selectedReceipt)} style={{ marginRight: 'auto', backgroundColor: '#28a745', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <FaFileExcel /> Xuất Excel
+              </button>
               <button className="btn-secondary" onClick={() => setIsDetailModalOpen(false)}>
                 Đóng
               </button>

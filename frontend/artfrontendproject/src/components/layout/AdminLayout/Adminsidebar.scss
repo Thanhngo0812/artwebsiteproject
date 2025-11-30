@@ -8,6 +8,7 @@
   transition: all 0.3s ease;
   overflow: hidden;
   z-index: 20;
+  height: 100%;
 
   &.close {
     width: 104px;
@@ -40,35 +41,47 @@
   }
 }
 
+/* Shared nav-items style for body and footer */
+.nav-items {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 20px;
+  margin-top: 10px;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.2s;
+
+  .icon {
+    font-size: 22px;
+    margin-top: 6px;
+    padding-right: 17px;
+  }
+
+  &:hover {
+    background-color: #f2f4f7;
+  }
+
+  &.active {
+    background-color: #ecf3ff;
+    color: #465fff;
+  }
+}
+
 .sidebar-body {
   margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-  .nav-items {
-    display: flex;
-    align-items: center;
-    padding: 0 0 0 20px;
-    margin-top: 10px;
-    text-decoration: none;
-    color: black;
-    cursor: pointer;
-    border-radius: 10px;
-    transition: background-color 0.2s;
-
-    .icon {
-      font-size: 22px;
-      margin-top: 6px;
-      padding-right: 17px;
-    }
-
-    &:hover {
-      background-color: #f2f4f7;
-    }
-
-    &.active {
-      background-color: #ecf3ff;
-      color: #465fff;
-    }
-  }
+.sidebar-footer {
+  margin-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 10px;
 }
 
 /* Overlay khi sidebar mở trên mobile */
