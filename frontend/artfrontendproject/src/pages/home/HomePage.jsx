@@ -4,41 +4,68 @@ import axios from "axios";
 import ProductSection from "../../components/product/ProductSection/ProductSection";
 import "./css/HomePage.css";
 
+// --- STYLE INJECTOR (Cho CSS Slider) ---
+const StyleInjector = ({ styles }) => {
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styles;
+    document.head.appendChild(styleElement);
+    return () => document.head.removeChild(styleElement);
+  }, [styles]);
+  return null;
+};
+
 export default function HomePage() {
-  //localStorage.setItem('user', 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoibmdvY29uZ3RoYW5oc2cwODEyIiwiaWF0IjoxNzYxOTg5MzgwLCJleHAiOjE3NjIwMTkzODB9.afj1NTGiTzjppFH9jsVr1iDOy04ZLDe4RBsv9r_j7EI');
-  
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newestProducts, setNewestProducts] = useState([]);
-  // const [viewedProducts, setViewedProducts] = useState([]);
   const [onSaleProducts, setOnSaleProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // --- SLIDER LOGIC ---
+  const [activeSlide, setActiveSlide] = useState(0);
+  const slides = [
+    {
+      image: "/bigbackground.jpg",
+      title: "Tranh Xịn - Đẳng Cấp Không Gian",
+      subtitle: "Nghệ thuật thổi hồn vào từng góc nhỏ ngôi nhà bạn"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2071&auto=format&fit=crop",
+      title: "Đẳng cấp không gian",
+      subtitle: "Nghệ thuật thổi hồn vào từng góc nhỏ ngôi nhà bạn"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=2070&auto=format&fit=crop",
+      title: "Sáng Tạo Không Giới Hạn",
+      subtitle: "Hơn 20.000+ mẫu tranh độc bản đang chờ bạn khám phá"
+    }
+  ];
+
+  // Auto-play Slider
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % slides.length);
+    }, 5000); // 5 giây chuyển 1 lần
+    return () => clearInterval(timer);
+  }, [slides.length]);
+  // --------------------
+
   useEffect(() => {
     fetchProducts();
-    // loadViewedProducts();
   }, []);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
       
-      // Fetch sản phẩm khuyến mãi
-      const onSaleRes = await axios.get(
-        "http://localhost:8888/api/products/on-sale?page=0&size=8"
-      );
+      const onSaleRes = await axios.get("http://localhost:8888/api/products/on-sale?page=0&size=8");
       setOnSaleProducts(onSaleRes.data.content || []);
 
-      // Fetch sản phẩm nổi bật
-      const featuredRes = await axios.get(
-        "http://localhost:8888/api/products/featured?page=0&size=8"
-      );
+      const featuredRes = await axios.get("http://localhost:8888/api/products/featured?page=0&size=8");
       setFeaturedProducts(featuredRes.data.content || []);
 
-      // Fetch sản phẩm mới
-      const newestRes = await axios.get(
-        "http://localhost:8888/api/products/newest?page=0&size=8"
-      );
+      const newestRes = await axios.get("http://localhost:8888/api/products/newest?page=0&size=8");
       setNewestProducts(newestRes.data.content || []);
 
       setLoading(false);
@@ -48,30 +75,135 @@ export default function HomePage() {
     }
   };
 
-  // Load sản phẩm đã xem từ localStorage
-  // const loadViewedProducts = async () => {
-  //   const viewed = localStorage.getItem("viewedProducts");
-  //   if (viewed) {
-  //     try {
-  //       const productIds = JSON.parse(viewed);
-  //       if (productIds && productIds.length > 0) {
-  //         // Lấy tối đa 8 sản phẩm
-  //         const idsToFetch = productIds.slice(0, 8);
-  //         const response = await axios.post(
-  //           "http://localhost:8888/api/products/by-ids?page=0&size=8",
-  //           idsToFetch
-  //         );
-  //         setViewedProducts(response.data.content || []);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching viewed products:", error);
-  //     }
-  //   }
-  // };
-
   const handleViewAllProducts = () => {
     navigate("/products");
   };
+
+  // --- CSS CHO SLIDER ---
+  const sliderStyles = `
+    /* Xóa style cũ của .homepage-hero nếu có xung đột */
+    
+    .hero-slider-container {
+      position: relative;
+      height: 600px; /* Chiều cao slider */
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .hero-slide {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out; /* Hiệu ứng Fade */
+      z-index: 1;
+    }
+    
+    .hero-slide.active {
+      opacity: 1;
+      z-index: 2;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); /* Lớp phủ tối màu */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+    }
+
+    /* Hiệu ứng chữ chạy lên */
+    .hero-content {
+      max-width: 800px;
+      padding: 20px;
+      animation: slideUp 1s ease-out forwards; 
+      opacity: 0; 
+      transform: translateY(30px);
+    }
+
+    /* Khi slide active thì content mới chạy animation */
+    .hero-slide.active .hero-content {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.8s 0.5s, transform 0.8s 0.5s; /* Delay 0.5s */
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .hero-title-highlight {
+      color: #FBD865; /* Màu vàng thương hiệu */
+    }
+
+    .hero-subtitle {
+      font-size: 1.4rem;
+      font-weight: 300;
+      margin-bottom: 30px;
+      font-style: italic;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .homepage-btn {
+      padding: 14px 40px;
+      background: transparent;
+      border: 2px solid #FBD865;
+      color: #FBD865;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 30px;
+    }
+
+    .homepage-btn:hover {
+      background: #FBD865;
+      color: #333;
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(251, 216, 101, 0.4);
+    }
+
+    /* Dots Navigation */
+    .slider-dots {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .dot.active {
+      background: #FBD865;
+      transform: scale(1.2);
+    }
+
+    @media (max-width: 768px) {
+      .hero-slider-container { height: 400px; }
+      .hero-title { font-size: 2rem; }
+      .hero-subtitle { font-size: 1rem; }
+    }
+  `;
 
   if (loading) {
     return (
@@ -84,23 +216,51 @@ export default function HomePage() {
 
   return (
     <div className="homepage">
-      {/* Hero Section */}
-      <div className="homepage-hero">
-        <div className="homepage-overlay">
-          <div className="homepage-center">
-            <h1 className="homepage-title" style={{ color: "#FBD865" }}>
-              "Tranh Xịn"
-            </h1>
-            <h1 className="homepage-title">
-              Thương Hiệu Tranh Trang Trí Hàng Đầu VN
-            </h1>
-            <div className="homepage-subtitle">TRANH ĐẸP TREO TƯỜNG TRANH XỊN</div>
-            <button className="homepage-btn" onClick={handleViewAllProducts}>
-              Xem 20.000+ Bộ Tranh
-            </button>
+      {/* Inject CSS Slider */}
+      <StyleInjector styles={sliderStyles} />
+
+      {/* --- HERO SLIDER MỚI --- */}
+      <div className="hero-slider-container">
+        {slides.map((slide, index) => (
+          <div 
+            key={index}
+            className={`hero-slide ${index === activeSlide ? 'active' : ''}`}
+            style={{ backgroundImage: `url(${slide.image})` }}
+          >
+            <div className="hero-overlay">
+              <div className="hero-content">
+                <h1 className="hero-title">
+                  {index === 0 ? (
+                     // Slide đầu tiên có style đặc biệt cho "Tranh Xịn"
+                     <>
+                        <span className="hero-title-highlight">"Tranh Xịn"</span> <br/>
+                        Thương Hiệu Hàng Đầu
+                     </>
+                  ) : (
+                     slide.title
+                  )}
+                </h1>
+                <div className="hero-subtitle">{slide.subtitle}</div>
+                <button className="homepage-btn" onClick={handleViewAllProducts}>
+                  Xem Ngay
+                </button>
+              </div>
+            </div>
           </div>
+        ))}
+
+        {/* Dots Navigation */}
+        <div className="slider-dots">
+          {slides.map((_, index) => (
+            <div 
+              key={index} 
+              className={`dot ${index === activeSlide ? 'active' : ''}`}
+              onClick={() => setActiveSlide(index)}
+            />
+          ))}
         </div>
       </div>
+      {/* --- KẾT THÚC SLIDER --- */}
 
 
       <ProductSection

@@ -41,8 +41,8 @@ export default function Footer() {
             <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">YouTube</a>
           </div>
           <div className="footer-contact">
-            <p>📞 Hotline: 1900 xxxx</p>
-            <p>✉️ Email: support@tranhxin.com</p>
+            <p>📞 Hotline: 0909 246 319</p>
+            <p>✉️ Email: support@tranhxin.com.vn</p>
           </div>
         </div>
       </div>
