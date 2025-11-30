@@ -170,6 +170,8 @@ CREATE TABLE `orders` (
 	`latitude` DECIMAL(10, 8) NULL,        -- Vĩ độ (Có thể NULL nếu chỉ cần địa chỉ văn bản)
     `longitude` DECIMAL(11, 8) NULL,       -- Kinh độ (Có thể NULL)
 	`address` TEXT NOT NULL,               -- Địa chỉ dạng văn bản
+    `customer_name` VARCHAR(255),
+    `customer_phone` VARCHAR(255),
     `subtotal_price` DECIMAL(15, 2) NOT NULL DEFAULT 0.00, -- Tổng tiền hàng (chưa giảm giá)
     `shipping_fee` DECIMAL(10, 2) NOT NULL DEFAULT 0.00, -- Phí vận chuyển
     `discount_amount` DECIMAL(15, 2) NOT NULL DEFAULT 0.00, -- Tổng tiền được giảm
@@ -262,27 +264,6 @@ CREATE TABLE `order_promotions` (
 -- BẢNG QUẢN LÝ THANH TOÁN (VNPAY, MOMO, ...)
 -- (Mở rộng)
 -- ============================================
-
--- 19. Bảng `payment_transactions` (Lịch sử giao dịch)
-CREATE TABLE `payment_transactions` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT,
-    `order_id` BIGINT NOT NULL,
-    
-    `gateway` VARCHAR(50) NOT NULL, -- (VNPAY, MOMO, COD, BANK_TRANSFER)
-    `gateway_transaction_code` VARCHAR(255) NULL, -- Mã giao dịch của cổng (ví dụ: vnp_TransactionNo)
-    `gateway_bank_code` VARCHAR(50) NULL, -- Mã ngân hàng (ví dụ: VCB, TCB)
-    
-    `amount` DECIMAL(15, 2) NOT NULL, -- Số tiền của giao dịch này
-    `payment_time` TIMESTAMP NULL, -- Thời gian cổng thanh toán báo
-    `status` VARCHAR(50) NOT NULL, 
-    `raw_data` TEXT NULL, -- Lưu toàn bộ JSON/dữ liệu callback (rất hữu ích để gỡ lỗi)
-    
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`),
-    INDEX `idx_gateway_txn_code` (`gateway_transaction_code`)
-);
 
 
 -- ============================================
@@ -490,61 +471,3 @@ END;
 //
 
 DELIMITER ;
-
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Trừu Tượng', NULL); -- ID 1
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Phong Cảnh', NULL); -- ID 2
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Sơn Dầu', NULL);    -- ID 3
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Nghệ Thuật', NULL); -- ID 4
-INSERT INTO categories (name, parent_id) VALUES ('Khung Tranh', NULL);      -- ID 5
-
--- Danh mục con của "Tranh Trừu Tượng" (parent_id = 1)
-INSERT INTO categories (name, parent_id) VALUES ('Trừu Tượng Hành động', 1); -- ID 6
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Trường màu', 1); -- ID 7
-INSERT INTO categories (name, parent_id) VALUES ('Trừu Tượng Hình học', 1); -- ID 8
-INSERT INTO categories (name, parent_id) VALUES ('Trừu Tượng Trữ tình', 1); -- ID 9
--- Danh mục con của "Tranh Phong Cảnh" (parent_id = 2)
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Biển', 2); -- ID 10
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Núi Rừng', 2); -- ID 11
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Đồng Quê', 2); -- ID 12
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Thành Phố', 2); -- ID 13
-
--- Danh mục con của "Tranh Sơn Dầu" (parent_id = 3)
-INSERT INTO categories (name, parent_id) VALUES ('Sơn Dầu Chân dung', 3); -- ID 14
-INSERT INTO categories (name, parent_id) VALUES ('Sơn Dầu Tĩnh vật', 3); -- ID 15
-INSERT INTO categories (name, parent_id) VALUES ('Sơn Dầu Hiện đại', 3); -- ID 16
-
--- Danh mục con của "Tranh Nghệ Thuật" (parent_id = 4)
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Ấn Tượng', 4); -- ID 17
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Lập Thể', 4); -- ID 18
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Siêu Thực', 4); -- ID 19
-INSERT INTO categories (name, parent_id) VALUES ('Tranh Phục Hưng', 4); -- ID 20
-
--- Danh mục con của "Khung Tranh" (parent_id = 5)
-INSERT INTO categories (name, parent_id) VALUES ('Khung Gỗ Cổ điển', 5); -- ID 21
-INSERT INTO categories (name, parent_id) VALUES ('Khung Kim Loại Hiện đại', 5); -- ID 22
-INSERT INTO categories (name, parent_id) VALUES ('Khung Composite', 5); -- ID 23
-INSERT INTO categories (name, parent_id) VALUES ('Khung Tranh Đơn Giản', 5); -- ID 24
-
-use artdbproject;
-
-INSERT INTO promotions 
-    (name, description, image_url, code, type, value, start_date, end_date, is_active, max_discount_value)
-VALUES 
-    (
-        'Giảm 20% Tranh Hoàng Hôn', 
-        'Giảm giá đặc biệt 20% cho Tranh Hoàng Hôn Trên Biển. Tối đa 150K.', 
-        'https://placehold.co/1200x300/FF8C00/FFFFFF?text=SALE+20%25+Tranh+Bien', 
-        NULL, -- Quan trọng: NULL để service tự động nhận diện
-        'PERCENTAGE', 
-        20.00, 
-        (NOW() - INTERVAL 1 DAY), -- Bắt đầu từ hôm qua
-        (NOW() + INTERVAL 1 MONTH), -- Kết thúc sau 1 tháng
-        TRUE,
-        150000.00 -- Giảm tối đa 150K
-    );
-
--- Lấy ID của khuyến mãi vừa tạo
-SET @promo1_id = LAST_INSERT_ID();
-
--- Liên kết nó với Product ID 1
-INSERT INTO promotion_products (promotion_id, product_id) VALUES (@promo1_id, 1);
