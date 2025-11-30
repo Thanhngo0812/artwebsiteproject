@@ -59,13 +59,13 @@ export default function HomePage() {
     try {
       setLoading(true);
       
-      const onSaleRes = await axios.get("http://localhost:8888/api/products/on-sale?page=0&size=8");
+      const onSaleRes = await axios.get("https://deployforstudy-1.onrender.com/api/products/on-sale?page=0&size=8");
       setOnSaleProducts(onSaleRes.data.content || []);
 
-      const featuredRes = await axios.get("http://localhost:8888/api/products/featured?page=0&size=8");
+      const featuredRes = await axios.get("https://deployforstudy-1.onrender.com/api/products/featured?page=0&size=8");
       setFeaturedProducts(featuredRes.data.content || []);
 
-      const newestRes = await axios.get("http://localhost:8888/api/products/newest?page=0&size=8");
+      const newestRes = await axios.get("https://deployforstudy-1.onrender.com/api/products/newest?page=0&size=8");
       setNewestProducts(newestRes.data.content || []);
 
       setLoading(false);

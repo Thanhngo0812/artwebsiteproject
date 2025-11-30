@@ -82,7 +82,7 @@ export default function Header() {
   useEffect(() => {
     const fetchCategoriesAndChildren = async () => {
       try {
-        const res = await fetch("http://localhost:8888/api/v1/categories/parents");
+        const res = await fetch("https://deployforstudy-1.onrender.com/api/v1/categories/parents");
         const parentsData = await res.json();
         setCategories(parentsData);
 
@@ -90,7 +90,7 @@ export default function Header() {
         const fetchChildrenPromises = parentsData.map(async (parent) => {
           try {
             const response = await axios.get(
-              `http://localhost:8888/api/v1/categories/${parent.id}/children`
+              `https://deployforstudy-1.onrender.com/api/v1/categories/${parent.id}/children`
             );
             if (response.data && response.data.length > 0) {
               newChildrenMap[parent.id] = response.data;
@@ -112,7 +112,7 @@ export default function Header() {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const res = await axios.get("http://localhost:8888/api/v1/promotions/sales");
+        const res = await axios.get("https://deployforstudy-1.onrender.com/api/v1/promotions/sales");
         if (Array.isArray(res.data)) {
           setSales(res.data);
         } else {
@@ -166,7 +166,7 @@ export default function Header() {
       const fetchSearchResults = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:8888/api/products/suggest?keyword=${searchQuery}&limit=5`
+            `https://deployforstudy-1.onrender.com/api/products/suggest?keyword=${searchQuery}&limit=5`
           );
           setSearchResults(response.data);
         } catch (error) {
