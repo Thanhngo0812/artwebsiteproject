@@ -14,47 +14,43 @@ import com.ct08team.artbackendproject.Service.Catalog.CategoryService;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@CrossOrigin(origins = "http://localhost:3000")
 public class CategoryController {
-	private CategoryService categoryService;
-	
-	public CategoryController(CategoryService categoryService) {
-		this.categoryService=categoryService;
-	}
-	
-	
-	
-    /**
-     * GET /api/v1/categories
-     * Lấy tất cả danh mục
-     */
-    @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
-//        List<CategoryDto> categories = categoryService.findAllCategories();
-        // Trả về HTTP 200 OK
-//        return ResponseEntity.ok(categories);
-    	List<CategoryDTO> categories = categoryService.getAllCategories();
-    	return ResponseEntity.ok(categories);
-    }
-    
-    
- // GET /api/v1/categories/parents
-    @GetMapping("/parents")
-    public ResponseEntity<List<CategoryDTO>> getCategoriesParent() {
-//        List<CategoryDto> categories = categoryService.findAllCategories();
-        // Trả về HTTP 200 OK
-//        return ResponseEntity.ok(categories);
-    	List<CategoryDTO> categories = categoryService.getCategoriesParent();
-    	return ResponseEntity.ok(categories);
-    }
-    
- // GET /api/v1/categories/{parentId}/children
-    @GetMapping("/{parentId}/children")
-    public ResponseEntity<List<CategoryDTO>> getCategoriesByParent(@PathVariable Long parentId) {
-//        List<CategoryDto> categories = categoryService.findAllCategories();
-        // Trả về HTTP 200 OK
-//        return ResponseEntity.ok(categories);
-    	List<CategoryDTO> categories = categoryService.getAllCategoriesByParent(parentId);
-    	return ResponseEntity.ok(categories);
-    }
+        private CategoryService categoryService;
+
+        public CategoryController(CategoryService categoryService) {
+                this.categoryService = categoryService;
+        }
+
+        /**
+         * GET /api/v1/categories
+         * Lấy tất cả danh mục
+         */
+        @GetMapping
+        public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+                // List<CategoryDto> categories = categoryService.findAllCategories();
+                // Trả về HTTP 200 OK
+                // return ResponseEntity.ok(categories);
+                List<CategoryDTO> categories = categoryService.getAllCategories();
+                return ResponseEntity.ok(categories);
+        }
+
+        // GET /api/v1/categories/parents
+        @GetMapping("/parents")
+        public ResponseEntity<List<CategoryDTO>> getCategoriesParent() {
+                // List<CategoryDto> categories = categoryService.findAllCategories();
+                // Trả về HTTP 200 OK
+                // return ResponseEntity.ok(categories);
+                List<CategoryDTO> categories = categoryService.getCategoriesParent();
+                return ResponseEntity.ok(categories);
+        }
+
+        // GET /api/v1/categories/{parentId}/children
+        @GetMapping("/{parentId}/children")
+        public ResponseEntity<List<CategoryDTO>> getCategoriesByParent(@PathVariable Long parentId) {
+                // List<CategoryDto> categories = categoryService.findAllCategories();
+                // Trả về HTTP 200 OK
+                // return ResponseEntity.ok(categories);
+                List<CategoryDTO> categories = categoryService.getAllCategoriesByParent(parentId);
+                return ResponseEntity.ok(categories);
+        }
 }

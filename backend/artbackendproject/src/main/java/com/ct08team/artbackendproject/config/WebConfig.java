@@ -9,10 +9,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**") // Áp dụng cho tất cả các đường dẫn bắt đầu bằng /api/
-                .allowedOrigins("http://localhost:3000", "https://artwebsitepropject.vercel.app")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Các phương thức được phép
-                .allowedHeaders("*") // Cho phép tất cả các header
-                .allowCredentials(true); // Cho phép gửi cookie
+        // CORS is handled in SecurityConfig
     }
 }

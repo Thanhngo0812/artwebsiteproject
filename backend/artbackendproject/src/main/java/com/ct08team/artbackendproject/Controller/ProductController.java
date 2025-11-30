@@ -24,7 +24,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
 
     @Autowired
@@ -33,16 +32,14 @@ public class ProductController {
     @Autowired
     private ProductVariantRepository variantRepository;
 
-
     @GetMapping("/search-query")
     public ResponseEntity<List<ProductListDTO>> searchProducts(
             @RequestParam(required = false) String q,
-            @RequestParam(defaultValue = "10") int limit
-    ) {
+            @RequestParam(defaultValue = "10") int limit) {
         if (q == null || q.trim().isEmpty()) {
             return ResponseEntity.ok(List.of());
         }
-        
+
         List<ProductListDTO> results = productService.searchProducts(q.trim(), limit);
         return ResponseEntity.ok(results);
     }
@@ -50,8 +47,7 @@ public class ProductController {
     @PostMapping("/search")
     public ResponseEntity<Page<ProductListDTO>> searchProducts(
             @RequestBody ProductFilterRequestDTO filter,
-            @PageableDefault(size = 20, sort = "productName") Pageable pageable)
-    {
+            @PageableDefault(size = 20, sort = "productName") Pageable pageable) {
         Page<ProductListDTO> productPage = productService.searchProducts(filter, pageable);
         return ResponseEntity.ok(productPage);
     }
@@ -61,20 +57,20 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort) {
-        
+
         int limitedSize = Math.min(size, 10);
-        
+
         Pageable pageable = PageRequest.of(page, limitedSize);
         Page<ProductListDTO> products = productService.getFeaturedProductsWithSort(pageable, sort);
-        
+
         long totalElements = Math.min(products.getTotalElements(), 20);
         int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", products.getContent());
         response.put("totalElements", totalElements);
         response.put("totalPages", totalPages);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -83,20 +79,20 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort) {
-        
+
         int limitedSize = Math.min(size, 10);
-        
+
         Pageable pageable = PageRequest.of(page, limitedSize, Sort.by("id").descending());
         Page<ProductListDTO> products = productService.getNewestProductsWithSort(pageable, sort);
-        
+
         long totalElements = Math.min(products.getTotalElements(), 20);
         int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", products.getContent());
         response.put("totalElements", totalElements);
         response.put("totalPages", totalPages);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -106,25 +102,24 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort) {
-        
+
         int limitedSize = Math.min(size, 10);
         Pageable pageable = PageRequest.of(page, limitedSize);
-        
+
         // Lấy featured products có filter
         Page<ProductListDTO> filteredProducts = productService.getFeaturedProductsWithFilter(
-            filterRequest, 
-            pageable,
-            sort
-        );
-        
+                filterRequest,
+                pageable,
+                sort);
+
         long totalElements = Math.min(filteredProducts.getTotalElements(), 20);
         int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", filteredProducts.getContent());
         response.put("totalElements", totalElements);
         response.put("totalPages", totalPages);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -134,25 +129,24 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort) {
-        
+
         int limitedSize = Math.min(size, 10);
         Pageable pageable = PageRequest.of(page, limitedSize);
-        
+
         // Lấy newest products có filter
         Page<ProductListDTO> filteredProducts = productService.getNewestProductsWithFilter(
-            filterRequest, 
-            pageable,
-            sort
-        );
-        
+                filterRequest,
+                pageable,
+                sort);
+
         long totalElements = Math.min(filteredProducts.getTotalElements(), 20);
         int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", filteredProducts.getContent());
         response.put("totalElements", totalElements);
         response.put("totalPages", totalPages);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -161,20 +155,20 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort) {
-        
+
         int limitedSize = Math.min(size, 10);
-        
+
         Pageable pageable = PageRequest.of(page, limitedSize);
         Page<ProductListDTO> products = productService.getOnSaleProductsWithSort(pageable, sort);
-        
+
         long totalElements = Math.min(products.getTotalElements(), 20);
         int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", products.getContent());
         response.put("totalElements", totalElements);
         response.put("totalPages", totalPages);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -184,24 +178,23 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort) {
-        
+
         int limitedSize = Math.min(size, 10);
         Pageable pageable = PageRequest.of(page, limitedSize);
-        
+
         Page<ProductListDTO> filteredProducts = productService.getOnSaleProductsWithFilter(
-            filterRequest, 
-            pageable,
-            sort
-        );
-        
+                filterRequest,
+                pageable,
+                sort);
+
         long totalElements = Math.min(filteredProducts.getTotalElements(), 20);
         int totalPages = (int) Math.ceil((double) totalElements / limitedSize);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", filteredProducts.getContent());
         response.put("totalElements", totalElements);
         response.put("totalPages", totalPages);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -209,20 +202,18 @@ public class ProductController {
     public ResponseEntity<?> getProductsByIds(
             @RequestBody java.util.List<Long> ids,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size)
-    {
-        
+            @RequestParam(defaultValue = "20") int size) {
+
         int limitedSize = Math.min(size, 20);
         Pageable pageable = PageRequest.of(page, limitedSize);
         Page<ProductListDTO> products = productService.getProductsByIds(ids, pageable);
-        
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", products.getContent());
         response.put("totalElements", products.getTotalElements());
         response.put("totalPages", products.getTotalPages());
         response.put("currentPage", products.getNumber());
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -230,23 +221,19 @@ public class ProductController {
     public ResponseEntity<Page<ProductVariantDTO>> getProductVariants(
             @PathVariable Long productId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size)
-    {
+            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductVariant> variantPage = variantRepository.findByProductId(productId, pageable);
-        
+
         if (variantPage.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        
-        Page<ProductVariantDTO> dtoPage = variantPage.map(v -> 
-            new ProductVariantDTO(
+
+        Page<ProductVariantDTO> dtoPage = variantPage.map(v -> new ProductVariantDTO(
                 v.getDimensions(),
                 v.getPrice().doubleValue(),
-                v.getStockQuantity()
-            )
-        );
-        
+                v.getStockQuantity()));
+
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -254,52 +241,46 @@ public class ProductController {
     public ResponseEntity<?> getProductDetail(@PathVariable Long id) {
         try {
             ProductDetailDTO dto = productService.getProductDetail(id);
-            
+
             if (dto == null) {
                 return ResponseEntity.status(404).body(Map.of(
-                    "message", "Product not found",
-                    "productId", id
-                ));
+                        "message", "Product not found",
+                        "productId", id));
             }
-            
-            
+
             return ResponseEntity.ok(dto);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of(
-                "message", "Internal server error: " + e.getMessage(),
-                "productId", id
-            ));
+                    "message", "Internal server error: " + e.getMessage(),
+                    "productId", id));
         }
     }
-
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<?> getProductsByCategory(
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        
+
         int limitedSize = Math.min(size, 20);
         Pageable pageable = PageRequest.of(page, limitedSize);
         Page<ProductListDTO> pageDto = productService.getProductsByCategory(categoryId, pageable);
-        
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", pageDto.getContent());
         response.put("totalElements", pageDto.getTotalElements());
         response.put("totalPages", pageDto.getTotalPages());
         response.put("currentPage", pageDto.getNumber());
-        
+
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/suggest")
     public ResponseEntity<List<ProductListDTO>> getSearchSuggestions(
             @RequestParam(name = "keyword") String keyword,
-            @RequestParam(name = "limit", defaultValue = "5") int limit)
-    {
+            @RequestParam(name = "limit", defaultValue = "5") int limit) {
         // 1. Kiểm tra nếu keyword rỗng
         if (keyword == null || keyword.trim().isEmpty()) {
             return ResponseEntity.ok(List.of()); // Trả về danh sách rỗng
@@ -330,16 +311,16 @@ public class ProductController {
         // Đây chính là List<ProductListDTO> mà React cần
         return ResponseEntity.ok(productPage.getContent());
     }
+
     @GetMapping("/admin/list")
     public ResponseEntity<Page<ProductListDTO>> getProductsForAdmin(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "50") int size
-    ) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        
+
         ProductFilterRequestDTO emptyFilter = new ProductFilterRequestDTO();
         Page<ProductListDTO> products = productService.searchProducts(emptyFilter, pageable);
-        
+
         return ResponseEntity.ok(products);
     }
 }
