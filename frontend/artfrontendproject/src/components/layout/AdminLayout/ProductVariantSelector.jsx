@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FaSearch, FaTimes, FaCheck, FaBoxOpen, FaInfoCircle } from 'react-icons/fa';
 import './ProductVariantSelector.scss';
 
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 
 export default function ProductVariantSelector({ isOpen, onClose, onSelect }) {
   const [searchQuery, setSearchQuery] = useState('');

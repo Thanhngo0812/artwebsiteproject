@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8888/api/products';
+const API_BASE = 'https://deployforstudy-1.onrender.com/api/products';
 
 async function getProductById(id) {
   const res = await fetch(`${API_BASE}/${id}`);

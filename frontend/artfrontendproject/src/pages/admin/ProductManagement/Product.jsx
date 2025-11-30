@@ -64,7 +64,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
   );
 };
 
-const API_BASE_URL = "http://localhost:8888";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com";
 const getAuthToken = () => localStorage.getItem('user');
 const createAuthHeaders = () => {
     const token = getAuthToken();

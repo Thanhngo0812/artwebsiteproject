@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'http://localhost:8888/api/v1/auth/';
+const API_URL = 'https://deployforstudy-1.onrender.com/api/v1/auth/';
 
 class AuthService {
   login(username, password) {

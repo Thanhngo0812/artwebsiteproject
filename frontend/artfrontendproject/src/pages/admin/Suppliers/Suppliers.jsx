@@ -4,7 +4,7 @@ import axios from "axios";
 import "./Suppliers.scss";
 import { FaTrash, FaEdit, FaPlus, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 
 export default function Suppliers() {
   const [suppliers, setSuppliers] = useState([]);

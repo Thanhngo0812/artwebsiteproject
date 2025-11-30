@@ -34,7 +34,7 @@ export default function Cart() {
   const fetchProductData = async (productId) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8888/api/products/${productId}`);
+      const response = await fetch(`https://deployforstudy-1.onrender.com/api/products/${productId}`);
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 

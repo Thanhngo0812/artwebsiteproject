@@ -5,7 +5,7 @@ import LoadingSpinner from '../../../components/common/LoadingSpinner/LoadingSpi
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: '',

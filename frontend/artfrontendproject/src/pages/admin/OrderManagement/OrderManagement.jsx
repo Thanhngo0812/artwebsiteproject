@@ -13,7 +13,7 @@ const ReactPaginate = ({ onPageChange, pageCount, forcePage }) => (
 );
 
 // API URL & KEY
-const API_BASE_URL = "http://localhost:8888";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com";
 const TOMTOM_API_KEY = process.env.REACT_APP_TOMTOM_API_KEY;
 
 // --- COMPONENT TỰ CHỨA (ICONS, STYLE) ---

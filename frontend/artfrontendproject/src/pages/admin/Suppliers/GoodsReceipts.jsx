@@ -17,7 +17,7 @@ import {
 } from "react-icons/fa";
 import * as XLSX from 'xlsx';
 
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 
 export default function GoodsReceipts() {
   const [receipts, setReceipts] = useState([]);

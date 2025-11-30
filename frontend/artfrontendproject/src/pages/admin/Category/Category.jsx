@@ -5,7 +5,7 @@ import { FaPlus, FaEdit, FaTrash, FaFolder, FaFolderOpen, FaTimes, FaSave } from
 import { toast } from "react-toastify";
 
 // API Base URL
-const API_BASE_URL = "http://localhost:8888/api/v1";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com/api/v1";
 
 export default function Category() {
     const [categories, setCategories] = useState([]);

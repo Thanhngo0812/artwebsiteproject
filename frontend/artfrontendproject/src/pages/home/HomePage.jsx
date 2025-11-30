@@ -25,19 +25,19 @@ export default function HomePage() {
       
       // Fetch sản phẩm khuyến mãi
       const onSaleRes = await axios.get(
-        "http://localhost:8888/api/products/on-sale?page=0&size=8"
+        "https://deployforstudy-1.onrender.com/api/products/on-sale?page=0&size=8"
       );
       setOnSaleProducts(onSaleRes.data.content || []);
 
       // Fetch sản phẩm nổi bật
       const featuredRes = await axios.get(
-        "http://localhost:8888/api/products/featured?page=0&size=8"
+        "https://deployforstudy-1.onrender.com/api/products/featured?page=0&size=8"
       );
       setFeaturedProducts(featuredRes.data.content || []);
 
       // Fetch sản phẩm mới
       const newestRes = await axios.get(
-        "http://localhost:8888/api/products/newest?page=0&size=8"
+        "https://deployforstudy-1.onrender.com/api/products/newest?page=0&size=8"
       );
       setNewestProducts(newestRes.data.content || []);
 
@@ -58,7 +58,7 @@ export default function HomePage() {
   //         // Lấy tối đa 8 sản phẩm
   //         const idsToFetch = productIds.slice(0, 8);
   //         const response = await axios.post(
-  //           "http://localhost:8888/api/products/by-ids?page=0&size=8",
+  //           "https://deployforstudy-1.onrender.com/api/products/by-ids?page=0&size=8",
   //           idsToFetch
   //         );
   //         setViewedProducts(response.data.content || []);

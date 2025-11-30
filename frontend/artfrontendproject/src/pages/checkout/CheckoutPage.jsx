@@ -10,7 +10,7 @@ import axios from 'axios';
 import { useCart } from '../../hooks/useCart';
 
 // Đặt URL backend của bạn ở đây
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 // Lấy API key từ file .env
 const TOMTOM_API_KEY = process.env.REACT_APP_TOMTOM_API_KEY;
 const getAuthToken = () => localStorage.getItem('user');

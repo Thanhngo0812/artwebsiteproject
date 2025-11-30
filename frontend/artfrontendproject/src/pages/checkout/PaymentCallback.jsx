@@ -14,7 +14,7 @@ const PaymentCallback = () => {
   const [message, setMessage] = useState('Đang xử lý kết quả thanh toán...');
   const [countdown, setCountdown] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
-  const API_BASE_URL = 'http://localhost:8888/api';
+  const API_BASE_URL = 'https://deployforstudy-1.onrender.com/api';
 
   // 2. Inject CSS cho Toastify thủ công thông qua CDN
   useEffect(() => {

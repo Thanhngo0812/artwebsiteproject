@@ -3,7 +3,7 @@ import axios from "axios";
 import "./User.scss";
 import { FaChevronUp, FaChevronDown, FaEdit, FaTrash, FaPlus, FaLock, FaUnlock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 
 export default function User() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -185,7 +185,7 @@ export default function User() {
     setIsModalOpen(false);
     try {
       const token = localStorage.getItem("user");
-      await axios.delete(`http://localhost:8888/api/admin/users/${userId}`, {
+      await axios.delete(`https://deployforstudy-1.onrender.com/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       showToast("Xóa người dùng thành công!", "success");
@@ -215,7 +215,7 @@ export default function User() {
     try {
       const token = localStorage.getItem("user");
       await axios.patch(
-        `http://localhost:8888/api/admin/users/${userId}/toggle-status`,
+        `https://deployforstudy-1.onrender.com/api/admin/users/${userId}/toggle-status`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

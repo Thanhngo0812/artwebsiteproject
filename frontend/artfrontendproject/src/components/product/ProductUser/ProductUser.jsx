@@ -41,7 +41,7 @@ export default function ProductUser({
       });
 
       axios
-        .get("http://localhost:8888/api/v1/filters/products")
+        .get("https://deployforstudy-1.onrender.com/api/v1/filters/products")
         .then((response) => setListFilters(response.data))
         .catch((error) => console.log("Lỗi khi reset filters:", error));
 
@@ -135,7 +135,7 @@ export default function ProductUser({
   const fetchDynamicFilters = async (categories) => {
     try {
       const response = await axios.post(
-        "http://localhost:8888/api/v1/filters/products-dynamic",
+        "https://deployforstudy-1.onrender.com/api/v1/filters/products-dynamic",
         { categories: categories }
       );
       setListFilters(response.data);
@@ -148,7 +148,7 @@ export default function ProductUser({
     const fetchListFilters = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8888/api/v1/filters/products"
+          "https://deployforstudy-1.onrender.com/api/v1/filters/products"
         );
         setListFilters(response.data);
       } catch (error) {
@@ -369,7 +369,7 @@ export default function ProductUser({
 
           if (hasActiveFilters) {
             const response = await axios.post(
-              `http://localhost:8888/api/products/${apiEndpoint}/filter?page=${currentPage - 1}&size=${pageSize}&sort=${sort}`,
+              `https://deployforstudy-1.onrender.com/api/products/${apiEndpoint}/filter?page=${currentPage - 1}&size=${pageSize}&sort=${sort}`,
               filters
             );
             
@@ -379,7 +379,7 @@ export default function ProductUser({
           }
 
           const response = await axios.get(
-            `http://localhost:8888/api/products/${apiEndpoint}`,
+            `https://deployforstudy-1.onrender.com/api/products/${apiEndpoint}`,
             {
               params: {
                 page: currentPage - 1,
@@ -396,7 +396,7 @@ export default function ProductUser({
 
         // API search bình thường
         const response = await axios.post(
-          `http://localhost:8888/api/products/search?page=${
+          `https://deployforstudy-1.onrender.com/api/products/search?page=${
             currentPage - 1
           }&size=${pageSize}&sort=${sort}`,
           filters

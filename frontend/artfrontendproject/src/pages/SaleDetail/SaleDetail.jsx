@@ -12,7 +12,7 @@ export default function SaleDetail() {
     useEffect(() => {
         const fetchPromotion = async () => {
             try {
-                const res = await axios.get(`http://localhost:8888/api/v1/promotions/${id}`);
+                const res = await axios.get(`https://deployforstudy-1.onrender.com/api/v1/promotions/${id}`);
                 setPromotion(res.data);
             } catch (error) {
                 console.error("Error fetching promotion:", error);

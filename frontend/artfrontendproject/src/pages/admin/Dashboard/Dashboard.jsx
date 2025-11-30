@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fa';
 
 // --- CONSTANTS ---
-const API_BASE_URL = "http://localhost:8888";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com";
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 // --- HELPER: StyleInjector ---

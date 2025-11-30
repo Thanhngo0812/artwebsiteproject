@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../../../components/common/LoadingSpinner/LoadingSpinner';
 import { jwtDecode } from 'jwt-decode';
 
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 
 // --- CÁC COMPONENT TỰ CHỨA ---
 const StyleInjector = ({ styles }) => {

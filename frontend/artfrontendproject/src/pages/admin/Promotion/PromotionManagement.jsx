@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import ReactPaginate from 'react-paginate'; 
 
-const API_BASE_URL = "http://localhost:8888";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com";
 
 // --- HELPER ---
 const StyleInjector = ({ styles }) => {

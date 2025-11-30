@@ -1269,3 +1269,182 @@ SELECT p.id, p.name, p.code, p.type, p.value, COUNT(pp.product_id) as total_prod
 FROM promotions p
 JOIN promotion_products pp ON p.id = pp.promotion_id
 GROUP BY p.id;
+
+SET SQL_SAFE_UPDATES = 0;
+
+-- ===================================
+-- DỮ LIỆU NHÀ CUNG CẤP (6 nhà cung cấp)
+-- ===================================
+
+INSERT INTO suppliers (name, contact_person, email, phone_number, address)
+VALUES ('Công ty TNHH Nghệ Thuật Việt', 'Nguyễn Văn An', 'nguyenvanan@nghethuatviet.com', '0901234567', '123 Đường Lê Lợi, Quận 1, TP.HCM');
+INSERT INTO suppliers (name, contact_person, email, phone_number, address)
+VALUES ('Công ty Cổ Phần Tranh Đẹp', 'Trần Thị Bình', 'tranbinhmoi@tranhdep.vn', '0912345678', '456 Nguyễn Huệ, Quận 3, TP.HCM');
+INSERT INTO suppliers (name, contact_person, email, phone_number, address)
+VALUES ('Xưởng Khung Tranh Hoàng Gia', 'Lê Minh Châu', 'leminhchau@khungtranhhoanggia.com', '0923456789', '789 Cách Mạng Tháng 8, Quận 10, TP.HCM');
+INSERT INTO suppliers (name, contact_person, email, phone_number, address)
+VALUES ('Nhà Cung Cấp Vật Liệu Mỹ Thuật An Phát', 'Phạm Đức Dũng', 'phamdung@anphat.com.vn', '0934567890', '321 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM');
+INSERT INTO suppliers (name, contact_person, email, phone_number, address)
+VALUES ('Công ty CP Sơn Dầu Đông Á', 'Huỳnh Thị Em', 'huynhem@sondaudenga.vn', '0945678901', '654 Pasteur, Quận 1, TP.HCM');
+INSERT INTO suppliers (name, contact_person, email, phone_number, address)
+VALUES ('Công ty TNHH Canvas & More', 'Võ Văn Phúc', 'vophuc@canvasmore.com', '0956789012', '987 Hai Bà Trưng, Quận 3, TP.HCM');
+
+-- ===================================
+-- DỮ LIỆU PHIẾU NHẬP (10 phiếu)
+-- ===================================
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (1, 'PN20251109001', 'Nhập hàng định kỳ tháng 11', 1, 0.00, '2025-11-09 00:00:00');
+SET @receipt1_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (2, 'PN20251121002', 'Nhập canvas và khung theo đơn đặt hàng', 1, 0.00, '2025-11-21 00:00:00');
+SET @receipt2_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (5, 'PN20251125003', NULL, 1, 0.00, '2025-11-25 00:00:00');
+SET @receipt3_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (5, 'PN20251129004', 'Nhập hàng chuẩn bị cho mùa lễ', 1, 0.00, '2025-11-29 00:00:00');
+SET @receipt4_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (1, 'PN20251130005', 'Nhập sản phẩm mới từ nhà cung cấp', 1, 0.00, '2025-11-30 00:00:00');
+SET @receipt5_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (6, 'PN20251105006', 'Nhập sản phẩm mới từ nhà cung cấp', 1, 0.00, '2025-11-05 00:00:00');
+SET @receipt6_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (2, 'PN20251115007', 'Nhập hàng chuẩn bị cho mùa lễ', 1, 0.00, '2025-11-15 00:00:00');
+SET @receipt7_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (3, 'PN20251118008', NULL, 1, 0.00, '2025-11-18 00:00:00');
+SET @receipt8_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (3, 'PN20251113009', NULL, 1, 0.00, '2025-11-13 00:00:00');
+SET @receipt9_id = LAST_INSERT_ID();
+
+INSERT INTO goods_receipts (supplier_id, receipt_code, note, creator_id, total_amount, created_at)
+VALUES (1, 'PN20251104010', 'Nhập sản phẩm mới từ nhà cung cấp', 1, 0.00, '2025-11-04 00:00:00');
+SET @receipt10_id = LAST_INSERT_ID();
+
+-- ===================================
+-- CHI TIẾT PHIẾU NHẬP
+-- ===================================
+
+-- Chi tiết phiếu nhập PN20251109001
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt1_id, 3, 22, 500000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt1_id, 4, 14, 2000000, 4469515);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt1_id, 13, 13, 2000000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt1_id, 44, 10, 300000, 724972);
+
+-- Chi tiết phiếu nhập PN20251121002
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt2_id, 41, 13, 1200000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt2_id, 42, 28, 1500000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt2_id, 36, 9, 3000000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt2_id, 41, 18, 3000000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt2_id, 48, 9, 2000000, NULL);
+
+-- Chi tiết phiếu nhập PN20251125003
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt3_id, 37, 7, 300000, 515547);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt3_id, 15, 13, 3000000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt3_id, 38, 8, 800000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt3_id, 50, 12, 1500000, NULL);
+
+-- Chi tiết phiếu nhập PN20251129004
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt4_id, 30, 25, 1500000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt4_id, 49, 5, 800000, 1259716);
+
+-- Chi tiết phiếu nhập PN20251130005
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt5_id, 34, 20, 800000, 1469898);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt5_id, 20, 26, 300000, 737375);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt5_id, 11, 14, 800000, 1868923);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt5_id, 36, 6, 300000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt5_id, 13, 18, 1200000, 2923568);
+
+-- Chi tiết phiếu nhập PN20251105006
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt6_id, 31, 15, 2000000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt6_id, 36, 29, 800000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt6_id, 26, 10, 1200000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt6_id, 35, 18, 800000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt6_id, 46, 18, 3000000, 5814431);
+
+-- Chi tiết phiếu nhập PN20251115007
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt7_id, 1, 5, 300000, 618726);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt7_id, 24, 17, 2000000, 3127987);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt7_id, 26, 28, 800000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt7_id, 50, 12, 1200000, 2728300);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt7_id, 16, 13, 300000, 547270);
+
+-- Chi tiết phiếu nhập PN20251118008
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt8_id, 5, 28, 2000000, 4640800);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt8_id, 21, 28, 800000, 1844287);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt8_id, 25, 18, 2000000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt8_id, 7, 13, 1500000, NULL);
+
+-- Chi tiết phiếu nhập PN20251113009
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt9_id, 22, 18, 300000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt9_id, 9, 18, 1200000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt9_id, 13, 12, 1200000, NULL);
+
+-- Chi tiết phiếu nhập PN20251104010
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt10_id, 16, 16, 300000, NULL);
+INSERT INTO goods_receipt_items (receipt_id, variant_id, quantity, import_price, new_selling_price)
+VALUES (@receipt10_id, 25, 16, 1200000, 2832317);
+
+-- ===================================
+-- CẬP NHẬT TỔNG GIÁ TRỊ PHIẾU NHẬP
+-- ===================================
+
+UPDATE goods_receipts gr
+SET total_amount = (
+    SELECT SUM(gri.quantity * gri.import_price)
+    FROM goods_receipt_items gri
+    WHERE gri.receipt_id = gr.id
+)
+WHERE gr.id > 0;
+
+SET SQL_SAFE_UPDATES = 1;

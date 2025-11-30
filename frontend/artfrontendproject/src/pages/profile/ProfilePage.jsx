@@ -63,7 +63,7 @@ export default function ProfilePage() {
     setLoadingAddresses(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8888/api/addresses/user/${user.id}`, {
+      const response = await fetch(`https://deployforstudy-1.onrender.com/api/addresses/user/${user.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -83,7 +83,7 @@ export default function ProfilePage() {
     setLoadingOrders(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8888/api/orders/user/${user.id}`, {
+      const response = await fetch(`https://deployforstudy-1.onrender.com/api/orders/user/${user.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -128,7 +128,7 @@ export default function ProfilePage() {
       const token = localStorage.getItem('token');
       const fullName = `${profileForm.firstName} ${profileForm.lastName}`.trim();
       
-      const response = await fetch(`http://localhost:8888/api/users/${user.id}`, {
+      const response = await fetch(`https://deployforstudy-1.onrender.com/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ export default function ProfilePage() {
         addressForm.postalCode
       ].filter(Boolean).join(', ');
 
-      const response = await fetch(`http://localhost:8888/api/addresses`, {
+      const response = await fetch(`https://deployforstudy-1.onrender.com/api/addresses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

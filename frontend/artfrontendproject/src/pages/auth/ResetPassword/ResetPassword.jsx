@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import LoadingSpinner from '../../../components/common/LoadingSpinner/LoadingSpinner';
 
 // Đặt URL backend của bạn ở đây
-const API_BASE_URL = 'http://localhost:8888';
+const API_BASE_URL = 'https://deployforstudy-1.onrender.com';
 
 // --- CÁC COMPONENT TỰ CHỨA ĐỂ KHẮC PHỤC LỖI IMPORT ---
 // (Copy từ các file khác của bạn để đảm bảo nhất quán)

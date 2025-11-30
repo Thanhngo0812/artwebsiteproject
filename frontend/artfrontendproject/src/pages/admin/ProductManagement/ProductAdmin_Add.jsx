@@ -71,7 +71,7 @@ const ReactPaginate = () => null;
 
 
 // Giả sử API_BASE_URL của bạn
-const API_BASE_URL = "http://localhost:8888";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com";
 
 // Hàm helper lấy token (Giả sử bạn lưu token trong localStorage)
 const getAuthToken = () => {

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const API_BASE_URL = "http://localhost:8888";
+const API_BASE_URL = "https://deployforstudy-1.onrender.com";
 
 // --- HELPER: StyleInjector & Icons ---
 const StyleInjector = ({ styles }) => {
