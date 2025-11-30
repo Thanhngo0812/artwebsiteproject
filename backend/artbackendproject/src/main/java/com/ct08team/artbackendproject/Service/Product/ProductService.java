@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
     @Autowired
-    private   CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
     @Autowired
     private MaterialRepository materialRepository;
     @Autowired
@@ -44,20 +44,20 @@ public class ProductService {
     private FilterService filterService; // Inject FilterService
     @Autowired
     private StorageService storageService; // (File này giờ đã dùng Cloudinary)
+
     /**
      * API mới: Lấy chi tiết sản phẩm theo ID
      * Dùng cho trang ProductDetail
-    */
+     */
 
     @Transactional(readOnly = true)
     public List<ProductListDTO> searchProducts(String keyword, int limit) {
         String searchKeyword = "%" + keyword.toLowerCase() + "%";
-        
+
         List<Product> products = productRepository.searchByKeyword(
-            searchKeyword, 
-            org.springframework.data.domain.PageRequest.of(0, limit)
-        );
-        
+                searchKeyword,
+                org.springframework.data.domain.PageRequest.of(0, limit));
+
         return products.stream()
                 .map(this::convertToProductListDTO)
                 .collect(Collectors.toList());
@@ -68,13 +68,13 @@ public class ProductService {
         try {
 
             Optional<Product> productOpt = productRepository.findByIdWithDetails(id);
-            
+
             if (!productOpt.isPresent()) {
                 return null;
             }
-            
+
             Product p = productOpt.get();
-            
+
             productRepository.findByIdWithVariants(id).ifPresent(productWithVariants -> {
                 p.setVariants(productWithVariants.getVariants());
             });
@@ -82,7 +82,7 @@ public class ProductService {
             productRepository.findByIdWithColors(id).ifPresent(productWithColors -> {
                 p.setColors(productWithColors.getColors());
             });
-            
+
             // Build DTO
             ProductDetailDTO dto = new ProductDetailDTO();
             dto.id = p.getId();
@@ -98,25 +98,32 @@ public class ProductService {
             Promotion promotion = promotionCalculationService.calculateBestPromotion(p);
 
             dto.promotionalPrice = promoPriceOpt.orElse(null);
+            if (promotion != null) {
+                dto.promotionType = promotion.getType().name();
+                dto.promotionValue = promotion.getValue();
+            }
 
             // Categories
-            dto.categories = p.getCategories() == null ? List.of() :
-                p.getCategories().stream()
-                    .map(c -> new ProductDetailDTO.CategoryDTO(c.getId(), c.getName()))
-                    .collect(Collectors.toList());
+            dto.categories = p.getCategories() == null ? List.of()
+                    : p.getCategories().stream()
+                            .map(c -> new ProductDetailDTO.CategoryDTO(c.getId(), c.getName()))
+                            .collect(Collectors.toList());
 
             // Variants
 
-            dto.variants = p.getVariants() == null ? List.of() :
-                p.getVariants().stream()
-                    .filter(v -> v.getVariantStatus() == 1)
-                    .map(v -> new ProductDetailDTO.VariantDTO(
-                        v.getId(),
-                        v.getDimensions(),
-                        v.getPrice() == null ? 0.0 : v.getPrice().doubleValue(),
-                        v.getStockQuantity(),
-                            (promotion!=null)?(promotionCalculationService.calculateDiscountedPrice(v.getPrice(),promotion)):null ))
-                    .collect(Collectors.toList());
+            dto.variants = p.getVariants() == null ? List.of()
+                    : p.getVariants().stream()
+                            .filter(v -> v.getVariantStatus() == 1)
+                            .map(v -> new ProductDetailDTO.VariantDTO(
+                                    v.getId(),
+                                    v.getDimensions(),
+                                    v.getPrice() == null ? 0.0 : v.getPrice().doubleValue(),
+                                    v.getStockQuantity(),
+                                    (promotion != null)
+                                            ? (promotionCalculationService.calculateDiscountedPrice(v.getPrice(),
+                                                    promotion))
+                                            : null))
+                            .collect(Collectors.toList());
 
             List<ProductDetailDTO.ImageDTO> imgs = new ArrayList<>();
             if (p.getVariants() != null) {
@@ -129,7 +136,7 @@ public class ProductService {
                     }
                 }
             }
-            
+
             // Fallback: Dùng thumbnail nếu không có ảnh
             if (imgs.isEmpty() && p.getThumbnail() != null) {
                 imgs.add(new ProductDetailDTO.ImageDTO(p.getThumbnail()));
@@ -141,26 +148,25 @@ public class ProductService {
                 // (Giả sử Entity Material của bạn có hàm .getId() và .getMaterialname())
                 dto.material = new ProductDetailDTO.MaterialDTO(
                         p.getMaterial().getId(),
-                        p.getMaterial().getMaterialName()
-                );
+                        p.getMaterial().getMaterialName());
             }
 
             System.out.println("   - Material: " + (dto.material != null ? dto.material.name : "null"));
             // ✅ Colors
-            dto.colors = p.getColors() == null ? List.of() :
-                p.getColors().stream()
-                    .map(productColor -> new ProductDetailDTO.ColorDTO(productColor.getHexCode()))
-                    .collect(Collectors.toList());
+            dto.colors = p.getColors() == null ? List.of()
+                    : p.getColors().stream()
+                            .map(productColor -> new ProductDetailDTO.ColorDTO(productColor.getHexCode()))
+                            .collect(Collectors.toList());
             System.out.println("   - Colors: " + dto.colors.size());
-            dto.topics = p.getTopics() == null ? List.of() :
-                    p.getTopics().stream()
+            dto.topics = p.getTopics() == null ? List.of()
+                    : p.getTopics().stream()
                             // (Giả sử Entity ProductTopic có hàm .getTopicName())
                             .map(productTopic -> new ProductDetailDTO.TopicDTO(productTopic.getTopicName()))
                             .collect(Collectors.toList());
             System.out.println("   - Topics: " + dto.topics.size());
             System.out.println("✅ [ProductService] DTO created successfully");
             return dto;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Could not fetch product: " + e.getMessage(), e);
@@ -178,6 +184,7 @@ public class ProductService {
 
         return page.map(this::convertToProductListDTO);
     }
+
     /**
      * API 3: Lấy danh sách sản phẩm (ĐÃ CẬP NHẬT)
      */
@@ -250,7 +257,8 @@ public class ProductService {
     public Page<ProductListDTO> getNewestProducts(Pageable pageable) {
         // CHỈNH SỬA: Chỉ tìm status = 1
         // Repository tự động sắp xếp nếu trong Pageable có sort (ví dụ: id, desc)
-        // Nếu pageable chưa có sort, bạn nên thêm default sort ở Controller hoặc tại đây
+        // Nếu pageable chưa có sort, bạn nên thêm default sort ở Controller hoặc tại
+        // đây
         Page<Product> productPage = productRepository.findByProductStatus(1, pageable);
         return productPage.map(this::convertToProductListDTO);
     }
@@ -301,9 +309,8 @@ public class ProductService {
 
         // 1. Tạo Specification từ file ProductAdminSpecification
         Specification<Product> spec = ProductAdminSpecification.build(
-                id, productName, categoryId, materialId, status, minPrice, maxPrice
-        );
-// Yêu cầu kết quả phải có status là 0 HOẶC 1
+                id, productName, categoryId, materialId, status, minPrice, maxPrice);
+        // Yêu cầu kết quả phải có status là 0 HOẶC 1
         Specification<Product> mandatoryStatusSpec = (root, query, criteriaBuilder) -> {
             Predicate status0 = criteriaBuilder.equal(root.get("productStatus"), 0);
             Predicate status1 = criteriaBuilder.equal(root.get("productStatus"), 1);
@@ -311,7 +318,8 @@ public class ProductService {
         };
 
         // 3. Gộp 2 Specification lại
-        // Lấy các filter của admin (filterSpec) VÀ điều kiện bắt buộc (mandatoryStatusSpec)
+        // Lấy các filter của admin (filterSpec) VÀ điều kiện bắt buộc
+        // (mandatoryStatusSpec)
         Specification<Product> finalSpec = spec.and(mandatoryStatusSpec);
 
         // 4. Gọi repository với Specification cuối cùng đã gộp
@@ -343,6 +351,7 @@ public class ProductService {
         product.setProductStatus(newStatus);
         productRepository.save(product);
     }
+
     @Transactional(rollbackFor = Exception.class)
     public void updateProduct(Long id, ProductUpdateDTO dto) {
         Product product = productRepository.findById(id)
@@ -434,7 +443,8 @@ public class ProductService {
                             .findFirst()
                             .ifPresent(v -> {
                                 v.setPrice(vDto.getPrice()); // Chỉ sửa giá bán
-                                // v.setDimensions(vDto.getDimensions()); // (Có thể cho sửa kích thước nếu muốn)
+                                // v.setDimensions(vDto.getDimensions()); // (Có thể cho sửa kích thước nếu
+                                // muốn)
 
                                 // Cập nhật ảnh: Xóa hết cũ, thêm mới từ URL
                                 v.getImages().clear();
@@ -469,6 +479,7 @@ public class ProductService {
 
         productRepository.save(product);
     }
+
     /**
      * API: DELETE /api/v1/admin/products/{id}
      * Xóa sản phẩm
@@ -481,8 +492,7 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
-
-    //add product
+    // add product
     @Transactional(rollbackFor = Exception.class)
     public ProductAdminDTO createProduct(
             ProductCreateDTO dto,
@@ -575,9 +585,13 @@ public class ProductService {
         // (Lưu ý: Trigger CSDL sẽ tự cập nhật min_price)
         return new ProductAdminDTO(savedProduct);
     }
-     /* === HÀM HELPER ĐÃ ĐƯỢC CẬP NHẬT ===
+
+    /*
+     * === HÀM HELPER ĐÃ ĐƯỢC CẬP NHẬT ===
      * Hàm helper để chuyển đổi Product Entity sang ProductListDTO.
+     * 
      * @param product Entity sản phẩm lấy từ DB
+     * 
      * @return DTO rút gọn để hiển thị danh sách
      */
     private ProductListDTO convertToProductListDTO(Product product) {
@@ -587,7 +601,7 @@ public class ProductService {
         // 2. Gọi service mới để tính giá khuyến mãi
         Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
         List<String> hexCodes = product.getColors() // Lấy List<ProductColor>
-                .stream()           // Bắt đầu stream
+                .stream() // Bắt đầu stream
                 .map(ProductColor::getHexCode) // Trích xuất chuỗi hexCode
                 .collect(Collectors.toList()); // Thu thập thành List<String>
         // 3. Trả về DTO mới
@@ -595,16 +609,15 @@ public class ProductService {
                 product.getId(),
                 product.getProductName(),
                 product.getThumbnail(),
-                originalPrice,              // Luôn là giá gốc
-                promoPriceOpt.orElse(null) , // Giá khuyến mãi (hoặc null nếu không có)
-                hexCodes
-        );
+                originalPrice, // Luôn là giá gốc
+                promoPriceOpt.orElse(null), // Giá khuyến mãi (hoặc null nếu không có)
+                hexCodes);
     }
 
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getFeaturedProductsWithSort(Pageable pageable, String sortParam) {
         List<Product> activeProducts = productRepository.findByProductStatus(1);
-        
+
         // Tính điểm featured
         List<Product> sortedProducts = activeProducts.stream()
                 .sorted((p1, p2) -> {
@@ -614,12 +627,12 @@ public class ProductService {
                 })
                 .limit(20)
                 .collect(Collectors.toList());
-        
+
         // Áp dụng sort nếu có
         if (sortParam != null && !sortParam.isEmpty()) {
             sortedProducts = applySortToList(sortedProducts, sortParam);
         }
-        
+
         return paginateProducts(sortedProducts, pageable);
     }
 
@@ -628,23 +641,23 @@ public class ProductService {
         Pageable top20 = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<Product> newestPage = productRepository.findByProductStatus(1, top20);
         List<Product> newestProducts = newestPage.getContent();
-        
+
         // Áp dụng sort nếu có
         if (sortParam != null && !sortParam.isEmpty()) {
             newestProducts = applySortToList(newestProducts, sortParam);
         }
-        
+
         return paginateProducts(newestProducts, pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getFeaturedProductsWithFilter(
-            ProductFilterRequestDTO filter, 
+            ProductFilterRequestDTO filter,
             Pageable pageable,
             String sortParam) {
-        
+
         List<Product> activeProducts = productRepository.findByProductStatus(1);
-        
+
         List<Product> sortedProducts = activeProducts.stream()
                 .sorted((p1, p2) -> {
                     double score1 = p1.getViewCount() * 0.3 + p1.getSalesCount() * 0.7;
@@ -653,29 +666,28 @@ public class ProductService {
                 })
                 .limit(20)
                 .collect(Collectors.toList());
-        
+
         List<Product> filteredProducts = applyFilters(sortedProducts, filter);
 
         if (sortParam != null && !sortParam.isEmpty()) {
             filteredProducts = applySortToList(filteredProducts, sortParam);
         }
-        
+
         return paginateProducts(filteredProducts, pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getNewestProductsWithFilter(
-            ProductFilterRequestDTO filter, 
+            ProductFilterRequestDTO filter,
             Pageable pageable,
             String sortParam) {
-        
 
         Pageable top20 = PageRequest.of(0, 20, Sort.by("id").descending());
         Page<Product> newestPage = productRepository.findByProductStatus(1, top20);
         List<Product> newestProducts = newestPage.getContent();
 
         List<Product> filteredProducts = applyFilters(newestProducts, filter);
-        
+
         if (sortParam != null && !sortParam.isEmpty()) {
             filteredProducts = applySortToList(filteredProducts, sortParam);
         }
@@ -683,83 +695,85 @@ public class ProductService {
         return paginateProducts(filteredProducts, pageable);
     }
 
-
     private List<Product> applyFilters(List<Product> products, ProductFilterRequestDTO filter) {
         return products.stream()
-            .filter(product -> {
-                // Filter by categories
-                if (filter.getCategories() != null && !filter.getCategories().isEmpty()) {
-                    List<Long> expandedCategoryIds = filterService.expandCategoryIds(filter.getCategories());
-                    boolean hasCategory = product.getCategories().stream()
-                        .anyMatch(cat -> expandedCategoryIds.contains(cat.getId()));
-                    if (!hasCategory) return false;
-                }
-                
-                // Filter by materials
-                if (filter.getMaterials() != null && !filter.getMaterials().isEmpty()) {
-                    if (!filter.getMaterials().contains(product.getMaterial().getId())) {
-                        return false;
+                .filter(product -> {
+                    // Filter by categories
+                    if (filter.getCategories() != null && !filter.getCategories().isEmpty()) {
+                        List<Long> expandedCategoryIds = filterService.expandCategoryIds(filter.getCategories());
+                        boolean hasCategory = product.getCategories().stream()
+                                .anyMatch(cat -> expandedCategoryIds.contains(cat.getId()));
+                        if (!hasCategory)
+                            return false;
                     }
-                }
-                
-                // Filter by price range
-                if (filter.getPriceRange() != null) {
-                    BigDecimal minPrice = filter.getPriceRange().getMinPrice();
-                    BigDecimal maxPrice = filter.getPriceRange().getMaxPrice();
-                    if (product.getMinPrice().compareTo(minPrice) < 0 || 
-                        product.getMinPrice().compareTo(maxPrice) > 0) {
-                        return false;
-                    }
-                }
-                
-                // Filter by colors
-                if (filter.getColors() != null && !filter.getColors().isEmpty()) {
-                    boolean hasColor = product.getColors().stream()
-                        .anyMatch(color -> filter.getColors().contains(color.getHexCode()));
-                    if (!hasColor) return false;
-                }
-                
-                // Filter by dimensions
-                if (filter.getDimensions() != null && !filter.getDimensions().isEmpty()) {
-                    boolean hasDimension = product.getVariants().stream()
-                        .anyMatch(variant -> filter.getDimensions().contains(variant.getDimensions()));
-                    if (!hasDimension) return false;
-                }
-                
-                // Filter by topics
-                if (filter.getTopics() != null && !filter.getTopics().isEmpty()) {
-                    boolean hasTopic = product.getTopics().stream()
-                        .anyMatch(topic -> filter.getTopics().contains(topic.getTopicName()));
-                    if (!hasTopic) return false;
-                }
-                
-                // Filter by product name
-                if (filter.getProductName() != null && !filter.getProductName().isEmpty()) {
-                    if (!product.getProductName().toLowerCase()
-                            .contains(filter.getProductName().toLowerCase())) {
-                        return false;
-                    }
-                }
-                
-                return true;
-            })
-            .collect(Collectors.toList());
-    }
 
+                    // Filter by materials
+                    if (filter.getMaterials() != null && !filter.getMaterials().isEmpty()) {
+                        if (!filter.getMaterials().contains(product.getMaterial().getId())) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by price range
+                    if (filter.getPriceRange() != null) {
+                        BigDecimal minPrice = filter.getPriceRange().getMinPrice();
+                        BigDecimal maxPrice = filter.getPriceRange().getMaxPrice();
+                        if (product.getMinPrice().compareTo(minPrice) < 0 ||
+                                product.getMinPrice().compareTo(maxPrice) > 0) {
+                            return false;
+                        }
+                    }
+
+                    // Filter by colors
+                    if (filter.getColors() != null && !filter.getColors().isEmpty()) {
+                        boolean hasColor = product.getColors().stream()
+                                .anyMatch(color -> filter.getColors().contains(color.getHexCode()));
+                        if (!hasColor)
+                            return false;
+                    }
+
+                    // Filter by dimensions
+                    if (filter.getDimensions() != null && !filter.getDimensions().isEmpty()) {
+                        boolean hasDimension = product.getVariants().stream()
+                                .anyMatch(variant -> filter.getDimensions().contains(variant.getDimensions()));
+                        if (!hasDimension)
+                            return false;
+                    }
+
+                    // Filter by topics
+                    if (filter.getTopics() != null && !filter.getTopics().isEmpty()) {
+                        boolean hasTopic = product.getTopics().stream()
+                                .anyMatch(topic -> filter.getTopics().contains(topic.getTopicName()));
+                        if (!hasTopic)
+                            return false;
+                    }
+
+                    // Filter by product name
+                    if (filter.getProductName() != null && !filter.getProductName().isEmpty()) {
+                        if (!product.getProductName().toLowerCase()
+                                .contains(filter.getProductName().toLowerCase())) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
 
     private Page<ProductListDTO> paginateProducts(List<Product> products, Pageable pageable) {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), products.size());
-        
+
         if (start > products.size()) {
             return Page.empty(pageable);
         }
-        
+
         List<Product> pageContent = products.subList(start, end);
         List<ProductListDTO> dtoList = pageContent.stream()
-            .map(this::convertToProductListDTO)
-            .collect(Collectors.toList());
-        
+                .map(this::convertToProductListDTO)
+                .collect(Collectors.toList());
+
         return new PageImpl<>(dtoList, pageable, products.size());
     }
 
@@ -767,55 +781,56 @@ public class ProductService {
         if (sortParam == null || sortParam.isEmpty()) {
             return products;
         }
-        
+
         String[] sortParts = sortParam.split(",");
         String field = sortParts[0];
         boolean isAscending = sortParts.length > 1 && "asc".equalsIgnoreCase(sortParts[1]);
-        
+
         return products.stream()
-            .sorted((p1, p2) -> {
-                int result = 0;
-                switch (field) {
-                    case "productName":
-                        result = p1.getProductName().compareTo(p2.getProductName());
-                        break;
-                    case "minPrice":
-                        result = p1.getMinPrice().compareTo(p2.getMinPrice());
-                        break;
-                    case "salesCount":
-                        result = Long.compare(p1.getSalesCount(), p2.getSalesCount());
-                        break;
-                    case "createdAt":
-                    case "id":
-                        result = p1.getId().compareTo(p2.getId());
-                        break;
-                    default:
-                        result = 0;
-                }
-                return isAscending ? result : -result;
-            })
-            .collect(Collectors.toList());
+                .sorted((p1, p2) -> {
+                    int result = 0;
+                    switch (field) {
+                        case "productName":
+                            result = p1.getProductName().compareTo(p2.getProductName());
+                            break;
+                        case "minPrice":
+                            result = p1.getMinPrice().compareTo(p2.getMinPrice());
+                            break;
+                        case "salesCount":
+                            result = Long.compare(p1.getSalesCount(), p2.getSalesCount());
+                            break;
+                        case "createdAt":
+                        case "id":
+                            result = p1.getId().compareTo(p2.getId());
+                            break;
+                        default:
+                            result = 0;
+                    }
+                    return isAscending ? result : -result;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getOnSaleProductsWithSort(Pageable pageable, String sortParam) {
         List<Product> activeProducts = productRepository.findByProductStatus(1);
-        
+
         // Lọc các sản phẩm có khuyến mãi
         List<Product> onSaleProducts = activeProducts.stream()
                 .filter(product -> {
-                    Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
-                    return promoPriceOpt.isPresent() && 
-                           promoPriceOpt.get().compareTo(product.getMinPrice()) < 0;
+                    Optional<BigDecimal> promoPriceOpt = promotionCalculationService
+                            .calculateBestPromotionPrice(product);
+                    return promoPriceOpt.isPresent() &&
+                            promoPriceOpt.get().compareTo(product.getMinPrice()) < 0;
                 })
                 .limit(20)
                 .collect(Collectors.toList());
-        
+
         // Áp dụng sort nếu có
         if (sortParam != null && !sortParam.isEmpty()) {
             onSaleProducts = applySortToList(onSaleProducts, sortParam);
         }
-        
+
         return paginateProducts(onSaleProducts, pageable);
     }
 
@@ -824,22 +839,23 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Page<ProductListDTO> getOnSaleProductsWithFilter(
-            ProductFilterRequestDTO filter, 
+            ProductFilterRequestDTO filter,
             Pageable pageable,
             String sortParam) {
-        
+
         List<Product> activeProducts = productRepository.findByProductStatus(1);
-        
+
         // Lọc sản phẩm có khuyến mãi
         List<Product> onSaleProducts = activeProducts.stream()
                 .filter(product -> {
-                    Optional<BigDecimal> promoPriceOpt = promotionCalculationService.calculateBestPromotionPrice(product);
-                    return promoPriceOpt.isPresent() && 
-                           promoPriceOpt.get().compareTo(product.getMinPrice()) < 0;
+                    Optional<BigDecimal> promoPriceOpt = promotionCalculationService
+                            .calculateBestPromotionPrice(product);
+                    return promoPriceOpt.isPresent() &&
+                            promoPriceOpt.get().compareTo(product.getMinPrice()) < 0;
                 })
                 .limit(20)
                 .collect(Collectors.toList());
-        
+
         // Áp dụng filter
         List<Product> filteredProducts = applyFilters(onSaleProducts, filter);
 
@@ -847,13 +863,14 @@ public class ProductService {
         if (sortParam != null && !sortParam.isEmpty()) {
             filteredProducts = applySortToList(filteredProducts, sortParam);
         }
-        
+
         return paginateProducts(filteredProducts, pageable);
     }
 
     @Transactional(readOnly = true)
     public ProductAdminDetailDTO getProductDetailAdmin(Long id) {
-        // Dùng findById (mặc định của JPA) là đủ, Hibernate sẽ lazy load các relation khi getter được gọi trong DTO
+        // Dùng findById (mặc định của JPA) là đủ, Hibernate sẽ lazy load các relation
+        // khi getter được gọi trong DTO
         // Hoặc dùng query fetch join nếu muốn tối ưu performance
         return productRepository.findById(id)
                 .map(ProductAdminDetailDTO::new) // Map sang DTO Admin

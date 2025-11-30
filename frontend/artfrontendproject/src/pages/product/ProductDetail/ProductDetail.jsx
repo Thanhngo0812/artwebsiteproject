@@ -144,6 +144,20 @@ export default function ProductDetail() {
   }
 
   const calculateVariantPromoPrice = (variantPrice) => {
+    // Nếu có thông tin promotionType và promotionValue từ backend (giống SaleDetail)
+    if (product.promotionType && product.promotionValue) {
+      const originalPrice = variantPrice;
+      let promotionalPrice = originalPrice;
+
+      if (product.promotionType === 'PERCENTAGE') {
+        promotionalPrice = originalPrice * (1 - product.promotionValue / 100);
+      } else if (product.promotionType === 'FIXED_AMOUNT') {
+        promotionalPrice = originalPrice - product.promotionValue;
+      }
+      return promotionalPrice > 0 ? promotionalPrice : 0;
+    }
+
+    // Fallback: Logic cũ (nếu backend chưa trả về type/value)
     if (!product.promotionalPrice || !product.minPrice) return null;
 
     // Tính % giảm giá từ product
